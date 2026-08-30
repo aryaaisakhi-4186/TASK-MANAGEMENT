@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF8C00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FF5722;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B71C1C;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="110" fill="url(#grad1)"/>
+  <rect x="24" y="24" width="464" height="464" rx="90" fill="none" stroke="#FFD700" stroke-width="6" opacity="0.4"/>
+  <g filter="url(#shadow)" fill="#FFFFFF" transform="translate(106, 106) scale(1.25)">
+    <!-- Scale of Justice / CA Emblem Icon -->
+    <path d="M120 40 L120 200 M60 200 L180 200 M120 30 C125 30 130 25 130 20 C130 15 125 10 120 10 C115 10 110 15 110 20 C110 25 115 30 120 30 Z" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+    <path d="M40 70 L200 70" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+    <!-- Left Pan -->
+    <path d="M40 70 L15 130 M40 70 L65 130" stroke="#FFFFFF" stroke-width="6"/>
+    <path d="M10 130 Q40 160 70 130 Z" fill="#FFD700"/>
+    <!-- Right Pan -->
+    <path d="M200 70 L175 130 M200 70 L225 130" stroke="#FFFFFF" stroke-width="6"/>
+    <path d="M170 130 Q200 160 230 130 Z" fill="#FFD700"/>
+  </g>
+  <text x="256" y="440" font-family="'Inter', sans-serif" font-size="42" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">TASK-VAANI</text>
+</svg>
