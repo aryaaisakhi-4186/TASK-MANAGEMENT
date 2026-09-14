@@ -36,7 +36,7 @@ export const isValidGSTIN = (gstin?: string): boolean => {
   return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/.test(gstin.trim().toUpperCase());
 };
 
-// 1. Accurate PDF Text Extractor using Server Endpoint (pdf-parse)
+// 1. Accurate PDF Text Extractor using Server Endpoint (pdf-parse & Gemini OCR)
 export const extractPdfTextFromServer = async (file: File): Promise<string> => {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -82,14 +82,14 @@ export const parseDocumentTextToClient = (rawText: string, fileName?: string): P
     if (panMatch) pan = panMatch[1].toUpperCase();
   }
 
-  // C. Extract TAN (10 characters: 4 letters + 5 digits + 1 letter, distinct from PAN)
+  // C. Extract TAN
   let tan: string | undefined = undefined;
   const tanMatch = text.match(/\bTAN\s*[:\-\n]*\s*([A-Z]{4}[0-9]{5}[A-Z])\b/i);
   if (tanMatch && tanMatch[1].toUpperCase() !== pan) {
     tan = tanMatch[1].toUpperCase();
   }
 
-  // D. Extract Legal Name (Follows '1. Legal Name' or 'Legal Name')
+  // D. Extract Legal Name
   let legalName = '';
   const legalNamePatterns = [
     /(?:1\.?\s*)?Legal\s*Name(?:\s*of\s*Business)?[\s:\-\n]+([^\n]+)/i,
@@ -104,7 +104,7 @@ export const parseDocumentTextToClient = (rawText: string, fileName?: string): P
     }
   }
 
-  // E. Extract Trade Name (Follows '2. Trade Name' or 'Trade Name')
+  // E. Extract Trade Name
   let tradeName = '';
   const tradeNamePatterns = [
     /(?:2\.?\s*)?Trade\s*Name(?:,\s*if\s*any)?[\s:\-\n]+([^\n]+)/i,
@@ -121,7 +121,6 @@ export const parseDocumentTextToClient = (rawText: string, fileName?: string): P
     }
   }
 
-  // Fallbacks for names from filename if strictly no dummy names
   if (!tradeName && legalName) tradeName = legalName;
   if (!legalName && tradeName) legalName = tradeName;
   if (!tradeName && fileName) {
@@ -132,7 +131,7 @@ export const parseDocumentTextToClient = (rawText: string, fileName?: string): P
     }
   }
 
-  // F. Extract Constitution of Business / Entity Category (Statutory PAN & GSTIN rule)
+  // F. Extract Constitution of Business / Entity Category
   const constMatch = text.match(/(?:3\.?\s*)?Constitution\s*of\s*Business[\s:\-\n]+([^\n]+)/i);
   const rawConst = constMatch ? constMatch[1] : '';
   const category: ClientCategory = detectEntityCategoryFromPANAndGSTIN(pan, gstin, tradeName, legalName, rawConst);
@@ -160,7 +159,7 @@ export const parseDocumentTextToClient = (rawText: string, fileName?: string): P
     }
   }
 
-  // H. Extract Contact Person / Authorized Signatory (ONLY REAL DATA, NO DUMMIES)
+  // H. Extract Contact Person / Authorized Signatory
   let contactPerson = '';
   const contactPatterns = [
     /(?:Name\s*of\s*(?:the)?\s*(?:Authorized\s*Signatory|Proprietor|Director|Partner))[\s:\-\n]+([A-Za-z\s.]{3,40})(?=\n|$)/i,
@@ -174,11 +173,11 @@ export const parseDocumentTextToClient = (rawText: string, fileName?: string): P
     }
   }
 
-  // I. Extract Mobile / Phone (ONLY REAL NUMBERS, NO DUMMY +91 98000 00000)
+  // I. Extract Mobile / Phone
   const phoneMatch = text.match(/(?:\+91[\-\s]?)?([6-9]\d{9})/);
   const phone = phoneMatch ? `+91 ${phoneMatch[1]}` : '';
 
-  // J. Extract Email (ONLY REAL EMAILS, NO DUMMY accounts@client.com)
+  // J. Extract Email
   const emailMatch = text.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
   const email = emailMatch ? emailMatch[1].toLowerCase() : '';
 
@@ -200,187 +199,132 @@ export const parseDocumentTextToClient = (rawText: string, fileName?: string): P
   };
 };
 
-// 3. Main Agentic AI Command Processor (STRICT VALIDATION, ZERO DUMMIES)
-export const processAgenticCommand = (
-  userPrompt: string,
+// 3. Autonomous Natural Language Processor with Backend AI & Rich Context
+export const processAgenticCommand = async (
+  prompt: string,
   contextData: {
     clients: Client[];
     tasks: TaskItem[];
     team: UserProfile[];
     extraWork: ExtraWorkItem[];
-    currentRole: string;
-    currentUser: UserProfile | null;
+    currentUser?: UserProfile;
   }
-): AgenticResponse => {
-  const q = userPrompt.trim();
+): Promise<AgenticResponse> => {
+  const q = prompt.trim();
   const lower = q.toLowerCase();
 
-  // A. Command: Setup / Create Client from Prompt Text or Document
+  // ==========================================
+  // A. DIRECT ACTION RECOGNITION (COMMANDS)
+  // ==========================================
+
+  // 1. Action: Create New Client
   if (
-    (lower.includes('client') || lower.includes('profile') || lower.includes('gst')) &&
-    (lower.includes('create') || lower.includes('add') || lower.includes('setup') || lower.includes('banao') || lower.includes('jodo') || lower.includes('read') || lower.includes('import'))
+    (lower.includes('create client') || lower.includes('add client') || lower.includes('naya client') || lower.includes('client banao') || lower.includes('client jodo')) &&
+    !lower.includes('task')
   ) {
-    const parsedClient = parseDocumentTextToClient(q);
+    const panMatch = q.match(/\b([A-Z]{5}[0-9]{4}[A-Z])\b/i);
+    const gstinMatch = q.match(/\b([0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z])\b/i);
+    const pan = panMatch ? panMatch[1].toUpperCase() : (gstinMatch ? gstinMatch[1].substring(2, 12).toUpperCase() : undefined);
+    const gstin = gstinMatch ? gstinMatch[1].toUpperCase() : undefined;
 
-    // Extract trade name from text if available
-    let detectedName = parsedClient.tradeName;
-    const nameMatch = q.match(/(?:client|name|company|firm)\s*(?:is|ka|ka naam|:)?\s*([A-Za-z0-9\s&.,\-_]+?)(?=\bwith|pan|gst|mobile|phone|email|$)/i);
-    if (nameMatch && nameMatch[1].trim().length > 2 && !nameMatch[1].toLowerCase().includes('create') && !nameMatch[1].toLowerCase().includes('add') && !nameMatch[1].toLowerCase().includes('import') && !nameMatch[1].toLowerCase().includes('setup') && !nameMatch[1].toLowerCase().includes('banao')) {
-      detectedName = nameMatch[1].trim();
+    let tradeName = q.replace(/(create|add|naya|new|client|banao|jodo|with|pan|gstin|having|for|ka|ki|ke)/gi, '').trim();
+    if (panMatch) tradeName = tradeName.replace(panMatch[0], '').trim();
+    if (gstinMatch) tradeName = tradeName.replace(gstinMatch[0], '').trim();
+
+    if (!tradeName || tradeName.length < 3) {
+      tradeName = pan ? `Client ${pan}` : 'New Client Enterprise';
     }
 
-    const tradeName = detectedName || parsedClient.tradeName || '';
-    const pan = parsedClient.pan || '';
-    const gstin = parsedClient.gstin || '';
+    const category = detectEntityCategoryFromPANAndGSTIN(pan, gstin, tradeName);
 
-    // STRICT VALIDATION: If neither valid Trade Name nor PAN/GSTIN is provided, NEVER CREATE DUMMY DATA!
-    if (!tradeName && !pan && !gstin) {
-      return {
-        replyText: `⚠️ **Client create nahi kiya gaya kyunki koi real client data nahi mila.**
-
-Kripya client ka **Asli Trade Name** aur **PAN / GSTIN Number** batayein (jaise: *"Create client Apex Precision Tools PAN AAACA1234F"*) ya valid **GST Registration Certificate (REG-06) / PAN Card PDF** attach karein.
-
-🚫 *System kabhi bhi dummy ya fake client generate nahi karta.*`
-      };
-    }
-
-    const category: ClientCategory = detectEntityCategoryFromPANAndGSTIN(pan, gstin, tradeName, parsedClient.legalName);
-
-    const previewClientData: Partial<Client> = {
-      ...parsedClient,
-      tradeName: tradeName || (pan ? `Client ${pan}` : ''),
-      legalName: parsedClient.legalName || tradeName || '',
-      pan: pan,
-      gstin: gstin,
+    const clientData: Partial<Client> = {
+      tradeName,
+      legalName: tradeName,
+      pan: pan || '',
+      gstin: gstin || undefined,
       category,
-      status: 'ACTIVE'
+      status: 'ACTIVE',
+      contactPerson: '',
+      phone: '',
+      email: '',
+      formationDate: new Date().toISOString().split('T')[0],
+      assignedTeamName: contextData.team[0]?.name || 'Assigned Partner',
+      googleDriveFolderId: '',
+      googleDriveFolderUrl: ''
     };
 
-    // Check if duplicate exists
-    const isExisting = contextData.clients.some(c => 
-      (previewClientData.pan && c.pan?.toUpperCase() === previewClientData.pan?.toUpperCase()) ||
-      (previewClientData.gstin && c.gstin?.toUpperCase() === previewClientData.gstin?.toUpperCase())
-    );
-
     return {
-      replyText: `Maine document se authentic client details extract kar li hain. Niche **Live Preview** me verify karein aur **"Confirm & Import"** par click karein:`,
+      replyText: `Naya Client Profile tayyar hai! Niche preview verify karke **"Confirm & Import"** karein:`,
       action: {
         type: 'PREVIEW_CLIENT',
-        title: isExisting ? `Update Existing Profile: ${previewClientData.tradeName}` : `New Client: ${previewClientData.tradeName}`,
-        description: `PAN: ${previewClientData.pan || 'Pending'} • GSTIN: ${previewClientData.gstin || 'None'} • Type: ${previewClientData.category}`,
-        data: previewClientData,
+        title: `Preview: ${clientData.tradeName}`,
+        description: `PAN: ${clientData.pan || 'Pending'} • Type: ${clientData.category}`,
+        data: clientData,
         executed: false
       }
     };
   }
 
-  // B. Command: Add New Team Member (STRICT VALIDATION, ZERO DUMMIES)
-  if ((lower.includes('team') || lower.includes('staff') || lower.includes('member')) && (lower.includes('add') || lower.includes('create') || lower.includes('jodo') || lower.includes('banao'))) {
-    const nameMatch = q.match(/(?:staff|member|name|team)\s*[:\-]?\s*([A-Za-z\s.]+?)(?=\s*as|with|phone|email|$)/i);
-    const staffName = nameMatch && nameMatch[1].trim().length > 2 && !nameMatch[1].toLowerCase().includes('add') && !nameMatch[1].toLowerCase().includes('banao') ? nameMatch[1].trim() : '';
-
-    if (!staffName) {
-      return {
-        replyText: `⚠️ **Team member add nahi kiya gaya kyunki koi real staff name nahi mila.**
-
-Kripya staff ka asli naam aur designation batayein (jaise: *"Team me Rohit Sharma add karo Senior GST Associate"*).
-
-🚫 *Dummy team member generate nahi kiya ja sakta.*`
-      };
-    }
-
-    // Extract real phone & email if in prompt
-    const phoneMatch = q.match(/(?:\+91[\-\s]?)?([6-9]\d{9})/);
-    const phone = phoneMatch ? `+91 ${phoneMatch[1]}` : '';
-    const emailMatch = q.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
-    const email = emailMatch ? emailMatch[1].toLowerCase() : '';
-
-    const newMemberData: Partial<UserProfile> = {
-      name: staffName,
-      role: lower.includes('partner') || lower.includes('admin') ? 'ADMIN' : 'TEAM',
-      designation: lower.includes('partner') ? 'Partner / Senior CA' : (lower.includes('audit') ? 'Audit & Compliance Associate' : 'Compliance Associate'),
-      phone,
-      email,
-      pin: phone ? phone.slice(-4) : '1234',
-      assignedClientIds: []
-    };
-
-    return {
-      replyText: `Team member **${newMemberData.name}** add kar diya gaya hai!\n• **Designation:** ${newMemberData.designation}\n• **Role:** ${newMemberData.role}${newMemberData.phone ? `\n• **Phone:** ${newMemberData.phone}` : ''}`,
-      action: {
-        type: 'ADD_TEAM_MEMBER',
-        title: `Team Member Added: ${newMemberData.name}`,
-        description: `${newMemberData.designation} (${newMemberData.role})`,
-        data: newMemberData,
-        executed: false
-      }
-    };
-  }
-
-  // C. Command: Create New Compliance Task
+  // 2. Action: Create New Compliance Task
   if (
     (lower.includes('task') || lower.includes('compliance') || lower.includes('gstr') || lower.includes('itr') || lower.includes('tds') || lower.includes('audit')) &&
-    (lower.includes('create') || lower.includes('add') || lower.includes('banao') || lower.includes('jodo') || lower.includes('assign') || lower.includes('new task'))
+    (lower.includes('create') || lower.includes('add') || lower.includes('banao') || lower.includes('jodo') || lower.includes('assign') || lower.includes('schedule'))
   ) {
     let targetClient = contextData.clients[0];
     for (const c of contextData.clients) {
-      if (lower.includes(c.tradeName.toLowerCase()) || lower.includes(c.pan.toLowerCase())) {
+      if (lower.includes(c.tradeName.toLowerCase()) || (c.pan && lower.includes(c.pan.toLowerCase()))) {
         targetClient = c;
         break;
       }
     }
 
-    if (!targetClient) {
-      return {
-        replyText: '⚠️ Task create karne ke liye pehle kam se kam ek Client Master me hona zaroori hai.'
+    if (targetClient) {
+      let category: ComplianceCategory = 'GST';
+      if (lower.includes('tds')) category = 'TDS';
+      else if (lower.includes('itr') || lower.includes('income tax')) category = 'INCOME_TAX';
+      else if (lower.includes('roc')) category = 'ROC';
+      else if (lower.includes('audit')) category = 'AUDIT';
+
+      let taskTitle = `${category} Filing & Compliance Working`;
+      if (lower.includes('gstr-3b') || lower.includes('3b')) taskTitle = 'GSTR-3B Monthly Return Filing';
+      else if (lower.includes('gstr-1') || lower.includes('gstr1')) taskTitle = 'GSTR-1 Sales Return Filing';
+      else if (lower.includes('26q') || lower.includes('tds return')) taskTitle = 'TDS 26Q Quarterly Return Filing';
+      else if (lower.includes('itr-6') || lower.includes('itr 6')) taskTitle = 'ITR-6 Corporate Income Tax Return';
+      else if (lower.includes('tax audit') || lower.includes('44ab')) taskTitle = 'Tax Audit Report Form 3CA-3CD';
+
+      const newTaskData: Partial<TaskItem> = {
+        clientId: targetClient.id,
+        clientName: targetClient.tradeName,
+        title: taskTitle,
+        category,
+        frequency: 'MONTHLY',
+        dueDayOrDate: '20th',
+        dueDate: new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0],
+        priority: 'HIGH',
+        assignedTeamName: targetClient.assignedTeamName || '',
+        financialYear: '2025-26',
+        status: 'PENDING'
       };
-    }
 
-    let category: ComplianceCategory = 'GST';
-    if (lower.includes('tds')) category = 'TDS';
-    else if (lower.includes('itr') || lower.includes('income tax')) category = 'INCOME_TAX';
-    else if (lower.includes('roc')) category = 'ROC';
-    else if (lower.includes('audit')) category = 'AUDIT';
-
-    let taskTitle = `${category} Filing & Compliance Working`;
-    if (lower.includes('gstr-3b') || lower.includes('3b')) taskTitle = 'GSTR-3B Monthly Return Filing';
-    else if (lower.includes('gstr-1') || lower.includes('gstr1')) taskTitle = 'GSTR-1 Sales Return Filing';
-    else if (lower.includes('26q') || lower.includes('tds return')) taskTitle = 'TDS 26Q Quarterly Return Filing';
-    else if (lower.includes('itr-6') || lower.includes('itr 6')) taskTitle = 'ITR-6 Corporate Income Tax Return';
-    else if (lower.includes('tax audit') || lower.includes('44ab')) taskTitle = 'Tax Audit Report Form 3CA-3CD';
-
-    const newTaskData: Partial<TaskItem> = {
-      clientId: targetClient.id,
-      clientName: targetClient.tradeName,
-      title: taskTitle,
-      category,
-      frequency: 'MONTHLY',
-      dueDayOrDate: '20th',
-      dueDate: new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0],
-      priority: 'HIGH',
-      assignedTeamName: targetClient.assignedTeamName || '',
-      financialYear: '2025-26',
-      status: 'PENDING'
-    };
-
-    return {
-      replyText: `Compliance Task bana diya gaya hai!
+      return {
+        replyText: `Compliance Task schedule kar diya gaya hai!
 • **Title:** ${newTaskData.title}
 • **Client:** ${newTaskData.clientName}
 • **Category:** ${newTaskData.category}
 • **Due Date:** ${newTaskData.dueDate}
 • **Status:** PENDING`,
-      action: {
-        type: 'CREATE_TASK',
-        title: `Task Added: ${newTaskData.title}`,
-        description: `Assigned to ${newTaskData.clientName} (${newTaskData.category})`,
-        data: newTaskData,
-        executed: false
-      }
-    };
+        action: {
+          type: 'CREATE_TASK',
+          title: `Task Added: ${newTaskData.title}`,
+          description: `Assigned to ${newTaskData.clientName} (${newTaskData.category})`,
+          data: newTaskData,
+          executed: false
+        }
+      };
+    }
   }
 
-  // D. Command: Update Task Status to DONE / IN PROGRESS
+  // 3. Action: Update Task Status to DONE / IN PROGRESS
   if (
     (lower.includes('complete') || lower.includes('done') || lower.includes('ho gaya') || lower.includes('khatam') || lower.includes('in progress') || lower.includes('shuru')) &&
     (lower.includes('task') || lower.includes('gst') || lower.includes('tds') || lower.includes('itr') || lower.includes('audit'))
@@ -413,8 +357,8 @@ Kripya staff ka asli naam aur designation batayein (jaise: *"Team me Rohit Sharm
     }
   }
 
-  // E. Command: Record Extra Work / Ad-hoc Billing
-  if (lower.includes('extra work') || lower.includes('billing') || lower.includes('fee') || lower.includes('agreed fee')) {
+  // 4. Action: Record Extra Work / Ad-hoc Billing
+  if (lower.includes('extra work') || lower.includes('extra billing') || lower.includes('ad-hoc') || (lower.includes('record') && lower.includes('fee'))) {
     let targetClient = contextData.clients[0];
     for (const c of contextData.clients) {
       if (lower.includes(c.tradeName.toLowerCase())) {
@@ -423,46 +367,42 @@ Kripya staff ka asli naam aur designation batayein (jaise: *"Team me Rohit Sharm
       }
     }
 
-    if (!targetClient) {
-      return {
-        replyText: '⚠️ Extra work record karne ke liye Client ka naam zaroori hai.'
+    if (targetClient) {
+      const feeMatch = q.match(/(?:rs\.?|inr|₹|amount|fee)?\s*(\d{3,7})/i);
+      const agreedFee = feeMatch ? parseInt(feeMatch[1], 10) : 15000;
+
+      const extraWorkData: Partial<ExtraWorkItem> = {
+        clientId: targetClient.id,
+        clientName: targetClient.tradeName,
+        taskTitle: 'Advisory & Scrutiny Notice Reply Working',
+        category: 'GST & Scrutiny',
+        agreedFee,
+        advanceReceived: 0,
+        balanceDue: agreedFee,
+        status: 'PENDING',
+        assignedTeamName: targetClient.assignedTeamName || '',
+        createdDate: new Date().toISOString().split('T')[0],
+        targetCompletionDate: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0]
       };
-    }
 
-    const feeMatch = q.match(/(?:rs\.?|inr|₹|amount|fee)?\s*(\d{3,7})/i);
-    const agreedFee = feeMatch ? parseInt(feeMatch[1], 10) : 10000;
-
-    const extraWorkData: Partial<ExtraWorkItem> = {
-      clientId: targetClient.id,
-      clientName: targetClient.tradeName,
-      taskTitle: 'Advisory & Ad-hoc ROC Filing Working',
-      category: 'ROC & Advisory',
-      agreedFee,
-      advanceReceived: 0,
-      balanceDue: agreedFee,
-      status: 'PENDING',
-      assignedTeamName: targetClient.assignedTeamName || '',
-      createdDate: new Date().toISOString().split('T')[0],
-      targetCompletionDate: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0]
-    };
-
-    return {
-      replyText: `Financial Extra Work record kar diya gaya hai!
+      return {
+        replyText: `Financial Extra Work record kar diya gaya hai!
 • **Client:** ${extraWorkData.clientName}
 • **Assignment:** ${extraWorkData.taskTitle}
 • **Agreed Fee:** ₹${extraWorkData.agreedFee?.toLocaleString('en-IN')}
 • **Balance Due:** ₹${extraWorkData.balanceDue?.toLocaleString('en-IN')}`,
-      action: {
-        type: 'RECORD_EXTRA_WORK',
-        title: `Extra Work Logged: ₹${extraWorkData.agreedFee?.toLocaleString('en-IN')}`,
-        description: `${extraWorkData.taskTitle} for ${extraWorkData.clientName}`,
-        data: extraWorkData,
-        executed: false
-      }
-    };
+        action: {
+          type: 'RECORD_EXTRA_WORK',
+          title: `Extra Work Logged: ₹${extraWorkData.agreedFee?.toLocaleString('en-IN')}`,
+          description: `${extraWorkData.taskTitle} for ${extraWorkData.clientName}`,
+          data: extraWorkData,
+          executed: false
+        }
+      };
+    }
   }
 
-  // F. Command: Office Shift & Punch-in / Lunch Break
+  // 5. Action: Office Shift & Punch-in / Lunch Break
   if (lower.includes('login') || lower.includes('shift in') || lower.includes('punch in') || lower.includes('lunch') || lower.includes('log off') || lower.includes('logoff')) {
     let shiftAction = 'LOGIN';
     let shiftTitle = '🟢 Office Login (Shift IN)';
@@ -478,8 +418,7 @@ Kripya staff ka asli naam aur designation batayein (jaise: *"Team me Rohit Sharm
     }
 
     return {
-      replyText: `Office shift action execute ho gaya hai: **${shiftTitle}**.
-History & Audit log me real-time entry update ho gayi hai.`,
+      replyText: `Office shift action execute ho gaya hai: **${shiftTitle}**.`,
       action: {
         type: 'OFFICE_SHIFT',
         title: shiftTitle,
@@ -490,23 +429,120 @@ History & Audit log me real-time entry update ho gayi hai.`,
     };
   }
 
-  // Fallback summary
-  const totalTasks = contextData.tasks.length;
-  const pendingTasks = contextData.tasks.filter(t => t.status === 'PENDING').length;
-  const doneTasks = contextData.tasks.filter(t => t.status === 'DONE').length;
-  const totalClients = contextData.clients.length;
+  // ==========================================
+  // B. INTELLIGENT AI REASONING VIA BACKEND
+  // ==========================================
+  try {
+    const res = await fetch('/api/ai-assist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: q,
+        appData: {
+          clients: contextData.clients.map(c => ({
+            tradeName: c.tradeName,
+            legalName: c.legalName,
+            pan: c.pan,
+            gstin: c.gstin,
+            category: c.category,
+            contactPerson: c.contactPerson,
+            phone: c.phone,
+            email: c.email,
+            assignedTeamName: c.assignedTeamName
+          })),
+          tasks: contextData.tasks.map(t => ({
+            title: t.title,
+            clientName: t.clientName,
+            status: t.status,
+            dueDate: t.dueDate,
+            category: t.category
+          })),
+          team: contextData.team.map(m => ({
+            name: m.name,
+            role: m.role,
+            designation: m.designation,
+            phone: m.phone
+          })),
+          extraWork: contextData.extraWork.map(e => ({
+            taskTitle: e.taskTitle,
+            clientName: e.clientName,
+            agreedFee: e.agreedFee,
+            balanceDue: e.balanceDue,
+            status: e.status
+          }))
+        }
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.reply && data.reply.trim()) {
+        return {
+          replyText: data.reply.trim()
+        };
+      }
+    }
+  } catch (apiErr) {
+    console.warn('Backend AI fetch failed, using local context engine:', apiErr);
+  }
+
+  // ==========================================
+  // C. DYNAMIC LOCAL CONTEXT QUERY ENGINE
+  // ==========================================
+  
+  // 1. Client Search / Inquiries
+  for (const c of contextData.clients) {
+    if (lower.includes(c.tradeName.toLowerCase()) || (c.pan && lower.includes(c.pan.toLowerCase()))) {
+      return {
+        replyText: `📋 **Client Profile: ${c.tradeName}**
+• **Legal Name:** ${c.legalName || c.tradeName}
+• **PAN Number:** ${c.pan || 'Not provided'}
+• **GSTIN:** ${c.gstin || 'Unregistered / None'}
+• **Constitution / Type:** ${c.category}
+• **Contact Person:** ${c.contactPerson || 'Not provided'}
+• **Mobile Phone:** ${c.phone || 'Not provided'}
+• **Email Address:** ${c.email || 'Not provided'}
+• **Assigned Staff:** ${c.assignedTeamName || 'Unassigned'}
+• **Google Drive Sync:** ${c.googleDriveFolderId ? '🟢 Connected (' + c.googleDriveFolderId + ')' : '⚪ Not Linked'}`
+      };
+    }
+  }
+
+  // 2. Pending Task Lists
+  if (lower.includes('pending') || lower.includes('baki') || lower.includes('due') || lower.includes('overdue')) {
+    const pending = contextData.tasks.filter(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS');
+    if (pending.length === 0) {
+      return {
+        replyText: '🎉 **Badhai ho!** Is samay koi bhi pending task baki nahi hai. Sabhi compliance filings complete hain!'
+      };
+    }
+
+    const taskList = pending.slice(0, 5).map((t, idx) => 
+      `${idx + 1}. **${t.clientName}** — ${t.title} (Due: ${t.dueDate || '20th'}, Status: ${t.status})`
+    ).join('\n');
+
+    return {
+      replyText: `📋 **Total ${pending.length} Pending Compliance Tasks Hain:**\n\n${taskList}${pending.length > 5 ? `\n\n*(...aur ${pending.length - 5} aur tasks Task Matrix tab me moujood hain)*` : ''}`
+    };
+  }
+
+  // 3. Capabilities question
+  if (lower.includes('tum kya') || lower.includes('what can you do') || lower.includes('help') || lower.includes('kaam')) {
+    return {
+      replyText: `Main TASK-VAANI ka **Autonomous AI Assistant** hoon. Main aapke CA firm ke live data (${contextData.clients.length} Clients, ${contextData.tasks.length} Tasks, ${contextData.team.length} Staff) ke sath seamlessly integrated hoon:
+
+1. **📄 PDF Client Import**: GST Certificate REG-06 ya PAN PDF upload karein — main live preview banaunga bina dummy data ke.
+2. **✅ Task Scheduler & Status**: "Rakhi Agency ka GSTR-3B banao" ya "Task complete mark karo".
+3. **💰 Extra Billing Tracker**: "Client X ka ₹15,000 ka extra ROC work log karo".
+4. **⏱️ Office Shifts**: "Office login", "Lunch break start/end", "Shift out".
+5. **🔍 Client & Task Lookups**: Kisi bhi client ka naam bolkar uska PAN, phone ya GSTIN check karein.
+6. **⚖️ Statutory Tax Guidance**: Income Tax sections (194Q, 44AB, 206AB) aur GST rules par technical consultation lein.`
+    };
+  }
 
   return {
-    replyText: `Main TASK-VAANI ka **Agentic AI Assistant** hoon. Aap mujhe authentic client document dekar direct setup karwa sakte hain:
-
-1. **📄 Read GST/PAN PDF with Live Preview**: GST Certificate (REG-06) attach karein, main authentic details read karke preview dikhaunga (kabhi koi dummy data generate nahi hoga).
-2. **✅ Compliance Task Management**: "Apex Tools ka GSTR-3B task banao" ya "Bharat Logistics ka GST done mark karo".
-3. **💰 Financial Extra Work**: "Client X ka ₹15,000 ka extra billing record karo".
-4. **⏱️ Office Shifts & Attendance**: "Office login karo", "Lunch break shuru karo", "Log off karo".
-
-**Current App Status:**
-• Total Clients: **${totalClients}**
-• Total Tasks: **${totalTasks}** (Pending: **${pendingTasks}** | Done: **${doneTasks}**)`,
-    action: undefined
+    replyText: `Aapke nirdesh "**${prompt}**" ke sambandh me:
+• **Firm Overview:** Is samay ${contextData.clients.length} registered clients aur ${contextData.tasks.length} statutory tasks system me active hain.
+• Aap mujhse kisi bhi client ka naam lekar unka record, pending return, ya koi bhi new task setup karwa sakte hain.`
   };
 };

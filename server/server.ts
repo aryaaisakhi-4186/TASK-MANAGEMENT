@@ -291,16 +291,17 @@ app.post('/api/reports/parse-pdf-text', async (req: Request, res: Response) => {
   }
 });
 
-// AI Assistant endpoint
+// AI Assistant endpoint with full Live App Context
 app.post('/api/ai-assist', async (req: Request, res: Response) => {
   try {
-    const { prompt } = req.body;
+    const { prompt, appData } = req.body;
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
-    const reply = await askCAAssistant(prompt);
+    const reply = await askCAAssistant(prompt, appData);
     res.json({ reply });
   } catch (err: any) {
+    console.warn('AI Assist Error:', err);
     res.status(500).json({ error: err.message || 'Internal AI service error' });
   }
 });
