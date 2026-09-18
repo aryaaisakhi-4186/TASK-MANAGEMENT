@@ -190,6 +190,72 @@ export const parseDocumentTextToClient = (rawText: string, fileName?: string): P
   };
 };
 
+// Robust Fuzzy & Token Matcher to find any Client from natural query
+export const findBestMatchingClient = (query: string, clients: Client[]): { client: Client; score: number } | null => {
+  const qClean = query.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+  const stopWords = new Set(['batao', 'dikhao', 'profile', 'details', 'poori', 'karo', 'hai', 'hain', 'status', 'kya', 'info', 'check', 'ka', 'ki', 'ke', 'aur', 'ko', 'par', 'se', 'the', 'for', 'about', 'show', 'give', 'me', 'please', 'sir', 'madam', 'search', 'find', 'view', 'full', 'all', 'information']);
+  const qTokens = qClean.split(/\s+/).filter(w => w.length >= 2 && !stopWords.has(w));
+
+  if (qTokens.length === 0 && query.trim().length < 3) return null;
+
+  let bestClient: Client | null = null;
+  let highestScore = 0;
+
+  for (const c of clients) {
+    let score = 0;
+    const tName = c.tradeName.toLowerCase();
+    const lName = (c.legalName || '').toLowerCase();
+    const pan = (c.pan || '').toLowerCase();
+    const gstin = (c.gstin || '').toLowerCase();
+    const contact = (c.contactPerson || '').toLowerCase();
+    const phone = (c.phone || '').replace(/\D/g, '');
+
+    // Full name direct containment
+    if (query.toLowerCase().includes(tName) || (lName && query.toLowerCase().includes(lName))) {
+      score += 150;
+    }
+
+    // Direct PAN / GSTIN match
+    if (pan && pan.length === 10 && query.toLowerCase().includes(pan)) score += 120;
+    if (gstin && gstin.length >= 10 && query.toLowerCase().includes(gstin)) score += 120;
+
+    // Token matching
+    const clientCombined = `${tName} ${lName} ${contact} ${pan}`;
+    let matchedTokenCount = 0;
+
+    for (const token of qTokens) {
+      if (tName.includes(token)) {
+        score += 30;
+        matchedTokenCount++;
+      } else if (lName.includes(token)) {
+        score += 25;
+        matchedTokenCount++;
+      } else if (contact.includes(token)) {
+        score += 20;
+        matchedTokenCount++;
+      } else if (pan.includes(token)) {
+        score += 35;
+        matchedTokenCount++;
+      } else if (token.length >= 4 && phone.includes(token)) {
+        score += 40;
+        matchedTokenCount++;
+      }
+    }
+
+    // Boost if multiple tokens matched (e.g. "shri ganesh charitable")
+    if (matchedTokenCount >= 2) {
+      score += matchedTokenCount * 30;
+    }
+
+    if (score > highestScore) {
+      highestScore = score;
+      bestClient = c;
+    }
+  }
+
+  return (bestClient && highestScore >= 20) ? { client: bestClient, score: highestScore } : null;
+};
+
 // 3. Human-like Conversational & Action NLP Processor
 export const processAgenticCommand = async (
   prompt: string,
@@ -256,13 +322,8 @@ export const processAgenticCommand = async (
     (lower.includes('task') || lower.includes('compliance') || lower.includes('gstr') || lower.includes('itr') || lower.includes('tds') || lower.includes('audit')) &&
     (lower.includes('create') || lower.includes('add') || lower.includes('banao') || lower.includes('jodo') || lower.includes('assign') || lower.includes('schedule'))
   ) {
-    let targetClient = contextData.clients[0];
-    for (const c of contextData.clients) {
-      if (lower.includes(c.tradeName.toLowerCase()) || (c.pan && lower.includes(c.pan.toLowerCase()))) {
-        targetClient = c;
-        break;
-      }
-    }
+    const match = findBestMatchingClient(q, contextData.clients);
+    const targetClient = match ? match.client : contextData.clients[0];
 
     if (targetClient) {
       let category: ComplianceCategory = 'GST';
@@ -276,6 +337,7 @@ export const processAgenticCommand = async (
       else if (lower.includes('gstr-1') || lower.includes('gstr1')) taskTitle = 'GSTR-1 Sales Return Filing';
       else if (lower.includes('26q') || lower.includes('tds return')) taskTitle = 'TDS 26Q Quarterly Return Filing';
       else if (lower.includes('itr-6') || lower.includes('itr 6')) taskTitle = 'ITR-6 Corporate Income Tax Return';
+      else if (lower.includes('itr-7') || lower.includes('trust')) taskTitle = 'ITR-7 Trust / Society Return';
       else if (lower.includes('tax audit') || lower.includes('44ab')) taskTitle = 'Tax Audit Report Form 3CA-3CD';
 
       const newTaskData: Partial<TaskItem> = {
@@ -310,12 +372,13 @@ export const processAgenticCommand = async (
     (lower.includes('complete') || lower.includes('done') || lower.includes('ho gaya') || lower.includes('khatam') || lower.includes('in progress') || lower.includes('shuru')) &&
     (lower.includes('task') || lower.includes('gst') || lower.includes('tds') || lower.includes('itr') || lower.includes('audit'))
   ) {
-    let targetTask = contextData.tasks.find(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS');
-    for (const t of contextData.tasks) {
-      if (lower.includes(t.clientName.toLowerCase()) || lower.includes(t.title.toLowerCase())) {
-        targetTask = t;
-        break;
-      }
+    const match = findBestMatchingClient(q, contextData.clients);
+    let targetTask = match 
+      ? contextData.tasks.find(t => (t.clientId === match.client.id || t.clientName.toLowerCase().includes(match.client.tradeName.toLowerCase())) && (t.status === 'PENDING' || t.status === 'IN_PROGRESS'))
+      : contextData.tasks.find(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS');
+
+    if (!targetTask) {
+      targetTask = contextData.tasks.find(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS') || contextData.tasks[0];
     }
 
     const nextStatus = lower.includes('progress') || lower.includes('shuru') ? 'IN_PROGRESS' : 'DONE';
@@ -428,7 +491,7 @@ export const processAgenticCommand = async (
       replyText: `Mera naam **CA-CompliBot** hai! Main aapka personal AI assistant aur practice manager hoon. 
 
 Aap mujhse:
-• Kisi bhi client ki details (PAN, GSTIN, Phone) puch sakte hain
+• Kisi bhi client ki details (PAN, GSTIN, Phone, Profile) puch sakte hain
 • Naye task ya client create karwa sakte hain
 • Income Tax, GST aur MCA statutory rules par advice le sakte hain
 • Office login, lunch break aur attendance mark karwa sakte hain.`
@@ -442,45 +505,58 @@ Aap mujhse:
     };
   }
 
-  // D. Capabilities / "Tum kya kya kar sakte ho"
-  if (lower.includes('tum kya') || lower.includes('what can you do') || lower.includes('help me') || lower.includes('kya kaam') || lower.includes('capabilities')) {
-    return {
-      replyText: `Main aapki firm ke liye ek senior assistant ki tarah kaam karta hoon. Yahan kuch mukhya cheezein hain jo main kar sakta hoon:
+  // D. Robust Client Profile & Information Lookup (Fuzzy Matched for ANY client)
+  const clientMatch = findBestMatchingClient(q, contextData.clients);
+  if (clientMatch) {
+    const c = clientMatch.client;
+    const clientTasks = contextData.tasks.filter(t => t.clientId === c.id || (t.clientName && t.clientName.toLowerCase().includes(c.tradeName.toLowerCase())));
+    const clientPending = clientTasks.filter(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS');
+    const clientExtra = contextData.extraWork.filter(e => e.clientId === c.id || (e.clientName && e.clientName.toLowerCase().includes(c.tradeName.toLowerCase())));
 
-1. **📄 GST & PAN PDF Reading**: GST Certificate (REG-06) ya PAN PDF upload karein — main bina kisi dummy data ke accurate trade name, PAN, GSTIN aur constitution extract kar dunga.
-2. **✅ Task Scheduling & Updates**: "Apex Tools ka GSTR-3B task banao" ya "Rakhi Agency ka GST complete mark karo".
-3. **🔍 Instant Client & Staff Lookups**: Kisi bhi client ka naam lekar unka mobile number, PAN, ya assigned staff puchen.
-4. **💰 Extra Billing Tracking**: "Client X ka ₹15,000 ka notice reply work add karo" — fees aur balance due track hoga.
-5. **⏱️ Office Shifts & Lunch Timers**: "Office login", "Lunch break shuru", "Log off".
-6. **⚖️ Income Tax & GST Advisory**: TDS under 194Q, 206AB, Section 44AB audit limits, aur DRC-01 notices par technical CA guidance.`
+    let taskSummaryText = '';
+    if (clientTasks.length > 0) {
+      taskSummaryText = `\n\n📋 **Compliance Tasks (${clientTasks.length} Total | ${clientPending.length} Pending):**\n` + 
+        clientTasks.map((t, i) => `  ${i + 1}. [${t.status}] ${t.title} *(Due: ${t.dueDate || '20th'})*`).join('\n');
+    } else {
+      taskSummaryText = `\n\n📋 **Compliance Tasks:** Filhal koi task schedule nahi hai.`;
+    }
+
+    let extraWorkText = '';
+    if (clientExtra.length > 0) {
+      extraWorkText = `\n\n💰 **Ad-hoc Extra Work:**\n` +
+        clientExtra.map(e => `  • ${e.taskTitle} (Agreed: ₹${e.agreedFee}, Balance: ₹${e.balanceDue})`).join('\n');
+    }
+
+    return {
+      replyText: `🏢 **Client Profile: ${c.tradeName}**
+• **Legal Registered Name:** ${c.legalName || c.tradeName}
+• **Constitution / Entity Type:** ${c.category}
+• **PAN Number:** ${c.pan || 'Not provided'}
+• **GSTIN Number:** ${c.gstin || 'Unregistered / None'}
+• **TAN Number:** ${c.tan || 'None'}
+• **Authorized Contact Person:** ${c.contactPerson || 'Not provided'}
+• **Mobile / Phone:** ${c.phone ? `📞 ${c.phone}` : 'Not provided'}
+• **Email Address:** ${c.email || 'Not provided'}
+• **Date of Formation / Liability:** ${c.formationDate || 'Not specified'}
+• **Assigned Staff / Partner:** ${c.assignedTeamName || 'Unassigned'}
+• **Google Drive Cloud Vault:** ${c.googleDriveFolderId ? `🟢 Linked (${c.googleDriveFolderId})` : '⚪ Not Connected'}${taskSummaryText}${extraWorkText}
+
+Kya aap inka koi naya compliance task schedule karna chahte hain ya details update karna chahte hain?`
     };
   }
 
-  // E. Specific Client Lookups (Natural match for ANY client in live list)
-  for (const c of contextData.clients) {
-    const cName = c.tradeName.toLowerCase();
-    const lName = (c.legalName || '').toLowerCase();
-    const pan = (c.pan || '').toLowerCase();
+  // E. Capabilities / "Tum kya kya kar sakte ho"
+  if (lower.includes('tum kya') || lower.includes('what can you do') || lower.includes('help me') || lower.includes('kya kaam') || lower.includes('capabilities')) {
+    return {
+      replyText: `Main aapki firm ke liye ek senior practice assistant ki tarah kaam karta hoon. Yahan kuch mukhya cheezein hain jo main kar sakta hoon:
 
-    if (
-      (cName.length > 2 && lower.includes(cName)) || 
-      (lName.length > 2 && lower.includes(lName)) || 
-      (pan.length === 10 && lower.includes(pan))
-    ) {
-      return {
-        replyText: `**${c.tradeName}** ki details ye rahi:
-• **Legal Name:** ${c.legalName || c.tradeName}
-• **Entity Type:** ${c.category}
-• **PAN Number:** ${c.pan || 'N/A'}
-• **GSTIN:** ${c.gstin || 'Unregistered / None'}
-• **Mobile / Phone:** ${c.phone ? `📞 ${c.phone}` : 'Not provided'}
-• **Contact Person:** ${c.contactPerson || 'Not provided'}
-• **Email:** ${c.email || 'Not provided'}
-• **Assigned Staff:** ${c.assignedTeamName || 'Unassigned'}
-
-Kya aap inka koi naya task schedule karna chahte hain ya Google Drive folder dekhna chahte hain?`
-      };
-    }
+1. **📄 GST & PAN PDF Reading**: GST Certificate (REG-06) ya PAN PDF upload karein — main bina kisi dummy data ke accurate trade name, PAN, GSTIN aur constitution extract kar dunga.
+2. **✅ Task Scheduling & Updates**: "Apex Tools ka GSTR-3B task banao" ya "Rakhi Agency ka GST complete mark karo".
+3. **🔍 Instant Client & Staff Lookups**: Kisi bhi client (e.g. "Shri Ganesh Charitable", "Rakhi Agency") ka naam bolkar unki poori profile, PAN, mobile number, ya pending tasks puchen.
+4. **💰 Extra Billing Tracking**: "Client X ka ₹15,000 ka notice reply work add karo" — fees aur balance due track hoga.
+5. **⏱️ Office Shifts & Lunch Timers**: "Office login", "Lunch break shuru", "Log off".
+6. **⚖️ Statutory CA Guidance**: TDS under 194Q, 206AB, Section 44AB audit limits, aur DRC-01 notices par technical guidance.`
+    };
   }
 
   // F. Pending Tasks Inquiries
@@ -501,10 +577,10 @@ Kya aap inka koi naya task schedule karna chahte hain ya Google Drive folder dek
       };
     }
 
-    const taskItems = pending.slice(0, 5).map((t, i) => `${i + 1}. **${t.clientName}** — ${t.title} *(Due: ${t.dueDate || '20th'}, Status: ${t.status})*`).join('\n');
+    const taskItems = pending.slice(0, 6).map((t, i) => `${i + 1}. **${t.clientName}** — ${t.title} *(Due: ${t.dueDate || '20th'}, Status: ${t.status})*`).join('\n');
 
     return {
-      replyText: `Filhal total **${pending.length} tasks** pending hain:\n\n${taskItems}${pending.length > 5 ? `\n\n*(...aur ${pending.length - 5} tasks Task Matrix me list hain)*` : ''}`
+      replyText: `Filhal total **${pending.length} tasks** pending hain:\n\n${taskItems}${pending.length > 6 ? `\n\n*(...aur ${pending.length - 6} tasks Task Matrix me list hain)*` : ''}`
     };
   }
 
@@ -569,6 +645,6 @@ Aap Extra Work Tracker tab me jakar client-wise invoice dekh sakte hain.`
   return {
     replyText: `Main aapki baat samajh gaya! Is samay aapki firm me **${contextData.clients.length} Clients** aur **${contextData.tasks.length} Compliance Tasks** active hain. 
 
-Aap mujhse kisi bhi client ka record check karne ko bol sakte hain, naya task schedule karwa sakte hain, ya Income Tax/GST par koi bhi statutory query puch sakte hain.`
+Aap mujhse kisi bhi client (jaise "Shri Ganesh Charitable", "Rakhi Agency", "Apex Tools") ka naam bolkar unka profile aur pending tasks dekh sakte hain!`
   };
 };
