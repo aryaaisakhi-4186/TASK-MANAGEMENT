@@ -298,7 +298,7 @@ export const CACompliBot: React.FC<{
     }
   };
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() && !attachedFile) return;
 
@@ -315,14 +315,19 @@ export const CACompliBot: React.FC<{
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
 
-    setTimeout(() => {
-      const response = processAgenticCommand(userText, {
+    try {
+      const response = await processAgenticCommand(userText, {
         clients,
         tasks,
         team,
         extraWork,
-        currentRole,
-        currentUser
+        currentUser: currentUser ? {
+          id: currentUser.id,
+          name: currentUser.name,
+          role: currentRole as 'ADMIN' | 'TEAM',
+          designation: currentUser.designation,
+          pin: '1234'
+        } : undefined
       });
 
       const msgId = (Date.now() + 1).toString();
@@ -344,8 +349,11 @@ export const CACompliBot: React.FC<{
       };
 
       setMessages(prev => [...prev, botReply]);
+    } catch (err: any) {
+      console.warn('Agentic command error:', err);
+    } finally {
       setLoading(false);
-    }, 400);
+    }
   };
 
   const updatePreviewField = (msgId: string, field: keyof Client, value: any) => {
