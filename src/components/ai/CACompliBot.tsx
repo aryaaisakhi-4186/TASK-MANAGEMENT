@@ -1,6 +1,8 @@
+import { getStoredGeminiKey, setStoredGeminiKey } from '../../services/clientAIService';
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Bot, 
+  Key,
   Send, 
   Sparkles, 
   Paperclip, 
@@ -97,6 +99,9 @@ export const CACompliBot: React.FC<{
   const [isListening, setIsListening] = useState(false);
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showKeyModal, setShowKeyModal] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState(getStoredGeminiKey());
+  const [keySavedMessage, setKeySavedMessage] = useState(false);
 
   // Editable form state for preview cards
   const [editingPreviewId, setEditingPreviewId] = useState<string | null>(null);
@@ -386,6 +391,15 @@ export const CACompliBot: React.FC<{
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* Gemini Cloud AI Key Button */}
+          <button
+            onClick={() => setShowKeyModal(true)}
+            title="Configure Google Gemini 3.7 Flash Cloud AI Key"
+            className="px-3 py-2 rounded-xl bg-purple-600/15 hover:bg-purple-600 text-purple-700 dark:text-purple-300 hover:text-white border border-purple-500/30 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+          >
+            <Key size={14} /> {getStoredGeminiKey() ? '✨ Gemini AI Connected' : '🔑 Connect Gemini Key'}
+          </button>
+
           {/* Read PDF Button */}
           <button
             onClick={() => fileInputRef.current?.click()}
@@ -413,6 +427,54 @@ export const CACompliBot: React.FC<{
           </button>
         </div>
       </div>
+
+      {/* Gemini API Key Configuration Modal */}
+      {showKeyModal && (
+        <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-xs flex flex-col gap-3 animate-in fade-in">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-purple-950 dark:text-purple-200 font-bold text-sm">
+              <Sparkles size={16} className="text-purple-600" />
+              <span>Google Gemini 3.7 Flash AI Cloud Integration</span>
+            </div>
+            <button
+              onClick={() => setShowKeyModal(false)}
+              className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+            >
+              ✕ Close
+            </button>
+          </div>
+          <p className="text-slate-600 dark:text-slate-300 text-xs">
+            Enter your free Google Gemini API Key to enable unlimited human-like natural reasoning and conversational AI directly on GitHub Pages and mobile devices.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <input
+              type="password"
+              value={apiKeyInput}
+              onChange={(e) => setApiKeyInput(e.target.value)}
+              placeholder="Paste your Gemini API Key (e.g. AIzaSy...)"
+              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-purple-500/30 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+            <button
+              onClick={() => {
+                setStoredGeminiKey(apiKeyInput);
+                setKeySavedMessage(true);
+                setTimeout(() => {
+                  setKeySavedMessage(false);
+                  setShowKeyModal(false);
+                }, 1500);
+              }}
+              className="w-full sm:w-auto shrink-0 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md shadow-purple-600/30 transition-all"
+            >
+              Save Key
+            </button>
+          </div>
+          {keySavedMessage && (
+            <div className="text-emerald-600 dark:text-emerald-400 font-bold text-xs flex items-center gap-1">
+              <Check size={14} /> Gemini 3.7 Flash Cloud AI successfully connected!
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Confirmation Modal for Clearing History */}
       {showClearConfirm && (
