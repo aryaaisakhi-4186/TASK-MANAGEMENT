@@ -143,6 +143,11 @@ const MainPortal: React.FC = () => {
         onClose={() => setIsInstallModalOpen(false)}
       />
 
+      <FirebaseSyncModal
+        isOpen={isFirebaseModalOpen}
+        onClose={() => setIsFirebaseModalOpen(false)}
+      />
+
       {selectedTask && (
         <TaskModal
           isOpen={true}

@@ -83,61 +83,75 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToCl
 
   if (!isOpen) return null;
 
-  // Process uploaded Excel / CSV / PDF File with Tabular Intelligence
-  const handleFileProcess = async (file: File) => {
+  // Process uploaded Excel / CSV / PDF Files with Tabular Intelligence
+  const handleMultipleFilesProcess = async (files: File[]) => {
+    if (!files || files.length === 0) return;
     setLoading(true);
     setErrorMsg(null);
     setMisclassificationAlert(null);
     setImportSuccessCount(null);
     setClientImportSuccessCount(null);
-    setSourceName(file.name);
+    setSourceName(files.length === 1 ? files[0].name : `${files.length} Files (${files.map(f => f.name).slice(0, 3).join(', ')}${files.length > 3 ? '...' : ''})`);
 
     try {
-      const isExcel = /\.(xlsx|xls|csv)$/i.test(file.name);
-      if (isExcel) {
-        const arrayBuffer = await file.arrayBuffer();
-        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+      let allRows: ParsedTeamRow[] = [];
+      for (const file of files) {
+        const isExcel = /\.(xlsx|xls|csv)$/i.test(file.name);
+        if (isExcel) {
+          const arrayBuffer = await file.arrayBuffer();
+          const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
-        if (!rawData || rawData.length === 0) {
-          throw new Error('Uploaded sheet contains no data rows.');
+          if (!rawData || rawData.length === 0) {
+            continue;
+          }
+
+          const classification = classifyRawTabularData(rawData, file.name);
+
+          if (classification.domain === 'CLIENT_MASTER') {
+            setMisclassificationAlert({
+              fileName: file.name,
+              domain: 'Client Master',
+              title: classification.detectedType,
+              summary: classification.summary,
+              sampleEntities: classification.sampleEntities,
+              clientRows: classification.clientRows,
+              rawData
+            });
+            setLoading(false);
+            return;
+          }
+
+          if (classification.domain === 'DOCUMENT_VAULT') {
+            setErrorMsg('⚠️ This spreadsheet contains Bank Statements / Transaction Vouchers. Please archive it in Document Vault.');
+            setLoading(false);
+            return;
+          }
+
+          allRows = [...allRows, ...mapRawDataToTeam(rawData)];
+        } else {
+          const rows = await parseTeamFromFile(file);
+          allRows = [...allRows, ...rows];
         }
-
-        const classification = classifyRawTabularData(rawData, file.name);
-
-        if (classification.domain === 'CLIENT_MASTER') {
-          setMisclassificationAlert({
-            fileName: file.name,
-            domain: 'Client Master',
-            title: classification.detectedType,
-            summary: classification.summary,
-            sampleEntities: classification.sampleEntities,
-            clientRows: classification.clientRows,
-            rawData
-          });
-          setLoading(false);
-          return;
-        }
-
-        if (classification.domain === 'DOCUMENT_VAULT') {
-          setErrorMsg('⚠️ This spreadsheet contains Bank Statements / Transaction Vouchers. Please archive it in Document Vault.');
-          setLoading(false);
-          return;
-        }
-
-        setParsedRows(mapRawDataToTeam(rawData));
-      } else {
-        const rows = await parseTeamFromFile(file);
-        setParsedRows(rows);
       }
+
+      if (allRows.length === 0) {
+        throw new Error('No valid team records found in uploaded file(s).');
+      }
+
+      setParsedRows(allRows);
     } catch (err: any) {
       console.warn('Team import parse error:', err);
       setErrorMsg(err.message || 'Failed to read file. Please ensure it is a valid Excel or PDF file.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFileProcess = (file: File) => {
+    handleMultipleFilesProcess([file]);
   };
 
   // Fetch from Google Sheet with Automatic Domain Classification Guard
@@ -280,13 +294,14 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToCl
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleFileProcess(file);
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length > 0) handleMultipleFilesProcess(files);
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFileProcess(file);
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) handleMultipleFilesProcess(files);
+    e.target.value = '';
   };
 
   const handleRemoveRow = (index: number) => {
@@ -598,6 +613,7 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToCl
                 <input
                   ref={fileInputRef}
                   type="file"
+                  multiple
                   accept=".xlsx,.xls,.csv,.pdf"
                   onChange={handleFileInputChange}
                   className="hidden"
