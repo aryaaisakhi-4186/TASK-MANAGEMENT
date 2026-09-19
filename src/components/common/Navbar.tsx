@@ -49,7 +49,7 @@ export const Navbar: React.FC<{ onOpenRoleModal: () => void; onOpenFirebaseModal
               <span className="text-lg font-black tracking-wider text-slate-900 dark:text-white font-serif">TASK-VAANI</span>
               
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 tracking-wide font-medium">CA & Statutory Compliance Hub</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 tracking-wide font-medium">Statutory Compliance Hub</p>
           </div>
         </div>
 
