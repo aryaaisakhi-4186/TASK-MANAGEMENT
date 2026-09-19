@@ -3,6 +3,8 @@ import { extractDocumentDataDirectly } from '../../services/documentOCRService';
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Bot,
+  Brain,
+  BrainCircuit,
   Copy,
   RotateCcw, 
   Key,
@@ -39,7 +41,8 @@ import {
   AgenticAction 
 } from '../../utils/agenticAIEngine';
 import { translateHindiToEnglish } from '../../utils/hindiEnglishTranslator';
-import { Client, ClientCategory } from '../../types';
+import { Client, ClientCategory, AIMemoryItem, AIMemoryCategory } from '../../types';
+import { StorageService } from '../../services/storage';
 
 interface ChatMessage {
   id: string;
@@ -105,6 +108,11 @@ export const CACompliBot: React.FC<{
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showKeyModal, setShowKeyModal] = useState(false);
+  const [showMemoryModal, setShowMemoryModal] = useState(false);
+  const [learnedMemories, setLearnedMemories] = useState<AIMemoryItem[]>(() => StorageService.getLearnedMemory());
+  const [newRuleTopic, setNewRuleTopic] = useState('');
+  const [newRuleContent, setNewRuleContent] = useState('');
+  const [newRuleCategory, setNewRuleCategory] = useState<AIMemoryCategory>('GENERAL_NOTE');
   const [apiKeyInput, setApiKeyInput] = useState(getStoredGeminiKey());
   const [keySavedMessage, setKeySavedMessage] = useState(false);
 
@@ -120,6 +128,38 @@ export const CACompliBot: React.FC<{
       console.warn('Failed to save chat history:', e);
     }
   }, [messages]);
+
+  const getTabDisplayName = (tabKey?: string): string => {
+    switch (tabKey) {
+      case 'clients': return 'Client Master';
+      case 'tasks': return 'Compliance Matrix';
+      case 'extra-work': return 'Extra Work Tracker';
+      case 'documents': return 'Document Vault';
+      case 'attendance': return 'Attendance & Shifts';
+      case 'team': return 'Staff Directory';
+      case 'dashboard': return 'Dashboard';
+      default: return 'App Tab';
+    }
+  };
+
+  const handleAddManualRule = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRuleContent.trim()) return;
+    const added = StorageService.addLearnedMemoryItem({
+      topic: newRuleTopic.trim() || 'Custom Firm Rule',
+      content: newRuleContent.trim(),
+      category: newRuleCategory,
+      source: 'MANUAL'
+    });
+    setLearnedMemories(StorageService.getLearnedMemory());
+    setNewRuleTopic('');
+    setNewRuleContent('');
+  };
+
+  const handleDeleteMemory = (id: string) => {
+    StorageService.deleteLearnedMemoryItem(id);
+    setLearnedMemories(StorageService.getLearnedMemory());
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -433,6 +473,19 @@ export const CACompliBot: React.FC<{
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* AI Learned Memory Button */}
+          <button
+            onClick={() => {
+              setLearnedMemories(StorageService.getLearnedMemory());
+              setShowMemoryModal(true);
+            }}
+            title="View rules and context the AI has learned from conversations"
+            className="px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500/15 to-teal-500/15 hover:from-emerald-500 hover:to-teal-500 text-emerald-800 dark:text-emerald-300 hover:text-white border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+          >
+            <BrainCircuit size={15} />
+            <span>🧠 AI Memory ({learnedMemories.length})</span>
+          </button>
+
           {/* Gemini Cloud AI Key Button */}
           <button
             onClick={() => setShowKeyModal(true)}
@@ -515,6 +568,100 @@ export const CACompliBot: React.FC<{
               <Check size={14} /> Gemini 3.7 Flash Cloud AI successfully connected!
             </div>
           )}
+        </div>
+      )}
+
+      {/* AI Long-Term Memory Hub Modal */}
+      {showMemoryModal && (
+        <div className="p-5 rounded-3xl bg-slate-50 dark:bg-slate-900 border-2 border-emerald-500/40 text-xs flex flex-col gap-4 animate-in zoom-in-95 shadow-2xl">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-2 text-emerald-950 dark:text-emerald-200 font-bold text-sm">
+              <BrainCircuit size={20} className="text-emerald-600" />
+              <span>🧠 AI Long-Term Memory & Continuous Learning Hub</span>
+            </div>
+            <button
+              onClick={() => setShowMemoryModal(false)}
+              className="px-3 py-1 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 text-xs font-bold transition-all"
+            >
+              ✕ Close
+            </button>
+          </div>
+
+          <p className="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+            Aap chat me AI se jo bhi baat karte hain (jaise <em>"yaad rakhna CloudWave ka kaam Amit karega"</em> ya <em>"meri firm me notice fee 5000 hai"</em>), AI unhe permanent memory me store kar leta hai aur future me har query par apply karta hai.
+          </p>
+
+          {/* Add Custom Rule Form */}
+          <form onSubmit={handleAddManualRule} className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
+            <h4 className="font-bold text-xs text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+              <Plus size={14} /> Sikhao Naya Rule / Practice Policy
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <input
+                type="text"
+                value={newRuleTopic}
+                onChange={(e) => setNewRuleTopic(e.target.value)}
+                placeholder="Topic (e.g. Notice Reply Fees)"
+                className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-950 border border-emerald-500/30 font-semibold text-xs focus:outline-none"
+              />
+              <select
+                value={newRuleCategory}
+                onChange={(e) => setNewRuleCategory(e.target.value as AIMemoryCategory)}
+                className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-950 border border-emerald-500/30 font-semibold text-xs focus:outline-none"
+              >
+                <option value="GENERAL_NOTE">General Policy</option>
+                <option value="CLIENT_RULE">Client Specific Rule</option>
+                <option value="FEE_RULE">Billing & Fee Rule</option>
+                <option value="STAFF_RULE">Staff Assignment Rule</option>
+                <option value="PREFERENCE">Operational Preference</option>
+              </select>
+              <button
+                type="submit"
+                className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition-all"
+              >
+                + Save Memory Rule
+              </button>
+            </div>
+            <textarea
+              rows={2}
+              value={newRuleContent}
+              onChange={(e) => setNewRuleContent(e.target.value)}
+              placeholder="Rule description (e.g. Always request 50% advance for ROC ad-hoc work)..."
+              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-emerald-500/30 text-xs focus:outline-none"
+            />
+          </form>
+
+          {/* List of Learned Rules */}
+          <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+            <h4 className="font-bold text-xs text-slate-700 dark:text-slate-300">
+              Active Learned Memory Rules ({learnedMemories.length}):
+            </h4>
+            {learnedMemories.length === 0 ? (
+              <p className="text-slate-500 text-xs italic">No rules saved yet. Teach the AI in chat or use the form above.</p>
+            ) : (
+              learnedMemories.map((m) => (
+                <div key={m.id} className="p-3 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-start justify-between gap-3 text-xs shadow-sm">
+                  <div className="space-y-0.5 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-900 dark:text-white">{m.topic}</span>
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-mono text-[9px] font-bold">
+                        {m.category}
+                      </span>
+                      <span className="text-[9px] text-slate-400">({m.learnedAt})</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300">{m.content}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteMemory(m.id)}
+                    title="Delete this memory rule"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all shrink-0"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       )}
 
@@ -748,12 +895,12 @@ export const CACompliBot: React.FC<{
                     </div>
                   )}
 
-                  {/* 2. Standard Executed Action Card */}
+                  {/* 2. Standard Executed Action Card with Direct Right-Tab Navigation */}
                   {msg.action && msg.action.executed && (
-                    <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3 text-xs animate-in zoom-in-95">
+                    <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs animate-in zoom-in-95">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                          <CheckCircle2 size={18} />
+                          {msg.action.type === 'LEARN_MEMORY' ? <Brain size={18} className="text-emerald-600" /> : <CheckCircle2 size={18} />}
                         </div>
                         <div className="min-w-0">
                           <p className="font-bold text-emerald-900 dark:text-emerald-300 truncate">
@@ -765,9 +912,21 @@ export const CACompliBot: React.FC<{
                         </div>
                       </div>
 
-                      <span className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[10px] shadow-sm shrink-0">
-                        Saved in Master
-                      </span>
+                      <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                        {msg.action.targetTab && onNavigateTab && (
+                          <button
+                            type="button"
+                            onClick={() => onNavigateTab(msg.action!.targetTab!)}
+                            className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-[11px] shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all active:scale-95"
+                          >
+                            <span>👉 Open in {getTabDisplayName(msg.action.targetTab)}</span>
+                            <ExternalLink size={12} />
+                          </button>
+                        )}
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[10px] shadow-sm">
+                          {msg.action.type === 'LEARN_MEMORY' ? '🧠 Saved to Memory' : 'Saved in App'}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>

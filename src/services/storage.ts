@@ -1,4 +1,4 @@
-import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord } from '../types';
+import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord, AIMemoryItem } from '../types';
 import { SEED_CLIENTS, SEED_TASKS, SEED_TEAM_MEMBERS, SEED_EXTRA_WORK, SEED_DOCUMENTS, SEED_AUDIT_LOGS, INITIAL_SYSTEM_SETTINGS } from '../data/seedData';
 
 const KEYS = {
@@ -13,6 +13,7 @@ const KEYS = {
   AUTH_SESSION: 'taskvaani_auth_session_v1',
   THEME: 'taskvaani_theme_v1',
   CLIENT_REMINDERS: 'taskvaani_client_reminders_v1',
+  AI_LEARNED_MEMORY: 'taskvaani_ai_learned_memory_v1',
 };
 
 // Safe JSON parser
@@ -87,6 +88,45 @@ export const StorageService = {
   getAuthSession: (): UserProfile | null => safeGet<UserProfile | null>(KEYS.AUTH_SESSION, null),
   saveAuthSession: (user: UserProfile | null) => safeSet(KEYS.AUTH_SESSION, user),
 
+
+  // AI Learned Memory & Long-Term Knowledge
+  getLearnedMemory: (): AIMemoryItem[] => safeGet<AIMemoryItem[]>(KEYS.AI_LEARNED_MEMORY, [
+    {
+      id: 'mem-1',
+      category: 'GENERAL_NOTE',
+      topic: 'Statutory Deadlines Priority',
+      content: 'Statutory GST, TDS, and Tax Audit deadlines are given utmost priority with zero late filing penalty.',
+      source: 'MANUAL',
+      learnedAt: 'System Master'
+    },
+    {
+      id: 'mem-2',
+      category: 'PREFERENCE',
+      topic: 'Tone & Communication',
+      content: 'Always respond like a senior human CA partner with empathy, precision, and clear step-by-step guidance.',
+      source: 'MANUAL',
+      learnedAt: 'System Master'
+    }
+  ]),
+  saveLearnedMemory: (memory: AIMemoryItem[]) => safeSet(KEYS.AI_LEARNED_MEMORY, memory),
+  addLearnedMemoryItem: (item: Omit<AIMemoryItem, 'id' | 'learnedAt'>): AIMemoryItem => {
+    const current = StorageService.getLearnedMemory();
+    const newItem: AIMemoryItem = {
+      ...item,
+      id: 'mem-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      learnedAt: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    };
+    StorageService.saveLearnedMemory([newItem, ...current]);
+    return newItem;
+  },
+  deleteLearnedMemoryItem: (id: string) => {
+    const current = StorageService.getLearnedMemory();
+    const updated = current.filter(m => m.id !== id);
+    StorageService.saveLearnedMemory(updated);
+  },
+  clearLearnedMemory: () => {
+    StorageService.saveLearnedMemory([]);
+  },
   // Reset to initial seed data (App Reset)
   resetToDefaults: () => {
     safeSet(KEYS.CLIENTS, SEED_CLIENTS);

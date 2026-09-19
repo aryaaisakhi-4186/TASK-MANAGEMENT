@@ -98,7 +98,7 @@ const MainPortal: React.FC = () => {
 
           {activeTab === 'audit' && <AuditLogViewer />}
 
-          {activeTab === 'ai-bot' && <CACompliBot />}
+          {activeTab === 'ai-bot' && <CACompliBot onNavigateTab={setActiveTab} />}
 
           {activeTab === 'settings' && <FirmSettingsModal />}
         </main>

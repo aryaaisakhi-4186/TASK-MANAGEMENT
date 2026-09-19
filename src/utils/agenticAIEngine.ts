@@ -1,5 +1,6 @@
 import { extractDocumentDataDirectly, extractBinaryPdfText, parseRawTextToClientData } from '../services/documentOCRService';
-import { Client, TaskItem, ExtraWorkItem, UserProfile, ComplianceCategory, ClientCategory } from '../types';
+import { Client, TaskItem, ExtraWorkItem, UserProfile, ComplianceCategory, ClientCategory, AIMemoryItem } from '../types';
+import { StorageService } from '../services/storage';
 import { detectEntityCategoryFromPANAndGSTIN } from './masterImportExport';
 import { callClientGeminiAI, AppContextData } from '../services/clientAIService';
 
@@ -14,11 +15,13 @@ export interface AgenticAction {
     | 'CREATE_FOLDER' 
     | 'ADD_TEAM_MEMBER' 
     | 'SEND_REMINDER' 
+    | 'LEARN_MEMORY'
     | 'INFO_SUMMARY';
   title: string;
   description: string;
   data: any;
   executed: boolean;
+  targetTab?: string;
 }
 
 export interface AgenticResponse {
@@ -334,7 +337,8 @@ export const processAgenticCommand = async (
           title: `Extra Work Logged: ₹${extraWorkData.agreedFee?.toLocaleString('en-IN')}`,
           description: `${extraWorkData.taskTitle} for ${extraWorkData.clientName}`,
           data: extraWorkData,
-          executed: false
+          executed: false,
+          targetTab: 'extra-work'
         }
       };
     }
@@ -383,7 +387,8 @@ export const processAgenticCommand = async (
         title: `Preview: ${clientData.tradeName}`,
         description: `PAN: ${clientData.pan || 'Pending'} • Type: ${clientData.category}`,
         data: clientData,
-        executed: false
+        executed: false,
+        targetTab: 'clients'
       }
     };
   }
@@ -463,7 +468,8 @@ export const processAgenticCommand = async (
           title: `Task Updated to ${nextStatus}`,
           description: `${targetTask.title} (${targetTask.clientName})`,
           data: { taskId: targetTask.id, status: nextStatus, taskTitle: targetTask.title, clientName: targetTask.clientName },
-          executed: false
+          executed: false,
+          targetTab: 'tasks'
         }
       };
     }
@@ -496,8 +502,97 @@ export const processAgenticCommand = async (
         title: shiftTitle,
         description: `Recorded for ${contextData.currentUser?.name || 'Staff'}`,
         data: { action: shiftAction },
-        executed: false
+        executed: false,
+        targetTab: 'dashboard'
       }
+    };
+  }
+
+  // =========================================================================
+  // ACTION F: LEARN & REMEMBER RULES INTO LONG-TERM AI MEMORY
+  // (e.g. "yaad rakhna CloudWave ka GST filing Amit karega", "meri firm me notice reply ki fee 5000 hoti hai")
+  // =========================================================================
+  if (
+    lower.includes('yaad rakhna') || 
+    lower.includes('yaad rakho') || 
+    lower.includes('remember this') || 
+    lower.includes('remember that') || 
+    lower.includes('note kar lo') || 
+    lower.includes('ye rule hai') || 
+    lower.includes('meri firm ka rule') || 
+    lower.includes('rule jod do') || 
+    lower.includes('hamesha yaad') ||
+    lower.includes('future ke liye') ||
+    (lower.includes('rule') && lower.includes('yaad'))
+  ) {
+    let cleanRule = q
+      .replace(/^(yaad rakhna|yaad rakho|remember this|remember that|note kar lo|ye rule hai|meri firm ka rule hai|rule jod do|hamesha yaad rakhna|future ke liye yaad rakhna)s*[:,-]?s*/i, '')
+      .trim();
+
+    if (!cleanRule || cleanRule.length < 3) cleanRule = q;
+
+    let category: 'PREFERENCE' | 'CLIENT_RULE' | 'STAFF_RULE' | 'FEE_RULE' | 'GENERAL_NOTE' = 'GENERAL_NOTE';
+    let topic = 'Firm Custom Rule';
+
+    if (lower.includes('fee') || lower.includes('billing') || lower.includes('rupaye') || lower.includes('charge') || lower.includes('paisa')) {
+      category = 'FEE_RULE';
+      topic = 'Billing & Fees Policy';
+    } else if (lower.includes('staff') || lower.includes('team') || lower.includes('employee') || lower.includes('assign') || lower.includes('karega') || lower.includes('karegi')) {
+      category = 'STAFF_RULE';
+      topic = 'Staff Allocation Rule';
+    } else {
+      const clientMatch = findBestMatchingClient(cleanRule, contextData.clients);
+      if (clientMatch) {
+        category = 'CLIENT_RULE';
+        topic = `Client Rule: ${clientMatch.client.tradeName}`;
+      } else {
+        category = 'PREFERENCE';
+        topic = 'Operational Preference';
+      }
+    }
+
+    const memoryItem = StorageService.addLearnedMemoryItem({
+      category,
+      topic,
+      content: cleanRule,
+      source: 'USER_CHAT'
+    });
+
+    return {
+      replyText: `Maine ye rule apni **Long-Term Memory** me permanently sikh kar save kar liya hai! 🧠✨\n\n` +
+        `• **Topic:** ${topic}\n` +
+        `• **Rule / Learned Instruction:** "${cleanRule}"\n` +
+        `• **Category:** ${category}\n\n` +
+        `Ab se main har future task creation, staff assignment, extra billing aur conversation me is rule ko 100% follow karunga!\n\nAap upar **🧠 AI Memory** button dabakar sabhi learned rules dekh ya edit kar sakte hain.`,
+      action: {
+        type: 'LEARN_MEMORY',
+        title: `🧠 Rule Learned: ${topic}`,
+        description: cleanRule,
+        data: memoryItem,
+        executed: true,
+        targetTab: 'ai-bot'
+      }
+    };
+  }
+
+  // Inquiry: "kya yaad hai", "learned rules", "ai memory", "firm ke rules batao"
+  if (
+    lower.includes('kya yaad') || 
+    lower.includes('rules kya') || 
+    lower.includes('learned memory') || 
+    lower.includes('firm ke rules') || 
+    lower.includes('yaad hai kya') ||
+    lower.includes('memory dikhao')
+  ) {
+    const memory = StorageService.getLearnedMemory();
+    if (memory.length === 0) {
+      return {
+        replyText: 'Abhi tak koi custom rule ya memory save nahi hai. Aap mujhse "yaad rakhna CloudWave ka GST filing Amit karega" ya "notice reply ki minimum fee 5000 hogi" bolkar naye rules sikha sakte hain!'
+      };
+    }
+    const memList = memory.map((m, i) => `${i + 1}. **[${m.topic}]**: ${m.content} *(Learned: ${m.learnedAt})*`).join('\n');
+    return {
+      replyText: `🧠 **Meri Long-Term Memory me ye ${memory.length} rules aur preferences saved hain:**\n\n${memList}\n\nMain in sabhi rules ko dhyan me rakhkar kaam karta hoon!`
     };
   }
 

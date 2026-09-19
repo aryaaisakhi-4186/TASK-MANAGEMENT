@@ -170,3 +170,14 @@ export interface SystemSettings {
   googleWebhookUrl?: string;
   lastCloudSyncTimestamp?: string;
 }
+
+export type AIMemoryCategory = 'PREFERENCE' | 'CLIENT_RULE' | 'STAFF_RULE' | 'FEE_RULE' | 'GENERAL_NOTE';
+
+export interface AIMemoryItem {
+  id: string;
+  category: AIMemoryCategory;
+  topic: string;
+  content: string;
+  source: 'USER_CHAT' | 'MANUAL';
+  learnedAt: string;
+}

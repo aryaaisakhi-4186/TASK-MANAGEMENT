@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { Client, TaskItem, ExtraWorkItem, UserProfile } from '../types';
+import { Client, TaskItem, ExtraWorkItem, UserProfile, AIMemoryItem } from '../types';
+import { StorageService } from './storage';
 
 const GEMINI_STORAGE_KEY = 'taskvaani_user_gemini_api_key';
 
@@ -29,9 +30,12 @@ export interface AppContextData {
   team: UserProfile[];
   extraWork: ExtraWorkItem[];
   currentUser?: UserProfile;
+  learnedMemory?: AIMemoryItem[];
 }
 
 export const buildSystemPrompt = (context: AppContextData): string => {
+  const memory = context.learnedMemory || StorageService.getLearnedMemory();
+
   const clientsList = context.clients.length > 0
     ? context.clients.map((c, i) => `${i + 1}. ${c.tradeName} (Legal: ${c.legalName || c.tradeName} | PAN: ${c.pan || 'N/A'} | GSTIN: ${c.gstin || 'N/A'} | Category: ${c.category} | Phone: ${c.phone || 'N/A'} | Contact: ${c.contactPerson || 'N/A'} | Staff: ${c.assignedTeamName || 'Unassigned'})`).join('\n')
     : 'No clients recorded yet.';
@@ -48,16 +52,24 @@ export const buildSystemPrompt = (context: AppContextData): string => {
     ? context.extraWork.map((e, i) => `${i + 1}. ${e.taskTitle} for ${e.clientName} (Agreed: ₹${e.agreedFee}, Balance: ₹${e.balanceDue}, Status: ${e.status})`).join('\n')
     : 'No extra billing assignments.';
 
+  const memoryList = memory.length > 0
+    ? memory.map((m, i) => `${i + 1}. [${m.category}] ${m.topic}: ${m.content} (Learned: ${m.learnedAt})`).join('\n')
+    : 'No custom memory rules saved yet.';
+
   return `You are "CA-CompliBot", a warm, highly intelligent, human-like AI Chartered Accountant, Tax Consultant, and Practice Manager built into the TASK-VAANI practice management app.
 
 TONE & PERSONALITY:
 - Speak completely naturally like a supportive, smart, and experienced senior colleague or CA partner sitting right next to the user.
 - Respond in the same language the user uses (Hindi, Hinglish, or English).
-- NEVER use robotic phrases like "Aapke nirdesh ke sambandh me", "System status:", or repetitive boilerplate lists.
-- Be conversational, friendly, polite, and helpful for general greetings ("Hello", "Kaise ho", "What is your name"), small talk, and questions about what you do.
+- When the user asks you to perform work or look up data, read their question thoroughly and give a direct, exact, helpful response.
+- Execute actions in the correct app areas:
+  • Client profiles -> Clients Master
+  • Tasks & Filings -> Compliance Matrix
+  • Extra Ad-hoc Billing -> Extra Work Tracker
+  • Documents & Statements -> Document Vault
+  • Shift & Lunch Breaks -> Attendance & Focus
 
-YOUR REAL-TIME FIRM KNOWLEDGE:
-You have direct live access to the firm's real operational data:
+YOUR REAL-TIME FIRM OPERATIONAL KNOWLEDGE:
 ---
 CLIENTS (${context.clients.length}):
 ${clientsList}
@@ -70,12 +82,15 @@ ${teamList}
 
 EXTRA BILLING & AD-HOC WORK:
 ${extraWorkList}
+
+AI LEARNED LONG-TERM KNOWLEDGE & USER RULES (${memory.length}):
+${memoryList}
 ---
 
 INSTRUCTIONS:
-1. When asked questions about clients, tasks, staff, fees, or status, directly lookup the real data above and answer specifically and accurately.
-2. For tax, GST, TDS (194Q, 206AB), Income Tax Act 1961 (44AB, 44AD), MCA/ROC compliances, provide expert, practical Chartered Accountant advice with section numbers and thresholds.
-3. For friendly talk ("Hi", "Hello", "Kaun ho tum", "Kya kar sakte ho"), reply warmly and naturally like a real human assistant.`;
+1. ALWAYS obey all learned rules and firm preferences listed in the Long-Term Knowledge section above.
+2. If the user tells you to remember a new rule (e.g. "yaad rakhna...", "remember this..."), acknowledge it warmly and confirm how you will use it in the future.
+3. When the user asks you to execute a task or record billing, provide clear summary details and confirm that it has been saved in the correct tab.`;
 };
 
 export const callClientGeminiAI = async (
