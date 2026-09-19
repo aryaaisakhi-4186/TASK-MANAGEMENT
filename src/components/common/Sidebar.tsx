@@ -12,7 +12,10 @@ import {
   Bot, 
   Settings,
   Clock,
-  Sparkles
+  Sparkles,
+  Phone,
+  MessageCircle,
+  Mail
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -70,10 +73,51 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
         })}
       </nav>
 
-      {/* Footer Info */}
-      <div className="pt-4 border-t border-slate-200 dark:border-slate-800/80 px-2 text-[11px] text-slate-500">
-        <p className="font-semibold text-slate-700 dark:text-slate-400">TASK-VAANI Enterprise v1.0</p>
-        <p>Day Light Corporate Workspace</p>
+      {/* Contact Us Support Box */}
+      <div className="pt-3 border-t border-slate-200 dark:border-slate-800/80 px-2 space-y-2">
+        <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/25 space-y-2 text-[11px]">
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+              <Phone size={13} className="text-amber-600 dark:text-amber-400" />
+              <span>Contact Us</span>
+            </span>
+            <span className="text-[9px] bg-amber-500/20 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded font-mono font-bold">Support</span>
+          </div>
+
+          <div className="space-y-1">
+            <a
+              href="tel:+918982147763"
+              className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 hover:text-amber-600 font-mono font-bold text-[10px] transition-colors"
+            >
+              <Phone size={11} className="text-amber-500 shrink-0" />
+              <span>+91-8982147763</span>
+            </a>
+
+            <a
+              href="https://wa.me/918982147763?text=Namaste%20TASK-VAANI%20Support"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 hover:underline font-bold text-[10px] transition-colors"
+            >
+              <MessageCircle size={11} className="text-emerald-500 shrink-0" />
+              <span>WhatsApp Direct Chat</span>
+            </a>
+
+            <a
+              href="mailto:arya.taskmanagement@gmail.com"
+              className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-amber-500 text-[10px] truncate transition-colors"
+              title="arya.taskmanagement@gmail.com"
+            >
+              <Mail size={11} className="text-amber-500 shrink-0" />
+              <span className="truncate">arya.taskmanagement@gmail.com</span>
+            </a>
+          </div>
+        </div>
+
+        <div className="px-1 text-[10px] text-slate-500">
+          <p className="font-semibold text-slate-600 dark:text-slate-400">TASK-VAANI Enterprise</p>
+          <p>Statutory Compliance Hub</p>
+        </div>
       </div>
     </aside>
   );

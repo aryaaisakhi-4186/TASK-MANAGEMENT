@@ -19,7 +19,10 @@ import {
   ChevronDown,
   ChevronUp,
   CheckSquare,
-  Square
+  Square,
+  Phone,
+  Mail,
+  MessageCircle
 } from 'lucide-react';
 
 export const HomePageLogin: React.FC = () => {
@@ -405,9 +408,60 @@ export const HomePageLogin: React.FC = () => {
 
       </section>
 
-      {/* Footer */}
-      <footer className="w-full border-t border-slate-800/60 bg-slate-950/40 py-3 px-6 text-center text-xs text-slate-500">
-        TASK-VAANI • Statutory Compliance Hub • Built for Chartered Accountants & Tax Professionals
+      {/* Footer with Contact Us & WhatsApp / Email / Phone */}
+      <footer className="w-full border-t border-slate-800/80 bg-slate-950/70 backdrop-blur-xl py-4 px-4 sm:px-6 text-xs text-slate-400">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          
+          <div className="text-center md:text-left">
+            <p className="font-bold text-white font-serif flex items-center justify-center md:justify-start gap-1.5">
+              <span>TASK-VAANI</span>
+              <span className="text-[10px] text-amber-400 font-sans font-normal">• Statutory Compliance Hub</span>
+            </p>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              Built for Chartered Accountants & Tax Professionals
+            </p>
+          </div>
+
+          {/* Contact Us Interactive Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider mr-1">
+              Contact Us:
+            </span>
+
+            {/* Direct Phone Call */}
+            <a
+              href="tel:+918982147763"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/40 text-slate-200 hover:text-white font-mono text-[11px] font-bold transition-all shadow-sm active:scale-95"
+              title="Call +91-8982147763"
+            >
+              <Phone size={13} className="text-amber-400" />
+              <span>+91-8982147763</span>
+            </a>
+
+            {/* Direct WhatsApp Chat */}
+            <a
+              href="https://wa.me/918982147763?text=Namaste%20TASK-VAANI%20Support%2C%20I%20have%20a%20query%20regarding%20the%20app."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/40 text-emerald-300 hover:text-emerald-200 text-[11px] font-bold transition-all shadow-sm active:scale-95"
+              title="Direct WhatsApp Chat"
+            >
+              <MessageCircle size={13} className="text-emerald-400" />
+              <span>WhatsApp Chat</span>
+            </a>
+
+            {/* Direct Email */}
+            <a
+              href="mailto:arya.taskmanagement@gmail.com"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/40 text-slate-200 hover:text-white text-[11px] font-medium transition-all shadow-sm active:scale-95"
+              title="Send Email"
+            >
+              <Mail size={13} className="text-amber-400" />
+              <span>arya.taskmanagement@gmail.com</span>
+            </a>
+          </div>
+
+        </div>
       </footer>
 
     </div>

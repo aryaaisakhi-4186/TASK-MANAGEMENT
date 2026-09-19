@@ -10,7 +10,10 @@ import {
   ShieldCheck, 
   Smartphone,
   Sparkles,
-  Download
+  Download,
+  Phone,
+  MessageCircle,
+  Mail
 } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 
@@ -135,6 +138,47 @@ export const MobileMoreDrawer: React.FC<Props> = ({
               </button>
             </>
           )}
+        </div>
+
+        {/* Contact Us Support Card */}
+        <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-xs text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                <Phone size={14} className="text-amber-600 dark:text-amber-400" />
+                <span>Contact Us & Support</span>
+              </span>
+              <span className="text-[10px] bg-amber-500/20 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-full font-bold">Helpdesk</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <a
+                href="tel:+918982147763"
+                className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-mono font-bold text-xs shadow-sm"
+              >
+                <Phone size={12} className="text-amber-500" />
+                <span>Call Us</span>
+              </a>
+
+              <a
+                href="https://wa.me/918982147763?text=Namaste%20TASK-VAANI%20Support"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-sm"
+              >
+                <MessageCircle size={12} />
+                <span>WhatsApp</span>
+              </a>
+            </div>
+
+            <a
+              href="mailto:arya.taskmanagement@gmail.com"
+              className="flex items-center justify-center gap-1.5 text-[11px] text-slate-600 dark:text-slate-400 hover:text-amber-500 font-medium truncate pt-1"
+            >
+              <Mail size={12} className="text-amber-500 shrink-0" />
+              <span className="truncate">arya.taskmanagement@gmail.com</span>
+            </a>
+          </div>
         </div>
 
       </div>
