@@ -1,7 +1,9 @@
 import { getStoredGeminiKey, setStoredGeminiKey } from '../../services/clientAIService';
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Bot, 
+  Bot,
+  Copy,
+  RotateCcw, 
   Key,
   Send, 
   Sparkles, 
@@ -78,6 +80,8 @@ export const CACompliBot: React.FC<{
   const { currentRole, currentUser } = useAuth();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load chat history from localStorage
@@ -303,17 +307,32 @@ export const CACompliBot: React.FC<{
     }
   };
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() && !attachedFile) return;
+  const handleCopyMessage = (text: string, msgId: string) => {
+    try {
+      navigator.clipboard.writeText(text);
+      setCopiedMsgId(msgId);
+      setTimeout(() => setCopiedMsgId(null), 2000);
+    } catch (e) {
+      console.warn('Clipboard write error:', e);
+    }
+  };
 
-    const userText = input;
+  const handleEditMessage = (text: string) => {
+    setInput(text);
+    inputRef.current?.focus();
+    scrollToBottom();
+  };
+
+  const sendUserPrompt = async (userText: string) => {
+    if (!userText.trim() && !attachedFile) return;
+
+    const textToSend = userText.trim();
     setInput('');
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       sender: 'user',
-      text: userText,
+      text: textToSend,
       timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -321,7 +340,7 @@ export const CACompliBot: React.FC<{
     setLoading(true);
 
     try {
-      const response = await processAgenticCommand(userText, {
+      const response = await processAgenticCommand(textToSend, {
         clients,
         tasks,
         team,
@@ -333,7 +352,7 @@ export const CACompliBot: React.FC<{
           designation: currentUser.designation,
           pin: '1234'
         } : undefined
-      });
+      }, messages);
 
       const msgId = (Date.now() + 1).toString();
 
@@ -359,6 +378,16 @@ export const CACompliBot: React.FC<{
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResendMessage = (text: string) => {
+    sendUserPrompt(text);
+  };
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() && !attachedFile) return;
+    await sendUserPrompt(input);
   };
 
   const updatePreviewField = (msgId: string, field: keyof Client, value: any) => {
@@ -539,6 +568,51 @@ export const CACompliBot: React.FC<{
                       {msg.timestamp}
                     </div>
                   </div>
+
+                  {/* Message Action Toolbar: Copy, Edit, Retry */}
+                  {msg.sender === 'user' ? (
+                    <div className="flex items-center justify-end gap-1.5 pt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
+                      <button
+                        type="button"
+                        onClick={() => handleCopyMessage(msg.text, msg.id)}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold transition-all shadow-sm"
+                        title="Copy message prompt"
+                      >
+                        {copiedMsgId === msg.id ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+                        <span>{copiedMsgId === msg.id ? 'Copied!' : 'Copy'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleEditMessage(msg.text)}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-300 border border-amber-500/30 font-semibold transition-all shadow-sm"
+                        title="Edit prompt in input bar"
+                      >
+                        <Edit3 size={11} />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleResendMessage(msg.text)}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold transition-all shadow-sm"
+                        title="Resend this message"
+                      >
+                        <RotateCcw size={11} />
+                        <span>Retry</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-start gap-1.5 pt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
+                      <button
+                        type="button"
+                        onClick={() => handleCopyMessage(msg.text, msg.id)}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold transition-all shadow-sm"
+                        title="Copy AI response"
+                      >
+                        {copiedMsgId === msg.id ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+                        <span>{copiedMsgId === msg.id ? 'Copied Response!' : 'Copy Response'}</span>
+                      </button>
+                    </div>
+                  )}
 
                   {/* 1. Interactive Live Editable Preview Card for Client Setup */}
                   {isPreviewAction && (
@@ -741,6 +815,7 @@ export const CACompliBot: React.FC<{
           </button>
 
           <input
+            ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}

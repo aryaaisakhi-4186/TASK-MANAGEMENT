@@ -544,7 +544,37 @@ export const processAgenticCommand = async (
   // 4. NATURAL HUMAN CONVERSATIONAL NLP ENGINE (Instant, Contextual & Empathetic)
   // =========================================================================
 
-  // A. Friendly Greetings & Small Talk
+  // A. Document Vault, Bank Statements, PDF, Drive Storage, File Upload Inquiries
+  // (e.g. "main agar tume bank statement ki pdf du to tum use document vault me sahi clinet me save kar loge", "bank statement analyze kar sakte ho")
+  if (
+    lower.includes('bank statement') ||
+    lower.includes('statement') ||
+    lower.includes('document vault') ||
+    lower.includes('vault') ||
+    (lower.includes('pdf') && (lower.includes('save') || lower.includes('read') || lower.includes('padh') || lower.includes('upload') || lower.includes('du') || lower.includes('den') || lower.includes('rakh') || lower.includes('store'))) ||
+    lower.includes('save kar loge') ||
+    lower.includes('save karoge') ||
+    lower.includes('save kar sakte') ||
+    lower.includes('drive me save') ||
+    lower.includes('cloud me save') ||
+    lower.includes('folder me save') ||
+    (lower.includes('document') && (lower.includes('save') || lower.includes('upload') || lower.includes('kaha') || lower.includes('kaise')))
+  ) {
+    const clientMatch = findBestMatchingClient(q, contextData.clients);
+    const clientNameStr = clientMatch ? `**${clientMatch.client.tradeName}**` : 'sahi client';
+
+    return {
+      replyText: `Haan, bilkul! Main aapke diye gaye documents ko accurately read karke ${clientNameStr} ke **Document Vault** me store kar sakta hoon. 📂✨\n\n` +
+        `**Kaise kaam karta hai:**\n` +
+        `1. **📎 PDF / Statement Upload karein**: Niche **📎 Paperclip** icon ya upar **"Read GST / PAN PDF"** button par click karke Bank Statement, GST Certificate (REG-06), PAN Card ya Tax Invoice attach karein.\n` +
+        `2. **🔍 Automatic Client & Data Extraction**: Main document se Trade Name, PAN, GSTIN aur details instantly extract karke screen par **Live Preview** dikhaunga.\n` +
+        `3. **📁 Sahi Client ke Vault me Save**: Jab aap **"Confirm & Import"** karenge, to document ${clientNameStr} ke **Document Vault** aur unke linked **Google Drive Folder** me bina kisi duplicate row ke 100% safely save ho jayega.\n` +
+        `4. **☁️ Zero Local Storage**: Sabhi files direct Google Drive cloud par archive hoti hain, jisse aapke device ka space 0% use hota hai!\n\n` +
+        `Aap abhi paperclip (📎) icon daba kar file attach karke test kar sakte hain!`
+    };
+  }
+
+  // B. Friendly Greetings & Small Talk
   if (lower === 'hi' || lower === 'hello' || lower === 'hey' || lower === 'namaste' || lower === 'pranam' || lower.startsWith('hello ') || lower.startsWith('hi ')) {
     if (lower.includes('name') || lower.includes('naam') || lower.includes('who are you') || lower.includes('kaun ho')) {
       return {
@@ -556,7 +586,7 @@ export const processAgenticCommand = async (
     };
   }
 
-  // B. Identity, Name, and Role Inquiries
+  // C. Identity, Name, and Role Inquiries
   if (lower.includes('what is your name') || lower.includes('naam kya hai') || lower.includes('who are you') || lower.includes('kaun ho tum') || lower.includes('koun ho')) {
     return {
       replyText: `Mera naam **CA-CompliBot** hai! Main aapka personal AI assistant aur practice manager hoon. 
@@ -564,19 +594,20 @@ export const processAgenticCommand = async (
 Aap mujhse:
 • Kisi bhi client ki details (PAN, GSTIN, Phone, Profile) puch sakte hain
 • Naye task ya extra billing add karwa sakte hain
+• Bank statement, GST certificate ya PAN PDF upload karke Document Vault me save karwa sakte hain
 • Income Tax, GST aur MCA statutory rules par advice le sakte hain
 • Office login, lunch break aur attendance mark karwa sakte hain.`
     };
   }
 
-  // C. How are you / Kaise ho
+  // D. How are you / Kaise ho
   if (lower.includes('kaise ho') || lower.includes('how are you') || lower.includes('kya haal hai') || lower.includes('sab theek')) {
     return {
       replyText: `Main bilkul badhiya hoon! Aapki firm ke sabhi records (${contextData.clients.length} Clients aur ${contextData.tasks.length} Compliance Tasks) up-to-date hain. Aap batayein, aaj kis client ka kaam process karein?`
     };
   }
 
-  // D. Robust Client Profile & Information Lookup (When specifically asking for client info / details / profile)
+  // E. Robust Client Profile & Information Lookup
   const isProfileInquiry = lower.includes('profile') || lower.includes('detail') || lower.includes('phone') || lower.includes('number') || lower.includes('pan') || lower.includes('gstin') || lower.includes('address') || lower.includes('contact') || lower.includes('koun hai') || lower.includes('kya hai') || lower.includes('batao') || lower.includes('dikhao') || lower.includes('check');
   const clientMatch = findBestMatchingClient(q, contextData.clients);
 
@@ -618,12 +649,12 @@ Kya aap inka koi naya compliance task schedule karna chahte hain ya details upda
     };
   }
 
-  // E. Capabilities / "Tum kya kya kar sakte ho"
-  if (lower.includes('tum kya') || lower.includes('what can you do') || lower.includes('help me') || lower.includes('kya kaam') || lower.includes('capabilities')) {
+  // F. Capabilities / "Tum kya kya kar sakte ho" / "Can you do..."
+  if (lower.includes('tum kya') || lower.includes('what can you do') || lower.includes('help me') || lower.includes('kya kaam') || lower.includes('capabilities') || lower.includes('kya kar sakte') || lower.includes('kar sakte ho') || lower.includes('kar loge')) {
     return {
       replyText: `Main aapki firm ke liye ek senior practice assistant ki tarah kaam karta hoon. Yahan kuch mukhya cheezein hain jo main kar sakta hoon:
 
-1. **📄 GST & PAN PDF Reading**: GST Certificate (REG-06) ya PAN PDF upload karein — main bina kisi dummy data ke accurate trade name, PAN, GSTIN aur constitution extract kar dunga.
+1. **📄 GST & PAN PDF / Bank Statement Reading**: GST Certificate (REG-06), Bank Statement ya PAN PDF upload karein — main accurate trade name, PAN, GSTIN extract karke unke **Document Vault** me store kar dunga.
 2. **💰 Extra Work & Billing Tracking**: "CloudWave ka extra work provisional balance sheet fee 10000 jod do" — instantly Extra Work Tracker me add karega.
 3. **✅ Task Scheduling & Updates**: "Apex Tools ka GSTR-3B task banao" ya "Rakhi Agency ka GST complete mark karo".
 4. **🔍 Instant Client Lookups**: Kisi bhi client ka naam bolkar unki poori profile, PAN, mobile number, ya pending tasks puchen.
@@ -632,7 +663,7 @@ Kya aap inka koi naya compliance task schedule karna chahte hain ya details upda
     };
   }
 
-  // F. Pending Tasks Inquiries
+  // G. Pending Tasks Inquiries
   if (lower.includes('pending') || lower.includes('baki') || lower.includes('due') || lower.includes('overdue') || (lower.includes('task') && (lower.includes('dikhao') || lower.includes('batao') || lower.includes('list')))) {
     let pending = contextData.tasks.filter(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS');
 
@@ -657,7 +688,7 @@ Kya aap inka koi naya compliance task schedule karna chahte hain ya details upda
     };
   }
 
-  // G. Staff & Team Directory
+  // H. Staff & Team Directory
   if (lower.includes('staff') || lower.includes('team') || lower.includes('member') || lower.includes('employee') || lower.includes('associates')) {
     if (contextData.team.length === 0) {
       return { replyText: 'Abhi system me koi team member add nahi hai. Aap Settings tab me jakar staff add kar sakte hain.' };
@@ -668,7 +699,7 @@ Kya aap inka koi naya compliance task schedule karna chahte hain ya details upda
     };
   }
 
-  // H. Billing & Balance Fees
+  // I. Billing & Balance Fees
   if (lower.includes('extra work') || lower.includes('billing') || lower.includes('fee') || lower.includes('balance') || lower.includes('fees') || lower.includes('paisa')) {
     if (contextData.extraWork.length === 0) {
       return { replyText: 'Abhi tak koi Extra Work ya Ad-hoc billing record nahi kiya gaya hai. Aap "CloudWave ka extra work provisional balance sheet fee 10000 jod do" bolkar naya billing assignment create kar sakte hain.' };
@@ -685,7 +716,7 @@ Aap Extra Work Tracker tab me jakar client-wise invoice dekh sakte hain.`
     };
   }
 
-  // I. Statutory Tax Knowledge (Income Tax 194Q, 206AB, 44AB, GST)
+  // J. Statutory Tax Knowledge (Income Tax 194Q, 206AB, 44AB, GST)
   if (lower.includes('194q') || lower.includes('206c') || lower.includes('44ab') || lower.includes('44ad') || lower.includes('115bac') || lower.includes('drc-01') || lower.includes('itc')) {
     if (lower.includes('194q')) {
       return {
@@ -707,17 +738,17 @@ Aap Extra Work Tracker tab me jakar client-wise invoice dekh sakte hain.`
     }
   }
 
-  // J. Thank you / Pleasantries
+  // K. Thank you / Pleasantries
   if (lower.includes('thank') || lower.includes('dhanyawad') || lower.includes('shukriya') || lower.includes('great') || lower.includes('good job') || lower.includes('shabash')) {
     return {
       replyText: `Aapka bahut-bahut shukriya! 🙏 Main hamesha aapke office management aur tax compliances ke liye yahan moujood hoon. Kuch aur help chahiye ho to batayein!`
     };
   }
 
-  // K. Default Conversational Response
+  // L. Default Conversational Response
   return {
-    replyText: `Main aapki baat samajh gaya! Is samay aapki firm me **${contextData.clients.length} Clients** aur **${contextData.tasks.length} Compliance Tasks** active hain. 
+    replyText: `Main aapki baat samajh gaya! Is samay aapki firm me **${contextData.clients.length} Clients** aur **${contextData.tasks.length} Compliance Tasks** active hain.
 
-Aap mujhse kisi bhi client (jaise "CloudWave Technologies", "Shri Ganesh Charitable", "Rakhi Agency") ka naam bolkar unka profile dekh sakte hain ya naya task/extra work jod sakte hain!`
+Aap mujhse kisi bhi client ka naam bolkar unka profile dekh sakte hain, 📎 PDF upload karke Document Vault me save karwa sakte hain, ya naya task/extra billing jod sakte hain!`
   };
 };
