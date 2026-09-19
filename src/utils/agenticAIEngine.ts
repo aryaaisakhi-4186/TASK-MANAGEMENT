@@ -643,8 +643,73 @@ export const processAgenticCommand = async (
   // 4. NATURAL HUMAN CONVERSATIONAL NLP ENGINE (Instant, Contextual & Empathetic)
   // =========================================================================
 
-  // A. Document Vault, Bank Statements, PDF, Drive Storage, File Upload Inquiries
-  // (e.g. "main agar tume bank statement ki pdf du to tum use document vault me sahi clinet me save kar loge", "bank statement analyze kar sakte ho")
+  // A. Name, Identity & Introduction Queries (Handles all variations: "tumara name kya hai", "apka naam", "who are you", "tera name", etc.)
+  const isNameOrIdentityInquiry = 
+    ((lower.includes('name') || lower.includes('naam') || lower.includes('nam')) && (lower.includes('kya') || lower.includes('kaun') || lower.includes('koun') || lower.includes('kon') || lower.includes('batao') || lower.includes('bataye') || lower.includes('tell') || lower.includes('what'))) ||
+    lower.includes('who are you') ||
+    lower.includes('what is your name') ||
+    lower.includes("what's your name") ||
+    lower.includes('tum kaun ho') ||
+    lower.includes('tum koun ho') ||
+    lower.includes('tum kon ho') ||
+    lower.includes('aap kaun ho') ||
+    lower.includes('aap koun ho') ||
+    lower.includes('aap kon ho') ||
+    lower.includes('ap kaun ho') ||
+    lower.includes('apna intro') ||
+    lower.includes('apna parichay') ||
+    lower.includes('apne bare me') ||
+    lower.includes('apne baare me') ||
+    lower.includes('tell me about yourself') ||
+    lower.includes('introduce yourself') ||
+    lower.includes('who created you') ||
+    lower.includes('kisne banaya') ||
+    lower.includes('kiski app hai');
+
+  if (isNameOrIdentityInquiry) {
+    return {
+      replyText: `Namaste! Mera naam **TASK-VAANI Agentic AI Assistant** hai. 🤖✨
+
+Main is app ka dedicated **AI Practice Manager aur Statutory CA Assistant** hoon.
+
+**Main aapke liye kya-kya kar sakta hoon:**
+• 📄 **GST / PAN / Bank Statement Reader**: PDF ya Excel upload karte hi trade name, GSTIN, PAN aur bank transactions extract karke sahi Document Vault me save karta hoon (bina kisi duplicate client ke).
+• 📋 **Statutory Task Matrix**: GSTR-3B, GSTR-1, PMT-06, TDS 24Q/26Q, Income Tax Return aur ROC tasks create aur track karta hoon.
+• 💰 **Ad-hoc Extra Billing**: "Client X ka provisional balance sheet fee ₹10,000 jod do" bolne par instantly Extra Work Tracker me add karta hoon.
+• ⏱️ **Office Shifts & Timers**: Office login, lunch break on/off, aur log-off manage karta hoon.
+• 🔍 **Client & Team Lookups**: Kisi bhi client ka naam bolkar unka PAN, GSTIN, mobile ya pending tasks dekh sakte hain.
+• 🧠 **Long-Term Memory**: Aap mujhse jo bhi naye rules ya practice policy sikhaate hain, main unhe permanent memory me yaad rakhta hoon!
+
+Batayein, aaj kis client ya compliance task me aapki madad karu?`
+    };
+  }
+
+  // B. What is TASK-VAANI / App Overview Queries (e.g. "task vaani kya hai", "ye app kya kaam karti hai")
+  if (
+    lower.includes('task vaani kya') || 
+    lower.includes('taskvaani kya') || 
+    lower.includes('app kya hai') || 
+    lower.includes('ye app kya') || 
+    lower.includes('kya software hai') ||
+    lower.includes('software ke bare me') ||
+    lower.includes('about task vaani') ||
+    lower.includes('about this app')
+  ) {
+    return {
+      replyText: `**TASK-VAANI — Statutory Compliance Hub** Chartered Accountants, Tax Practitioners, aur Compliance Professionals ke liye banaya gaya ek complete Operating System hai.
+
+**Iske 5 Mukhya Features:**
+1. 📊 **Compliance Matrix**: GST, TDS, Income Tax, ROC aur Audit ke monthly/annual statutory due dates ka live real-time dashboard.
+2. 🤖 **Autonomous Agentic AI**: PDF/Excel reading, OCR data extraction, auto task creation, aur Hindi/English conversational support.
+3. 📁 **Universal Document Vault**: Client-indexed Google Drive cloud storage jisme Bank Statements, Invoices, aur Scrutiny Notices (DRC-01, ASMT-10) auto-index hote hain.
+4. 👥 **Staff Management & Shifts**: Office Shift Login, 10:30 AM Statutory Chime, Lunch Break push timers, aur biometric punch logs.
+5. 💰 **Extra Billing Tracker**: Client-wise ad-hoc project reports, CMA data, aur advisory fees ka balance tracking.
+
+Aap upar diye gaye tabs me se kisi bhi section ko explore kar sakte hain!`
+    };
+  }
+
+  // C. Document Vault, Bank Statements, PDF, Drive Storage, File Upload Inquiries
   if (
     lower.includes('bank statement') ||
     lower.includes('statement') ||
@@ -673,40 +738,99 @@ export const processAgenticCommand = async (
     };
   }
 
-  // B. Friendly Greetings & Small Talk
-  if (lower === 'hi' || lower === 'hello' || lower === 'hey' || lower === 'namaste' || lower === 'pranam' || lower.startsWith('hello ') || lower.startsWith('hi ')) {
-    if (lower.includes('name') || lower.includes('naam') || lower.includes('who are you') || lower.includes('kaun ho')) {
+  // D. Friendly Greetings & Small Talk (Hi, Hello, Namaste, Pranam, etc.)
+  if (
+    lower === 'hi' || lower === 'hello' || lower === 'hey' || lower === 'namaste' || lower === 'pranam' || 
+    lower === 'namaskar' || lower === 'satsriakal' || lower === 'good morning' || lower === 'good afternoon' || 
+    lower === 'good evening' || lower.startsWith('hello ') || lower.startsWith('hi ') || lower.startsWith('hey ') ||
+    lower.startsWith('namaste ')
+  ) {
+    return {
+      replyText: `Namaste! Main **TASK-VAANI Agentic AI Assistant** hoon. Kaise hain aap?
+
+Aap mujhse koi bhi compliance task create karwa sakte hain, client profile dekh sakte hain, ya Bank Statement / GST PDF attach karke Document Vault me save karwa sakte hain.
+
+Aaj office me kis client ka kaam dekhna hai?`
+    };
+  }
+
+  // E. How are you / Kaise ho / Kya haal hai
+  if (
+    lower.includes('kaise ho') || 
+    lower.includes('how are you') || 
+    lower.includes('kya haal') || 
+    lower.includes('kya hal') || 
+    lower.includes('sab theek') || 
+    lower.includes('kaisa chal raha')
+  ) {
+    return {
+      replyText: `Main bilkul badhiya aur active hoon! 🙏
+
+Aapki firm ke records real-time sync hain:
+• **Clients in Master:** ${contextData.clients.length} Clients
+• **Active Compliance Tasks:** ${contextData.tasks.length} Tasks
+• **Staff Associates:** ${contextData.team.length} Members
+• **Extra Billing Assignments:** ${contextData.extraWork.length} Items
+
+Batayein, aaj kaunsa task process karein?`
+    };
+  }
+
+  // F. Capabilities / "Tum kya kya kar sakte ho" / "Can you do..."
+  if (
+    lower.includes('tum kya') || 
+    lower.includes('what can you do') || 
+    lower.includes('help me') || 
+    lower.includes('kya kaam') || 
+    lower.includes('capabilities') || 
+    lower.includes('kya kar sakte') || 
+    lower.includes('kar sakte ho') || 
+    lower.includes('kar loge') ||
+    lower.includes('madad kar sakte')
+  ) {
+    return {
+      replyText: `Main aapki firm ke liye ek senior practice manager aur tax assistant ki tarah kaam karta hoon:
+
+1. **📄 Universal Document & OCR Reader**: GST Certificate (REG-06), PAN Card, Bank Statement ya Invoice upload karein — main accurate data extract karke Document Vault me sahi folder me save karta hoon (Duplicate-Safe).
+2. **💰 Extra Billing & Ad-hoc Work**: "CloudWave ka provisional balance sheet fee ₹15,000 jod do" bolkar extra billing add karein.
+3. **✅ Task Scheduling & Done Updates**: "Apex Tools ka GSTR-3B task banao" ya "Bharat Logistics ka GST done mark karo".
+4. **🔍 Instant Client Profile Lookups**: Kisi bhi client ka naam bolkar unka PAN, GSTIN, mobile, address ya pending task list dekhein.
+5. **⏱️ Office Shift & Lunch Break**: "Office login karo", "Lunch break start karo", "Log off karo".
+6. **🧠 Continuous Rule Learning**: "Yaad rakhna..." bolkar firm ke custom rules aur policies sikhayein.`
+    };
+  }
+
+  // G. Guidance / How to do X in App (e.g. "client kaise banaye", "excel kaise upload kare")
+  if (
+    (lower.includes('kaise') || lower.includes('how to') || lower.includes('kaha se')) &&
+    (lower.includes('client') || lower.includes('task') || lower.includes('excel') || lower.includes('pdf') || lower.includes('vault') || lower.includes('team') || lower.includes('shift'))
+  ) {
+    if (lower.includes('client')) {
       return {
-        replyText: `Namaste! Mera naam **CA-CompliBot** hai. Main TASK-VAANI ka **AI Practice Manager aur Tax Assistant** hoon. Main aapke office ke clients, compliance tasks, GST/ITR filings, aur billing ko manage karne me madad karta hoon. Batayein, aaj kis kaam me help karu?`
+        replyText: `**Client add karne ke 3 aasan tarike hain:**
+1. **📄 PDF se Auto-Setup**: GST REG-06 ya PAN card ka PDF niche paperclip (📎) se attach karein. AI sabhi details extract karke live preview dikhayega aur 1-click me save karega.
+2. **🌐 Google Sheet / Excel**: **Client Master** tab me jakar **"Import Clients"** button dabayein aur apni Google Sheet link paste karein ya Excel file drop karein.
+3. **💬 AI Prompt se**: Chat me likhein *"Naya client XYZ Traders PAN ABCDE1234F jod do"*.`
       };
     }
-    return {
-      replyText: `Namaste! Main **CA-CompliBot** hoon. Kaise hain aap? Aaj office me kaunsa client ya compliance task dekhna hai?`
-    };
+    if (lower.includes('task')) {
+      return {
+        replyText: `**Compliance Task banane ke 2 aasan tarike:**
+1. **💬 AI se bole**: Chat me likhein *"Apex Tools ka GSTR-3B task banao priority high"* ya *"Client X ka TDS 24Q task add karo"*.
+2. **📋 Compliance Matrix Tab**: **Compliance Matrix** tab me jakar **"+ New Compliance Task"** button click karein.`
+      };
+    }
+    if (lower.includes('excel') || lower.includes('pdf')) {
+      return {
+        replyText: `**Excel / PDF Upload karne ke tarike:**
+• **Direct AI Chat**: Niche paperclip (📎) icon click karke multiple PDFs / Excel files ek sath attach karein. AI auto-detect karke Client Master, Team Directory, ya Document Vault me route kar dega.
+• **Client Master Tab**: "Import Clients" button se Google Sheet / Excel import karein.
+• **Staff Directory Tab**: "Import Team" button se staff list import karein.`
+      };
+    }
   }
 
-  // C. Identity, Name, and Role Inquiries
-  if (lower.includes('what is your name') || lower.includes('naam kya hai') || lower.includes('who are you') || lower.includes('kaun ho tum') || lower.includes('koun ho')) {
-    return {
-      replyText: `Mera naam **CA-CompliBot** hai! Main aapka personal AI assistant aur practice manager hoon. 
-
-Aap mujhse:
-• Kisi bhi client ki details (PAN, GSTIN, Phone, Profile) puch sakte hain
-• Naye task ya extra billing add karwa sakte hain
-• Bank statement, GST certificate ya PAN PDF upload karke Document Vault me save karwa sakte hain
-• Income Tax, GST aur MCA statutory rules par advice le sakte hain
-• Office login, lunch break aur attendance mark karwa sakte hain.`
-    };
-  }
-
-  // D. How are you / Kaise ho
-  if (lower.includes('kaise ho') || lower.includes('how are you') || lower.includes('kya haal hai') || lower.includes('sab theek')) {
-    return {
-      replyText: `Main bilkul badhiya hoon! Aapki firm ke sabhi records (${contextData.clients.length} Clients aur ${contextData.tasks.length} Compliance Tasks) up-to-date hain. Aap batayein, aaj kis client ka kaam process karein?`
-    };
-  }
-
-  // E. Robust Client Profile & Information Lookup
+  // H. Client Profile Lookup
   const isProfileInquiry = lower.includes('profile') || lower.includes('detail') || lower.includes('phone') || lower.includes('number') || lower.includes('pan') || lower.includes('gstin') || lower.includes('address') || lower.includes('contact') || lower.includes('koun hai') || lower.includes('kya hai') || lower.includes('batao') || lower.includes('dikhao') || lower.includes('check');
   const clientMatch = findBestMatchingClient(q, contextData.clients);
 
@@ -748,21 +872,7 @@ Kya aap inka koi naya compliance task schedule karna chahte hain ya details upda
     };
   }
 
-  // F. Capabilities / "Tum kya kya kar sakte ho" / "Can you do..."
-  if (lower.includes('tum kya') || lower.includes('what can you do') || lower.includes('help me') || lower.includes('kya kaam') || lower.includes('capabilities') || lower.includes('kya kar sakte') || lower.includes('kar sakte ho') || lower.includes('kar loge')) {
-    return {
-      replyText: `Main aapki firm ke liye ek senior practice assistant ki tarah kaam karta hoon. Yahan kuch mukhya cheezein hain jo main kar sakta hoon:
-
-1. **📄 GST & PAN PDF / Bank Statement Reading**: GST Certificate (REG-06), Bank Statement ya PAN PDF upload karein — main accurate trade name, PAN, GSTIN extract karke unke **Document Vault** me store kar dunga.
-2. **💰 Extra Work & Billing Tracking**: "CloudWave ka extra work provisional balance sheet fee 10000 jod do" — instantly Extra Work Tracker me add karega.
-3. **✅ Task Scheduling & Updates**: "Apex Tools ka GSTR-3B task banao" ya "Rakhi Agency ka GST complete mark karo".
-4. **🔍 Instant Client Lookups**: Kisi bhi client ka naam bolkar unki poori profile, PAN, mobile number, ya pending tasks puchen.
-5. **⏱️ Office Shifts & Lunch Timers**: "Office login", "Lunch break shuru", "Log off".
-6. **⚖️ Statutory CA Guidance**: TDS under 194Q, 206AB, Section 44AB audit limits, aur DRC-01 notices par technical guidance.`
-    };
-  }
-
-  // G. Pending Tasks Inquiries
+  // I. Pending Tasks Inquiries
   if (lower.includes('pending') || lower.includes('baki') || lower.includes('due') || lower.includes('overdue') || (lower.includes('task') && (lower.includes('dikhao') || lower.includes('batao') || lower.includes('list')))) {
     let pending = contextData.tasks.filter(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS');
 
@@ -787,10 +897,10 @@ Kya aap inka koi naya compliance task schedule karna chahte hain ya details upda
     };
   }
 
-  // H. Staff & Team Directory
+  // J. Staff & Team Directory
   if (lower.includes('staff') || lower.includes('team') || lower.includes('member') || lower.includes('employee') || lower.includes('associates')) {
     if (contextData.team.length === 0) {
-      return { replyText: 'Abhi system me koi team member add nahi hai. Aap Settings tab me jakar staff add kar sakte hain.' };
+      return { replyText: 'Abhi system me koi team member add nahi hai. Aap Staff Directory tab me jakar staff add kar sakte hain.' };
     }
     const staffSummary = contextData.team.map((m, i) => `${i + 1}. **${m.name}** (${m.designation || m.role}) ${m.phone ? `• 📞 ${m.phone}` : ''}`).join('\n');
     return {
@@ -798,10 +908,10 @@ Kya aap inka koi naya compliance task schedule karna chahte hain ya details upda
     };
   }
 
-  // I. Billing & Balance Fees
+  // K. Billing & Balance Fees
   if (lower.includes('extra work') || lower.includes('billing') || lower.includes('fee') || lower.includes('balance') || lower.includes('fees') || lower.includes('paisa')) {
     if (contextData.extraWork.length === 0) {
-      return { replyText: 'Abhi tak koi Extra Work ya Ad-hoc billing record nahi kiya gaya hai. Aap "CloudWave ka extra work provisional balance sheet fee 10000 jod do" bolkar naya billing assignment create kar sakte hain.' };
+      return { replyText: 'Abhi tak koi Extra Work ya Ad-hoc billing record nahi kiya gaya hai. Aap "CloudWave ka extra work provisional balance sheet fee ₹10,000 jod do" bolkar naya billing assignment create kar sakte hain.' };
     }
     const totalAgreed = contextData.extraWork.reduce((s, e) => s + (e.agreedFee || 0), 0);
     const totalBal = contextData.extraWork.reduce((s, e) => s + (e.balanceDue || 0), 0);
@@ -815,7 +925,7 @@ Aap Extra Work Tracker tab me jakar client-wise invoice dekh sakte hain.`
     };
   }
 
-  // J. Statutory Tax Knowledge (Income Tax 194Q, 206AB, 44AB, GST)
+  // L. Statutory Tax Knowledge (Income Tax 194Q, 206AB, 44AB, GST)
   if (lower.includes('194q') || lower.includes('206c') || lower.includes('44ab') || lower.includes('44ad') || lower.includes('115bac') || lower.includes('drc-01') || lower.includes('itc')) {
     if (lower.includes('194q')) {
       return {
@@ -837,17 +947,25 @@ Aap Extra Work Tracker tab me jakar client-wise invoice dekh sakte hain.`
     }
   }
 
-  // K. Thank you / Pleasantries
+  // M. Thank you / Pleasantries
   if (lower.includes('thank') || lower.includes('dhanyawad') || lower.includes('shukriya') || lower.includes('great') || lower.includes('good job') || lower.includes('shabash')) {
     return {
       replyText: `Aapka bahut-bahut shukriya! 🙏 Main hamesha aapke office management aur tax compliances ke liye yahan moujood hoon. Kuch aur help chahiye ho to batayein!`
     };
   }
 
-  // L. Default Conversational Response
+  // N. Smart Human-like Contextual Fallback
   return {
-    replyText: `Main aapki baat samajh gaya! Is samay aapki firm me **${contextData.clients.length} Clients** aur **${contextData.tasks.length} Compliance Tasks** active hain.
+    replyText: `Main aapki baat samajh raha hoon!
 
-Aap mujhse kisi bhi client ka naam bolkar unka profile dekh sakte hain, 📎 PDF upload karke Document Vault me save karwa sakte hain, ya naya task/extra billing jod sakte hain!`
+Aapne poocha: *"${q}"*
+
+Main **TASK-VAANI Agentic AI** hoon. Main aapke natural prompts par direct app ke andar action leta hoon:
+• 📄 **GST/PAN PDF ya Bank Statement**: Niche 📎 se attach karein, main verify karke Document Vault me save kar dunga.
+• 📋 **Task Schedule**: "Apex Tools ka GSTR-3B task banao" ya "GST complete mark karo".
+• 💰 **Extra Billing**: "Client X ka balance sheet fee ₹10,000 jod do".
+• 🔍 **Client Info**: Kisi bhi client ka naam bolkar unka PAN, GSTIN ya pending tasks dekhein.
+
+Kripya batayein aapko kaunsa specific client ya task execute karwana hai?`
   };
 };
