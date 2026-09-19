@@ -127,6 +127,7 @@ export const DocumentVault: React.FC = () => {
   const [tags, setTags] = useState('July 2026, Compliance');
   const [uploadMode, setUploadMode] = useState<'BROWSE' | 'CAMERA'>('BROWSE');
   const [selectedFileName, setSelectedFileName] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [selectedFileSize, setSelectedFileSize] = useState('420 KB');
   const [selectedFileType, setSelectedFileType] = useState('PDF');
   const [cameraStreamActive, setCameraStreamActive] = useState(false);
@@ -363,18 +364,32 @@ export const DocumentVault: React.FC = () => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    setSelectedFileName(file.name);
-    const sizeInKB = Math.round(file.size / 1024);
-    setSelectedFileSize(sizeInKB > 1024 ? `${(sizeInKB / 1024).toFixed(1)} MB` : `${sizeInKB} KB`);
-    const ext = file.name.split('.').pop()?.toUpperCase() || 'PDF';
-    setSelectedFileType(ext);
+    setSelectedFiles(files);
+    if (files.length === 1) {
+      const file = files[0];
+      setSelectedFileName(file.name);
+      const sizeInKB = Math.round(file.size / 1024);
+      setSelectedFileSize(sizeInKB > 1024 ? `${(sizeInKB / 1024).toFixed(1)} MB` : `${sizeInKB} KB`);
+      const ext = file.name.split('.').pop()?.toUpperCase() || 'PDF';
+      setSelectedFileType(ext);
 
-    if (!title) {
-      const cleanTitle = file.name.replace(/\.[^/.]+$/, '');
-      setTitle(cleanTitle);
+      if (!title) {
+        const cleanTitle = file.name.replace(/\.[^/.]+$/, '');
+        setTitle(cleanTitle);
+      }
+    } else {
+      setSelectedFileName(`${files.length} Documents Selected: ${files.map(f => f.name).slice(0, 3).join(', ')}${files.length > 3 ? '...' : ''}`);
+      const totalBytes = files.reduce((acc, f) => acc + f.size, 0);
+      const sizeInKB = Math.round(totalBytes / 1024);
+      setSelectedFileSize(sizeInKB > 1024 ? `${(sizeInKB / 1024).toFixed(1)} MB` : `${sizeInKB} KB`);
+      setSelectedFileType('BATCH');
+
+      if (!title) {
+        setTitle(`${files.length} Documents Batch`);
+      }
     }
   };
 
@@ -391,39 +406,78 @@ export const DocumentVault: React.FC = () => {
     setUploadDriveNotice(null);
 
     try {
-      // 1. Upload file metadata directly to Client's Google Drive Folder (Zero local storage waste)
-      const uploadRes = await GoogleDriveService.uploadDocumentToClientDriveFolder(
-        {
-          name: title || selectedFileName || 'Document',
+      if (selectedFiles.length > 1) {
+        let lastMsg = '';
+        for (const file of selectedFiles) {
+          const sizeInKB = Math.round(file.size / 1024);
+          const fSize = sizeInKB > 1024 ? `${(sizeInKB / 1024).toFixed(1)} MB` : `${sizeInKB} KB`;
+          const fType = file.name.split('.').pop()?.toUpperCase() || 'PDF';
+          const fTitle = file.name.replace(/\.[^/.]+$/, '');
+
+          const uploadRes = await GoogleDriveService.uploadDocumentToClientDriveFolder(
+            {
+              name: fTitle,
+              fileType: fType,
+              fileSize: fSize,
+              category: folderLabel
+            },
+            selectedClient,
+            'arya.taskmanagement@gmail.com'
+          );
+          lastMsg = uploadRes.message;
+
+          addDocument({
+            clientId,
+            clientName: selectedClient.tradeName,
+            title: fTitle,
+            category: uploadFolderId,
+            fileType: fType,
+            fileSize: fSize,
+            fileUrl: uploadRes.driveFileUrl,
+            googleDriveUrl: uploadRes.driveFileUrl,
+            googleDriveFileId: uploadRes.driveFileId,
+            isDriveSynced: true,
+            uploadSource: 'BROWSE',
+            uploadedBy: currentUser?.name || 'Staff',
+            tags: [folderLabel, ...tags.split(',').map(t => t.trim()).filter(Boolean)],
+          });
+        }
+        setUploadDriveNotice(`Successfully saved ${selectedFiles.length} documents directly to ${selectedClient.tradeName}'s Google Drive folder & Document Vault!`);
+      } else {
+        const uploadRes = await GoogleDriveService.uploadDocumentToClientDriveFolder(
+          {
+            name: title || selectedFileName || 'Document',
+            fileType: selectedFileType,
+            fileSize: selectedFileSize,
+            category: folderLabel,
+            base64OrBlob: capturedPhotoUrl || undefined
+          },
+          selectedClient,
+          'arya.taskmanagement@gmail.com'
+        );
+
+        addDocument({
+          clientId,
+          clientName: selectedClient.tradeName,
+          title: title || selectedFileName || 'Document',
+          category: uploadFolderId,
           fileType: selectedFileType,
           fileSize: selectedFileSize,
-          category: folderLabel,
-          base64OrBlob: capturedPhotoUrl || undefined
-        },
-        selectedClient,
-        'arya.taskmanagement@gmail.com'
-      );
+          fileUrl: uploadRes.driveFileUrl,
+          googleDriveUrl: uploadRes.driveFileUrl,
+          googleDriveFileId: uploadRes.driveFileId,
+          isDriveSynced: true,
+          uploadSource: uploadMode === 'CAMERA' ? 'CAMERA' : 'BROWSE',
+          uploadedBy: currentUser?.name || 'Staff',
+          tags: [folderLabel, ...tags.split(',').map(t => t.trim()).filter(Boolean)],
+        });
 
-      // 2. Index in Document Vault with Google Drive direct link
-      addDocument({
-        clientId,
-        clientName: selectedClient.tradeName,
-        title: title || selectedFileName || 'Document',
-        category: uploadFolderId,
-        fileType: selectedFileType,
-        fileSize: selectedFileSize,
-        fileUrl: uploadRes.driveFileUrl,
-        googleDriveUrl: uploadRes.driveFileUrl,
-        googleDriveFileId: uploadRes.driveFileId,
-        isDriveSynced: true,
-        uploadSource: uploadMode === 'CAMERA' ? 'CAMERA' : 'BROWSE',
-        uploadedBy: currentUser?.name || 'Staff',
-        tags: [folderLabel, ...tags.split(',').map(t => t.trim()).filter(Boolean)],
-      });
+        setUploadDriveNotice(uploadRes.message);
+      }
 
-      setUploadDriveNotice(uploadRes.message);
       setTitle('');
       setSelectedFileName('');
+      setSelectedFiles([]);
       setCapturedPhotoUrl(null);
       stopCamera();
 
@@ -551,6 +605,7 @@ export const DocumentVault: React.FC = () => {
                 <input
                   ref={fileInputRef}
                   type="file"
+                  multiple
                   accept=".pdf,image/*,.xlsx,.xls,.csv,.doc,.docx"
                   onChange={handleFileChange}
                   className="hidden"

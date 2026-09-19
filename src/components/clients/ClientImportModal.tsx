@@ -65,26 +65,34 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const handleFileProcess = async (file: File) => {
+  const handleMultipleFilesProcess = async (files: File[]) => {
+    if (!files || files.length === 0) return;
     setLoading(true);
     setErrorMsg(null);
     setImportSuccessCount(null);
-    setSourceName(file.name);
+    setSourceName(files.length === 1 ? files[0].name : `${files.length} Files (${files.map(f => f.name).slice(0, 3).join(', ')}${files.length > 3 ? '...' : ''})`);
 
     try {
-      const rows = await parseClientsFromFile(file);
-      setParsedRows(rows);
-      // If single file (e.g. PDF), automatically open edit view for instant review
-      if (rows.length === 1) {
+      let allRows: ParsedClientRow[] = [];
+      for (const file of files) {
+        const rows = await parseClientsFromFile(file);
+        allRows = [...allRows, ...rows];
+      }
+      setParsedRows(allRows);
+      if (allRows.length === 1) {
         setEditingIndex(0);
-        setEditFormData({ ...rows[0] });
+        setEditFormData({ ...allRows[0] });
       }
     } catch (err: any) {
       console.warn('Import parse error:', err);
-      setErrorMsg(err.message || 'Failed to read file. Please ensure it is a valid Excel or PDF file.');
+      setErrorMsg(err.message || 'Failed to read files. Please ensure valid Excel, PDF or image documents.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFileProcess = (file: File) => {
+    handleMultipleFilesProcess([file]);
   };
 
   const handleFetchGoogleSheet = async (e?: React.FormEvent) => {
@@ -120,13 +128,13 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleFileProcess(file);
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length > 0) handleMultipleFilesProcess(files);
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFileProcess(file);
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) handleMultipleFilesProcess(files);
   };
 
   const handleRemoveRow = (index: number) => {
@@ -406,7 +414,8 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".pdf,.xlsx,.xls,.csv"
+                  multiple
+                  accept=".pdf,.xlsx,.xls,.csv,image/*"
                   onChange={handleFileInputChange}
                   className="hidden"
                 />

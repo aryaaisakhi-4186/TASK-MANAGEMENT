@@ -220,59 +220,67 @@ export const CACompliBot: React.FC<{
     }));
   };
 
-  // Process Document File (PDF, Excel, Image) with Multi-Engine OCR & Document Intelligence
-  const handleFileUpload = async (file: File) => {
+  // Process Multiple Document Files (PDF, Images, Excel) with Multi-Engine OCR & Document Intelligence
+  const handleMultipleFilesUpload = async (files: File[]) => {
+    if (!files || files.length === 0) return;
     setLoading(true);
-    setAttachedFile(file);
 
     try {
-      // Use comprehensive Multi-Engine OCR (Gemini Vision + PDF.js + Binary Stream + Server API)
-      const clientData = await extractDocumentDataDirectly(file);
-      const msgId = (Date.now() + 1).toString();
-
-      // Check if duplicate exists
-      const isExisting = clients.some(c => 
-        (clientData.pan && clientData.pan !== 'PAN-PENDING' && c.pan?.toUpperCase() === clientData.pan?.toUpperCase()) ||
-        (clientData.gstin && c.gstin?.toUpperCase() === clientData.gstin?.toUpperCase())
-      );
-
+      const fileNames = files.map(f => f.name).join(', ');
       const userMsg: ChatMessage = {
         id: Date.now().toString(),
         sender: 'user',
-        text: `Please analyze "${file.name}" and extract all client profile fields (PAN, GSTIN, Trade Name, Legal Name, Contact, Phone, Category) with Live Preview before importing.`,
-        attachedFileName: file.name,
+        text: files.length === 1
+          ? `Please analyze "${files[0].name}" and extract all client profile fields (PAN, GSTIN, Trade Name, Legal Name, Contact, Phone, Category) with Live Preview before importing.`
+          : `Please analyze these ${files.length} uploaded documents (${fileNames}) and extract client profiles with Live Preview for all of them before importing.`,
+        attachedFileName: files.length === 1 ? files[0].name : `${files.length} Documents Attached`,
         timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
       };
 
-      const action: AgenticAction = {
-        type: 'PREVIEW_CLIENT',
-        title: isExisting ? `Update Profile: ${clientData.tradeName || file.name}` : `New Client: ${clientData.tradeName || file.name}`,
-        description: `PAN: ${clientData.pan || 'Pending'} • GSTIN: ${clientData.gstin || 'None'} • Type: ${clientData.category || 'PVT_LTD'} • Contact: ${clientData.contactPerson || 'N/A'}`,
-        data: clientData,
-        executed: false
-      };
+      setMessages(prev => [...prev, userMsg]);
 
-      // Set initial form data for preview
-      setPreviewFormData(prev => ({ ...prev, [msgId]: clientData }));
+      const newBotMessages: ChatMessage[] = [];
 
-      const botReply: ChatMessage = {
-        id: msgId,
-        sender: 'bot',
-        text: `📄 **${file.name}** ko accurately read aur analyze kar liya gaya hai! ✨\n\n` +
-          `• **Trade Name:** ${clientData.tradeName || 'N/A'}\n` +
-          `• **Legal Name:** ${clientData.legalName || clientData.tradeName || 'N/A'}\n` +
-          `• **PAN Number:** ${clientData.pan ? `` + clientData.pan + `` : '⚠️ Not detected'}\n` +
-          `• **GSTIN Number:** ${clientData.gstin ? `` + clientData.gstin + `` : '⚪ None / Unregistered'}\n` +
-          `• **Entity Constitution:** ${clientData.category || 'PVT_LTD'}\n` +
-          `• **Contact Person:** ${clientData.contactPerson || 'Authorized Representative'}\n` +
-          `• **Phone:** ${clientData.phone || 'Not detected'}\n` +
-          `• **Email:** ${clientData.email || 'Not detected'}\n\n` +
-          `Niche diye gaye **Live Extracted Client Preview** me sabhi columns me data feed ho chuka hai. Aap inhe verify ya edit karke **"Confirm & Import Client"** par click karein:`,
-        action,
-        timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-      };
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const clientData = await extractDocumentDataDirectly(file);
+        const msgId = (Date.now() + i + 1).toString();
 
-      setMessages(prev => [...prev, userMsg, botReply]);
+        const isExisting = clients.some(c => 
+          (clientData.pan && clientData.pan !== 'PAN-PENDING' && c.pan?.toUpperCase() === clientData.pan?.toUpperCase()) ||
+          (clientData.gstin && c.gstin?.toUpperCase() === clientData.gstin?.toUpperCase())
+        );
+
+        const action: AgenticAction = {
+          type: 'PREVIEW_CLIENT',
+          title: isExisting ? `Update Profile: ${clientData.tradeName || file.name}` : `New Client: ${clientData.tradeName || file.name}`,
+          description: `PAN: ${clientData.pan || 'Pending'} • GSTIN: ${clientData.gstin || 'None'} • Type: ${clientData.category || 'PVT_LTD'} • Contact: ${clientData.contactPerson || 'N/A'}`,
+          data: clientData,
+          executed: false
+        };
+
+        setPreviewFormData(prev => ({ ...prev, [msgId]: clientData }));
+
+        const botReply: ChatMessage = {
+          id: msgId,
+          sender: 'bot',
+          text: `📄 [${i + 1}/${files.length}] **${file.name}** successfully parsed! ✨\n\n` +
+            `• **Trade Name:** ${clientData.tradeName || 'N/A'}\n` +
+            `• **Legal Name:** ${clientData.legalName || clientData.tradeName || 'N/A'}\n` +
+            `• **PAN Number:** ${clientData.pan ? clientData.pan : '⚠️ Not detected'}\n` +
+            `• **GSTIN Number:** ${clientData.gstin ? clientData.gstin : '⚪ None / Unregistered'}\n` +
+            `• **Entity Constitution:** ${clientData.category || 'PVT_LTD'}\n` +
+            `• **Contact Person:** ${clientData.contactPerson || 'Authorized Representative'}\n` +
+            `• **Phone / Email:** ${clientData.phone || 'None'} • ${clientData.email || 'None'}\n\n` +
+            `Niche diye gaye **Live Preview** me details verify karein aur fir **"Confirm & Import Client"** par click karein:`,
+          action,
+          timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+        };
+
+        newBotMessages.push(botReply);
+      }
+
+      setMessages(prev => [...prev, ...newBotMessages]);
       setAttachedFile(null);
     } catch (err: any) {
       console.warn('Doc process error:', err);
@@ -799,10 +807,12 @@ export const CACompliBot: React.FC<{
         <input
           ref={fileInputRef}
           type="file"
+          multiple
           accept=".pdf,.xlsx,.xls,.csv,image/*"
           onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFileUpload(file);
+            const files = Array.from(e.target.files || []);
+            if (files.length > 0) handleMultipleFilesUpload(files);
+            e.target.value = "";
           }}
           className="hidden"
         />
