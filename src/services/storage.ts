@@ -87,7 +87,7 @@ export const StorageService = {
   getAuthSession: (): UserProfile | null => safeGet<UserProfile | null>(KEYS.AUTH_SESSION, null),
   saveAuthSession: (user: UserProfile | null) => safeSet(KEYS.AUTH_SESSION, user),
 
-  // Reset to initial seed data
+  // Reset to initial seed data (App Reset)
   resetToDefaults: () => {
     safeSet(KEYS.CLIENTS, SEED_CLIENTS);
     safeSet(KEYS.TASKS, SEED_TASKS);
@@ -95,6 +95,24 @@ export const StorageService = {
     safeSet(KEYS.EXTRA_WORK, SEED_EXTRA_WORK);
     safeSet(KEYS.DOCUMENTS, SEED_DOCUMENTS);
     safeSet(KEYS.AUDIT_LOGS, SEED_AUDIT_LOGS);
+    safeSet(KEYS.ATTENDANCE, []);
+    safeSet(KEYS.CLIENT_REMINDERS, []);
     safeSet(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
+  },
+
+  // Full clean factory wipeout (Full App Reset - 0 Data)
+  fullCleanWipe: () => {
+    safeSet(KEYS.CLIENTS, []);
+    safeSet(KEYS.TASKS, []);
+    safeSet(KEYS.TEAM, [SEED_TEAM_MEMBERS[0]]);
+    safeSet(KEYS.EXTRA_WORK, []);
+    safeSet(KEYS.DOCUMENTS, []);
+    safeSet(KEYS.AUDIT_LOGS, []);
+    safeSet(KEYS.ATTENDANCE, []);
+    safeSet(KEYS.CLIENT_REMINDERS, []);
+    safeSet(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
+    try {
+      localStorage.removeItem('taskvaani_agentic_ai_chat_history');
+    } catch {}
   }
 };

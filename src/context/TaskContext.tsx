@@ -65,6 +65,7 @@ interface TaskContextType {
   updateSettings: (updates: Partial<SystemSettings>) => void;
   purgeAuditLogs: () => void;
   resetAllData: () => void;
+  fullAppReset: () => void;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -767,6 +768,19 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setExtraWork(StorageService.getExtraWork());
     setDocuments(StorageService.getDocuments());
     setAuditLogs(StorageService.getAuditLogs());
+    setAttendanceRecords([]);
+    setSettings(StorageService.getSettings());
+  };
+
+  const fullAppReset = () => {
+    StorageService.fullCleanWipe();
+    setClients([]);
+    setTasks([]);
+    setTeam(StorageService.getTeam());
+    setExtraWork([]);
+    setDocuments([]);
+    setAuditLogs([]);
+    setAttendanceRecords([]);
     setSettings(StorageService.getSettings());
   };
 
@@ -811,7 +825,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logoffOffice,
       startLunchBreak,
       endLunchBreak,
-      resetAllData
+      resetAllData,
+      fullAppReset
     }}>
       {children}
     </TaskContext.Provider>
