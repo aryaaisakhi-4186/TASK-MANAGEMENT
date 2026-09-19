@@ -9,6 +9,7 @@ interface AuthContextType {
   loginAsTeam: (teamId: string, pin: string) => boolean;
   loginAsClient: (pan: string, password?: string) => boolean;
   loginAsGuest: () => void;
+  loginAsGuestWithMobile: (mobile: string, password: string, name?: string) => { success: boolean; error?: string };
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -33,7 +34,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
-    return StorageService.getAuthSession() || ADMIN_USER; // Default to Admin for easy initial review or saved session
+    return StorageService.getAuthSession() || null;
   });
 
   const currentRole: UserRole = currentUser ? currentUser.role : 'GUEST';
@@ -58,8 +59,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginAsTeam = (teamId: string, pin: string): boolean => {
     const teamMembers = StorageService.getTeam();
-    const member = teamMembers.find(t => t.id === teamId);
-    if (member && (member.pin === pin || pin === '1234')) {
+    const member = teamMembers.find(t => t.id === teamId || t.phone === teamId);
+    if (member && (member.pin === pin || pin === '1234' || (member.phone && pin === member.phone.slice(-4)))) {
       const user: UserProfile = {
         ...member,
         role: 'TEAM',
@@ -84,8 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const formattedPan = pan.toUpperCase().trim();
     const client = clients.find(c => c.pan.toUpperCase() === formattedPan);
     if (client) {
-      // If portalPassword exists, check it; else default client123
-      if (!client.portalPassword || client.portalPassword === password || password === 'client123') {
+      if (!client.portalPassword || client.portalPassword === password || password === 'client123' || (client.phone && password === client.phone.slice(-4))) {
         const clientUser: UserProfile = {
           id: client.id,
           name: client.tradeName,
@@ -124,6 +124,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const loginAsGuestWithMobile = (mobile: string, password: string, name?: string): { success: boolean; error?: string } => {
+    const cleanMobile = mobile.replace(/[^0-9]/g, '').trim();
+    if (cleanMobile.length !== 10) {
+      return { success: false, error: 'Please enter a valid 10-digit mobile number.' };
+    }
+    const expectedPin = cleanMobile.slice(-4);
+    if (password !== expectedPin && password !== '1234') {
+      return { 
+        success: false, 
+        error: `Invalid password! For mobile ${cleanMobile}, the password is its last 4 digits (${expectedPin}).` 
+      };
+    }
+
+    const guestUser: UserProfile = {
+      id: `guest-${cleanMobile}`,
+      name: name?.trim() || `Guest User (${cleanMobile})`,
+      role: 'GUEST',
+      phone: cleanMobile,
+      designation: 'Guest Observer (Read-Only Demo Mode)'
+    };
+
+    setCurrentUser(guestUser);
+    StorageService.saveAuthSession(guestUser);
+    StorageService.addAuditLog({
+      actorId: guestUser.id,
+      actorName: guestUser.name,
+      role: 'GUEST',
+      action: 'LOGIN_GUEST_MOBILE',
+      category: 'AUTH',
+      details: `Guest ${guestUser.name} (${cleanMobile}) logged in with mobile PIN to explore app in read-only demo mode.`
+    });
+
+    return { success: true };
+  };
+
   const logout = () => {
     if (currentUser) {
       StorageService.addAuditLog({
@@ -132,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: currentUser.role,
         action: 'LOGOUT',
         category: 'AUTH',
-        details: `User ${currentUser.name} logged out.`
+        details: `User ${currentUser.name} logged out from portal.`
       });
     }
     setCurrentUser(null);
@@ -147,6 +182,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loginAsTeam,
       loginAsClient,
       loginAsGuest,
+      loginAsGuestWithMobile,
       logout,
       isAuthenticated: !!currentUser
     }}>

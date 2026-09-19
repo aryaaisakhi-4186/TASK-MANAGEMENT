@@ -22,11 +22,16 @@ import { CACompliBot } from './components/ai/CACompliBot';
 import { FirmSettingsModal } from './components/settings/FirmSettingsModal';
 import { FirebaseSyncModal } from './components/settings/FirebaseSyncModal';
 import { InstallPWAModal } from './components/common/InstallPWAModal';
+import { HomePageLogin } from './components/auth/HomePageLogin';
 import { TaskItem } from './types';
 import { Smartphone } from 'lucide-react';
 
 const MainPortal: React.FC = () => {
-  const { currentRole } = useAuth();
+  const { currentRole, currentUser, logout, isAuthenticated } = useAuth();
+
+  if (!isAuthenticated || !currentUser) {
+    return <HomePageLogin />;
+  }
   const [activeTab, setActiveTab] = useState<string>(() => {
     return currentRole === 'CLIENT' ? 'client-portal' : 'dashboard';
   });
@@ -48,6 +53,22 @@ const MainPortal: React.FC = () => {
       
       {/* Top Corporate Navigation */}
       <Navbar onOpenRoleModal={() => setIsRoleModalOpen(true)} onOpenFirebaseModal={() => setIsFirebaseModalOpen(true)} />
+
+      {/* Guest Read-Only Demonstration Banner */}
+      {currentRole === 'GUEST' && (
+        <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-900 text-white px-4 py-2 flex items-center justify-between text-xs font-bold border-b border-purple-500/30 shadow-md">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+            <span>👁️ Guest Demo Mode (Read-Only) — Viewing as: <strong>{currentUser?.name}</strong></span>
+          </div>
+          <button
+            onClick={logout}
+            className="px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-[11px] font-bold shadow transition-all active:scale-95"
+          >
+            🔒 Switch to Admin / Staff Login
+          </button>
+        </div>
+      )}
 
       {/* Mobile Install Quick Banner on Phones */}
       <div className="md:hidden bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 px-4 py-2 flex items-center justify-between text-xs font-bold shadow-sm">
