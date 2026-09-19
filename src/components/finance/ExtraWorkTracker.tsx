@@ -3,13 +3,13 @@ import { useTasks } from '../../context/TaskContext';
 import { useAuth } from '../../context/AuthContext';
 import { ExcelService } from '../../services/excelService';
 import { ExtraWorkItem } from '../../types';
-import { IndianRupee, Plus, Download, Edit3, Trash2 } from 'lucide-react';
+import { IndianRupee, Plus, Download, Edit3, Copy, Trash2 } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { ExtraWorkModal } from './ExtraWorkModal';
 import { VoiceSearchBar } from '../common/VoiceSearchBar';
 
 export const ExtraWorkTracker: React.FC = () => {
-  const { extraWork, deleteExtraWork } = useTasks();
+  const { extraWork, deleteExtraWork, addExtraWork } = useTasks();
   const { currentRole } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -154,6 +154,30 @@ export const ExtraWorkTracker: React.FC = () => {
 
                   <td className="p-3.5 text-right">
                     <div className="flex items-center justify-end gap-1.5">
+                      {/* Copy / Duplicate Button */}
+                      <button
+                        onClick={() => {
+                          addExtraWork({
+                            clientId: item.clientId,
+                            clientName: item.clientName,
+                            taskTitle: `${item.taskTitle} (Copy)`,
+                            description: item.description || '',
+                            category: item.category,
+                            agreedFee: item.agreedFee,
+                            advanceReceived: 0,
+                            balanceDue: item.agreedFee,
+                            status: 'PENDING',
+                            assignedTeamId: item.assignedTeamId || '',
+                            assignedTeamName: item.assignedTeamName,
+                            targetCompletionDate: item.targetCompletionDate
+                          });
+                        }}
+                        title="Copy / Duplicate Assignment"
+                        className="p-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-700 dark:text-blue-300 hover:text-white font-bold transition-all border border-blue-500/30 flex items-center gap-1 text-[11px] px-2"
+                      >
+                        <Copy size={13} /> Copy
+                      </button>
+
                       {/* Direct Edit Button */}
                       <button
                         onClick={() => setSelectedItemForEdit(item)}

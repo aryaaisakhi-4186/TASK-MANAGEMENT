@@ -5,6 +5,7 @@ import { TaskItem, TaskStatus, Client } from '../../types';
 import { GoogleDriveService } from '../../services/googleDriveService';
 import { 
   CalendarCheck2, 
+  Copy, 
   Plus, 
   Search, 
   CheckCircle2, 
@@ -43,6 +44,7 @@ export const TaskMatrixGrid: React.FC<{
   const { 
     tasks, 
     clients, 
+    addTask, 
     updateTaskStatus, 
     bulkUpdateTasks, 
     settings, 
@@ -52,6 +54,27 @@ export const TaskMatrixGrid: React.FC<{
   } = useTasks();
   
   const { currentRole, currentUser } = useAuth();
+
+  const handleDuplicateTask = (task: TaskItem) => {
+    addTask({
+      clientId: task.clientId,
+      clientName: task.clientName,
+      title: `${task.title} (Copy)`,
+      description: task.description || '',
+      category: task.category,
+      frequency: task.frequency,
+      dueDayOrDate: task.dueDayOrDate,
+      dueDate: task.dueDate,
+      status: 'PENDING',
+      assignedTeamId: task.assignedTeamId,
+      assignedTeamName: task.assignedTeamName,
+      priority: task.priority,
+      financialYear: task.financialYear,
+      period: task.period
+    });
+    setActionNotice(`📋 Task "${task.title}" copied & created as new task!`);
+    setTimeout(() => setActionNotice(null), 3500);
+  };
 
   const [activeTab, setActiveTab] = useState<TaskTabType>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
@@ -731,12 +754,22 @@ export const TaskMatrixGrid: React.FC<{
 
                                 {/* Edit Button */}
                                 <td className="p-3 text-right">
-                                  <button
-                                    onClick={() => onOpenEditTask(task)}
-                                    className="p-1.5 px-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 text-slate-700 dark:text-slate-300 hover:text-amber-900 font-semibold text-[11px] border border-slate-200 dark:border-slate-700 shadow-sm inline-flex items-center gap-1"
-                                  >
-                                    <Edit3 size={12} /> Edit
-                                  </button>
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    <button
+                                      onClick={() => handleDuplicateTask(task)}
+                                      title="Copy / Duplicate this task"
+                                      className="p-1.5 px-2.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-700 dark:text-blue-300 hover:text-white font-bold text-[11px] border border-blue-500/30 shadow-sm inline-flex items-center gap-1 transition-all active:scale-95"
+                                    >
+                                      <Copy size={12} /> Copy
+                                    </button>
+                                    <button
+                                      onClick={() => onOpenEditTask(task)}
+                                      title="Edit task title, due date & assigned staff"
+                                      className="p-1.5 px-2.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-900 dark:text-amber-300 hover:text-slate-950 font-bold text-[11px] border border-amber-500/30 shadow-sm inline-flex items-center gap-1 transition-all active:scale-95"
+                                    >
+                                      <Edit3 size={12} /> Edit
+                                    </button>
+                                  </div>
                                 </td>
 
                               </tr>
@@ -871,12 +904,22 @@ export const TaskMatrixGrid: React.FC<{
 
                       {/* Edit Action */}
                       <td className="p-3.5 text-right">
-                        <button
-                          onClick={() => onOpenEditTask(task)}
-                          className="p-1.5 px-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-100 text-slate-700 dark:text-slate-300 hover:text-amber-900 font-semibold text-[11px] border border-slate-200 dark:border-slate-700 shadow-sm inline-flex items-center gap-1"
-                        >
-                          <Edit3 size={12} /> Edit
-                        </button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handleDuplicateTask(task)}
+                            title="Copy / Duplicate this task"
+                            className="p-1.5 px-2.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-700 dark:text-blue-300 hover:text-white font-bold text-[11px] border border-blue-500/30 shadow-sm inline-flex items-center gap-1 transition-all active:scale-95"
+                          >
+                            <Copy size={12} /> Copy
+                          </button>
+                          <button
+                            onClick={() => onOpenEditTask(task)}
+                            title="Edit task title, due date & assigned staff"
+                            className="p-1.5 px-2.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-900 dark:text-amber-300 hover:text-slate-950 font-bold text-[11px] border border-amber-500/30 shadow-sm inline-flex items-center gap-1 transition-all active:scale-95"
+                          >
+                            <Edit3 size={12} /> Edit
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

@@ -1,24 +1,27 @@
 import React, { useState, useMemo } from 'react';
-import { useTasks } from '../../context/TaskContext';
-import { useAuth } from '../../context/AuthContext';
-import { TaskItem, TaskStatus, TaskPriority } from '../../types';
 import { 
-  Sparkles, 
-  CheckCircle2, 
+  CalendarCheck2, 
   Clock, 
   AlertCircle, 
-  ArrowUpRight, 
-  Flame, 
-  Calendar, 
-  Building, 
+  CheckCircle2, 
   User, 
+  Building, 
+  ArrowUpRight, 
+  Calendar,
+  AlertTriangle,
+  Flame,
+  Sparkles,
   CheckCheck,
-  AlertTriangle
+  Copy,
+  Edit3
 } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
+import { useTasks } from '../../context/TaskContext';
+import { useAuth } from '../../context/AuthContext';
+import { TaskItem, TaskPriority, TaskStatus } from '../../types';
 
 export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) => void }> = ({ onOpenTaskModal }) => {
-  const { tasks, updateTaskStatus } = useTasks();
+  const { tasks, updateTaskStatus, addTask } = useTasks();
   const { currentRole, currentUser } = useAuth();
   const [activeFilter, setActiveFilter] = useState<'ALL' | 'CRITICAL' | 'PENDING' | 'IN_PROGRESS'>('ALL');
 
@@ -283,11 +286,35 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
                         </button>
                       )}
                       <button
-                        onClick={() => onOpenTaskModal(task)}
-                        title="View Full Task Details"
-                        className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 transition-all"
+                        onClick={() => {
+                          addTask({
+                            clientId: task.clientId,
+                            clientName: task.clientName,
+                            title: `${task.title} (Copy)`,
+                            description: task.description || '',
+                            category: task.category,
+                            frequency: task.frequency,
+                            dueDayOrDate: task.dueDayOrDate,
+                            dueDate: task.dueDate,
+                            status: 'PENDING',
+                            assignedTeamId: task.assignedTeamId,
+                            assignedTeamName: task.assignedTeamName,
+                            priority: task.priority,
+                            financialYear: task.financialYear,
+                            period: task.period
+                          });
+                        }}
+                        title="Copy / Duplicate Task"
+                        className="p-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-700 dark:text-blue-300 hover:text-white border border-blue-500/30 transition-all"
                       >
-                        <ArrowUpRight size={13} />
+                        <Copy size={13} />
+                      </button>
+                      <button
+                        onClick={() => onOpenTaskModal(task)}
+                        title="Edit Task Details"
+                        className="p-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-900 dark:text-amber-300 hover:text-slate-950 border border-amber-500/30 transition-all font-bold"
+                      >
+                        <Edit3 size={13} />
                       </button>
                     </div>
                   </td>

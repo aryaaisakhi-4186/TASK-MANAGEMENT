@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { useAuth } from '../../context/AuthContext';
 import { TaskItem, ComplianceCategory, TaskFrequency, TaskStatus } from '../../types';
-import { X, Calendar, User, Tag, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { X, Calendar, Copy, User, Tag, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 
