@@ -1,3 +1,4 @@
+import { extractDocumentDataDirectly } from '../services/documentOCRService';
 import * as XLSX from 'xlsx';
 import { Client, ClientCategory, UserProfile } from '../types';
 
@@ -485,21 +486,12 @@ export const parseClientsFromFile = async (file: File): Promise<ParsedClientRow[
     return mapRawDataToClients(rawData);
   }
 
-  if (isPdf) {
-    let rawText = '';
-    try {
-      rawText = await extractPdfTextFromServer(file);
-    } catch (e) {
-      console.warn('PDF server parse attempt:', e);
-    }
+  const isImage = /\.(png|jpe?g|webp|bmp)$/i.test(file.name);
 
-    if (!rawText || rawText.trim().length < 5) {
-      rawText = file.name.replace(/\.pdf$/i, '').replace(/[_-]/g, ' ');
-    }
+  if (isPdf || isImage) {
+    const client = await extractDocumentDataDirectly(file);
 
-    const client = parseDocumentTextToClientData(rawText, file.name);
-
-    let tradeName = client.tradeName || file.name.replace(/\.pdf$/i, '').replace(/[_-]/g, ' ').trim();
+    let tradeName = client.tradeName || file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ').trim();
     let pan = client.pan || '';
     let gstin = client.gstin || '';
 

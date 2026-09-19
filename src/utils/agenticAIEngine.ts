@@ -1,3 +1,4 @@
+import { extractDocumentDataDirectly, extractBinaryPdfText, parseRawTextToClientData } from '../services/documentOCRService';
 import { Client, TaskItem, ExtraWorkItem, UserProfile, ComplianceCategory, ClientCategory } from '../types';
 import { detectEntityCategoryFromPANAndGSTIN } from './masterImportExport';
 import { callClientGeminiAI, AppContextData } from '../services/clientAIService';

@@ -1,4 +1,5 @@
 import { getStoredGeminiKey, setStoredGeminiKey } from '../../services/clientAIService';
+import { extractDocumentDataDirectly } from '../../services/documentOCRService';
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Bot,
@@ -219,19 +220,14 @@ export const CACompliBot: React.FC<{
     }));
   };
 
-  // Process Document File (PDF, Excel, Image)
+  // Process Document File (PDF, Excel, Image) with Multi-Engine OCR & Document Intelligence
   const handleFileUpload = async (file: File) => {
     setLoading(true);
     setAttachedFile(file);
 
     try {
-      let extractedText = '';
-      if (file.name.toLowerCase().endsWith('.pdf')) {
-        // Use server pdf-parse endpoint for true text extraction
-        extractedText = await extractPdfTextFromServer(file);
-      }
-
-      const clientData = parseDocumentTextToClient(extractedText, file.name);
+      // Use comprehensive Multi-Engine OCR (Gemini Vision + PDF.js + Binary Stream + Server API)
+      const clientData = await extractDocumentDataDirectly(file);
       const msgId = (Date.now() + 1).toString();
 
       // Check if duplicate exists
@@ -243,15 +239,15 @@ export const CACompliBot: React.FC<{
       const userMsg: ChatMessage = {
         id: Date.now().toString(),
         sender: 'user',
-        text: `Please analyze "${file.name}" and extract client details with Live Preview before importing.`,
+        text: `Please analyze "${file.name}" and extract all client profile fields (PAN, GSTIN, Trade Name, Legal Name, Contact, Phone, Category) with Live Preview before importing.`,
         attachedFileName: file.name,
         timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
       };
 
       const action: AgenticAction = {
         type: 'PREVIEW_CLIENT',
-        title: isExisting ? `Update Profile: ${clientData.tradeName}` : `New Client: ${clientData.tradeName}`,
-        description: `PAN: ${clientData.pan} • GSTIN: ${clientData.gstin || 'Auto'} • Contact: ${clientData.contactPerson}`,
+        title: isExisting ? `Update Profile: ${clientData.tradeName || file.name}` : `New Client: ${clientData.tradeName || file.name}`,
+        description: `PAN: ${clientData.pan || 'Pending'} • GSTIN: ${clientData.gstin || 'None'} • Type: ${clientData.category || 'PVT_LTD'} • Contact: ${clientData.contactPerson || 'N/A'}`,
         data: clientData,
         executed: false
       };
@@ -262,7 +258,16 @@ export const CACompliBot: React.FC<{
       const botReply: ChatMessage = {
         id: msgId,
         sender: 'bot',
-        text: `📄 **${file.name}** ko accurately read kar liya gaya hai!\nNiche diye gaye **Live Preview** me details verify karein aur fir **"Confirm & Import"** par click karein:`,
+        text: `📄 **${file.name}** ko accurately read aur analyze kar liya gaya hai! ✨\n\n` +
+          `• **Trade Name:** ${clientData.tradeName || 'N/A'}\n` +
+          `• **Legal Name:** ${clientData.legalName || clientData.tradeName || 'N/A'}\n` +
+          `• **PAN Number:** ${clientData.pan ? `` + clientData.pan + `` : '⚠️ Not detected'}\n` +
+          `• **GSTIN Number:** ${clientData.gstin ? `` + clientData.gstin + `` : '⚪ None / Unregistered'}\n` +
+          `• **Entity Constitution:** ${clientData.category || 'PVT_LTD'}\n` +
+          `• **Contact Person:** ${clientData.contactPerson || 'Authorized Representative'}\n` +
+          `• **Phone:** ${clientData.phone || 'Not detected'}\n` +
+          `• **Email:** ${clientData.email || 'Not detected'}\n\n` +
+          `Niche diye gaye **Live Extracted Client Preview** me sabhi columns me data feed ho chuka hai. Aap inhe verify ya edit karke **"Confirm & Import Client"** par click karein:`,
         action,
         timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
       };
