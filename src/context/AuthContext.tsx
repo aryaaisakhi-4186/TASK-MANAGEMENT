@@ -9,7 +9,8 @@ interface AuthContextType {
   loginAsTeam: (teamId: string, pin: string) => boolean;
   loginAsClient: (pan: string, password?: string) => boolean;
   loginAsGuest: () => void;
-  loginAsGuestWithMobile: (mobile: string, password: string, name?: string) => { success: boolean; error?: string };
+  loginAsGuestWithMobile: (mobile: string, password: string, name: string, firmName?: string, city?: string, email?: string) => { success: boolean; error?: string };
+  updateGuestDemoSetup: (firmName: string, city: string, email?: string) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -124,25 +125,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const loginAsGuestWithMobile = (mobile: string, password: string, name?: string): { success: boolean; error?: string } => {
+  const loginAsGuestWithMobile = (
+    mobile: string, 
+    password: string, 
+    name: string,
+    firmName?: string,
+    city?: string,
+    email?: string
+  ): { success: boolean; error?: string } => {
     const cleanMobile = mobile.replace(/[^0-9]/g, '').trim();
     if (cleanMobile.length !== 10) {
-      return { success: false, error: 'Please enter a valid 10-digit mobile number.' };
+      return { success: false, error: 'Kripya 10-digit valid Mobile Number enter karein.' };
+    }
+    if (!name || !name.trim()) {
+      return { success: false, error: 'Kripya apna Naam (Name) enter karein (Mandatory).' };
     }
     const expectedPin = cleanMobile.slice(-4);
     if (password !== expectedPin && password !== '1234') {
       return { 
         success: false, 
-        error: `Invalid password! For mobile ${cleanMobile}, the password is its last 4 digits (${expectedPin}).` 
+        error: `Invalid password! Mobile ${cleanMobile} ke liye password aakhri 4 digits (${expectedPin}) hona chahiye.` 
       };
     }
 
+    // Register or fetch Guest Lead record with 15-day trial
+    const lead = StorageService.addOrUpdateGuestLead({
+      name: name.trim(),
+      phone: cleanMobile,
+      firmName: firmName || '',
+      city: city || '',
+      email: email || ''
+    });
+
+    // Calculate trial days remaining
+    const expiryMs = new Date(lead.trialEndDate).getTime();
+    const nowMs = Date.now();
+    const daysRemaining = Math.max(0, Math.ceil((expiryMs - nowMs) / (1000 * 60 * 60 * 24)));
+    const isExpired = daysRemaining <= 0;
+
     const guestUser: UserProfile = {
       id: `guest-${cleanMobile}`,
-      name: name?.trim() || `Guest User (${cleanMobile})`,
+      name: lead.name,
       role: 'GUEST',
       phone: cleanMobile,
-      designation: 'Guest Observer (Read-Only Demo Mode)'
+      email: lead.email,
+      designation: isExpired 
+        ? 'Guest (15-Day Free Demo Expired — Read Only)' 
+        : `Guest (${daysRemaining} Days Free Demo Active)`,
+      trialInfo: {
+        startDate: lead.trialStartDate,
+        endDate: lead.trialEndDate,
+        daysRemaining,
+        isExpired,
+        firmName: lead.firmName,
+        city: lead.city,
+        isDemoSetup: lead.isDemoSetup
+      }
     };
 
     setCurrentUser(guestUser);
@@ -153,10 +191,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       role: 'GUEST',
       action: 'LOGIN_GUEST_MOBILE',
       category: 'AUTH',
-      details: `Guest ${guestUser.name} (${cleanMobile}) logged in with mobile PIN to explore app in read-only demo mode.`
+      details: `Guest ${guestUser.name} (${cleanMobile}) logged in. 15-Day Trial Status: ${daysRemaining} days remaining.`
     });
 
     return { success: true };
+  };
+
+  const updateGuestDemoSetup = (firmName: string, city: string, email?: string) => {
+    if (!currentUser || currentUser.role !== 'GUEST' || !currentUser.phone) return;
+    const updatedLead = StorageService.addOrUpdateGuestLead({
+      name: currentUser.name,
+      phone: currentUser.phone,
+      firmName: firmName.trim(),
+      city: city.trim(),
+      email: email?.trim() || currentUser.email || '',
+      isDemoSetup: true
+    });
+
+    const expiryMs = new Date(updatedLead.trialEndDate).getTime();
+    const nowMs = Date.now();
+    const daysRemaining = Math.max(0, Math.ceil((expiryMs - nowMs) / (1000 * 60 * 60 * 24)));
+
+    const updatedUser: UserProfile = {
+      ...currentUser,
+      email: updatedLead.email,
+      trialInfo: {
+        startDate: updatedLead.trialStartDate,
+        endDate: updatedLead.trialEndDate,
+        daysRemaining,
+        isExpired: daysRemaining <= 0,
+        firmName: updatedLead.firmName,
+        city: updatedLead.city,
+        isDemoSetup: true
+      }
+    };
+
+    setCurrentUser(updatedUser);
+    StorageService.saveAuthSession(updatedUser);
   };
 
   const logout = () => {
@@ -183,6 +254,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loginAsClient,
       loginAsGuest,
       loginAsGuestWithMobile,
+      updateGuestDemoSetup,
       logout,
       isAuthenticated: !!currentUser
     }}>

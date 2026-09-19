@@ -125,12 +125,16 @@ export const HomePageLogin: React.FC = () => {
       }
     }
 
-    // 4. If 10-Digit Mobile Number -> Auto Guest Read-Only Demo Mode
+    // 4. If 10-Digit Mobile Number -> Auto Guest 15-Day Free Demo Mode
     if (cleanNum.length === 10) {
+      if (!guestName || !guestName.trim()) {
+        setErrorMsg('Kripya apna Naam (Name) enter karein — Ye mandatory hai.');
+        return;
+      }
       const lastFour = cleanNum.slice(-4);
       if (cleanSecret === lastFour || cleanSecret === '1234') {
-        setSuccessInfo('Logging in to Guest Read-Only Demo Mode...');
-        const res = loginAsGuestWithMobile(cleanNum, cleanSecret, guestName || `Guest (${cleanNum})`);
+        setSuccessInfo('Logging in to Guest 15-Day Free Demo Mode...');
+        const res = loginAsGuestWithMobile(cleanNum, cleanSecret, guestName.trim());
         if (!res.success) {
           setErrorMsg(res.error || 'Guest login failed.');
         }
@@ -157,13 +161,16 @@ export const HomePageLogin: React.FC = () => {
     if (type === 'ADMIN') {
       setIdentifier('admin');
       setSecret('admin123');
+      setGuestName('');
     } else if (type === 'STAFF') {
       const firstStaff = team[0];
       setIdentifier(firstStaff?.phone || firstStaff?.name || '9876500001');
       setSecret(firstStaff?.pin || '1234');
+      setGuestName('');
     } else if (type === 'GUEST') {
       setIdentifier('9876543210');
       setSecret('3210');
+      setGuestName('Demo CA Professional');
     }
   };
 
@@ -240,6 +247,24 @@ export const HomePageLogin: React.FC = () => {
                   className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 font-mono font-bold text-white text-sm placeholder:text-slate-600 focus:border-amber-500 focus:outline-none transition-all shadow-inner"
                 />
               </div>
+
+              {/* Mandatory Name Field for Guest Users */}
+              {identifier.replace(/[^0-9]/g, '').length === 10 && (
+                <div className="animate-in fade-in">
+                  <label className="block text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                    <Users size={13} className="text-amber-400" />
+                    <span>Your Name (Mandatory) *</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="Enter your full name (e.g. CA Amit Sharma / Demo User)"
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-amber-500/50 text-white text-sm placeholder:text-slate-600 focus:border-amber-500 focus:outline-none transition-all shadow-inner font-medium"
+                  />
+                </div>
+              )}
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">

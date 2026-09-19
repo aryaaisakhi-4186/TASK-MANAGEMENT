@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { FirebaseService } from '../../services/firebaseService';
 import { StorageService } from '../../services/storage';
-import { Settings, Flame, Shield, Bell, Save, Check, Mail, Cloud, Eye, EyeOff, RefreshCw, Trash2, AlertTriangle, AlertCircle } from 'lucide-react';
+import { Settings, Flame, Shield, Bell, Save, Check, Mail, Cloud, Eye, EyeOff, RefreshCw, Trash2, AlertTriangle, AlertCircle, Users } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
+import { GuestLeadsModal } from './GuestLeadsModal';
 
 export const FirmSettingsModal: React.FC = () => {
   const { settings, updateSettings, resetAllData, fullAppReset } = useTasks();
+  const [isGuestLeadsOpen, setIsGuestLeadsOpen] = useState(false);
 
   const [firmName, setFirmName] = useState(settings.firmName || '');
   const [firmEmail, setFirmEmail] = useState(settings.firmEmail || '');
@@ -214,7 +216,38 @@ export const FirmSettingsModal: React.FC = () => {
         </form>
       </GlassCard>
 
-{/* Danger Zone: App Reset & Full App Reset */}
+      {/* Guest Demo Leads & Trial Tracking Card */}
+      <GlassCard className="p-6 max-w-2xl mx-auto" variant="elevated">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30 flex items-center justify-center font-bold">
+              <Users size={20} />
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm">Guest Demo Leads & 15-Day Trial Tracking</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                View all registered guest mobile numbers, names, trial days remaining, and follow-ups.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsGuestLeadsOpen(true)}
+            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-md transition-all active:scale-95 flex items-center gap-1.5"
+          >
+            <Users size={14} />
+            <span>Open Leads Viewer</span>
+          </button>
+        </div>
+      </GlassCard>
+
+      <GuestLeadsModal 
+        isOpen={isGuestLeadsOpen}
+        onClose={() => setIsGuestLeadsOpen(false)}
+      />
+
+      {/* Danger Zone: App Reset & Full App Reset */}
       <GlassCard className="p-6 max-w-2xl mx-auto border-red-500/30" variant="elevated" glow="gold">
         <div className="flex items-center gap-2.5 mb-4 text-red-600 dark:text-red-400">
           <AlertTriangle size={20} className="shrink-0" />

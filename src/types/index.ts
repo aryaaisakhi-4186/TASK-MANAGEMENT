@@ -1,5 +1,15 @@
 export type UserRole = 'ADMIN' | 'TEAM' | 'CLIENT' | 'GUEST';
 
+export interface GuestTrialInfo {
+  startDate: string;
+  endDate: string;
+  daysRemaining: number;
+  isExpired: boolean;
+  firmName?: string;
+  city?: string;
+  isDemoSetup?: boolean;
+}
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -12,6 +22,22 @@ export interface UserProfile {
   assignedClientIds?: string[];
   designation?: string;
   isEmployeeLogin?: boolean;
+  trialInfo?: GuestTrialInfo;
+}
+
+export interface GuestLead {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  firmName?: string;
+  city?: string;
+  registeredAt: string;
+  trialStartDate: string;
+  trialEndDate: string;
+  trialStatus: 'ACTIVE_DEMO' | 'EXPIRED' | 'CONVERTED';
+  isDemoSetup: boolean;
+  notes?: string;
 }
 
 export type ClientCategory = 'PVT_LTD' | 'LLP' | 'PARTNERSHIP' | 'PROPRIETOR' | 'INDIVIDUAL' | 'TRUST';

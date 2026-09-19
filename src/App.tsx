@@ -23,6 +23,9 @@ import { FirmSettingsModal } from './components/settings/FirmSettingsModal';
 import { FirebaseSyncModal } from './components/settings/FirebaseSyncModal';
 import { InstallPWAModal } from './components/common/InstallPWAModal';
 import { HomePageLogin } from './components/auth/HomePageLogin';
+import { TrialBanner } from './components/common/TrialBanner';
+import { GuestOnboardingModal } from './components/auth/GuestOnboardingModal';
+import { GuestLeadsModal } from './components/settings/GuestLeadsModal';
 import { TaskItem } from './types';
 import { Smartphone } from 'lucide-react';
 
@@ -38,6 +41,10 @@ const MainPortal: React.FC = () => {
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [isFirebaseModalOpen, setIsFirebaseModalOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [isGuestLeadsOpen, setIsGuestLeadsOpen] = useState(false);
+  const [isGuestOnboardingOpen, setIsGuestOnboardingOpen] = useState(() => {
+    return currentRole === 'GUEST' && !currentUser?.trialInfo?.isDemoSetup;
+  });
   const [selectedTask, setSelectedTask] = useState<TaskItem | null | 'NEW'>(null);
 
   useEffect(() => {
@@ -48,27 +55,24 @@ const MainPortal: React.FC = () => {
     }
   }, [currentRole]);
 
+  useEffect(() => {
+    if (currentRole === 'GUEST' && !currentUser?.trialInfo?.isDemoSetup) {
+      setIsGuestOnboardingOpen(true);
+    }
+  }, [currentRole, currentUser?.trialInfo?.isDemoSetup]);
+
   return (
     <div className="min-h-[100dvh] bg-slate-100/80 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-amber-500/30 selection:text-amber-800 transition-colors duration-200">
       
       {/* Top Corporate Navigation */}
-      <Navbar onOpenRoleModal={() => setIsRoleModalOpen(true)} onOpenFirebaseModal={() => setIsFirebaseModalOpen(true)} />
+      <Navbar 
+        onOpenRoleModal={() => setIsRoleModalOpen(true)} 
+        onOpenFirebaseModal={() => setIsFirebaseModalOpen(true)}
+        onOpenGuestLeads={() => setIsGuestLeadsOpen(true)}
+      />
 
-      {/* Guest Read-Only Demonstration Banner */}
-      {currentRole === 'GUEST' && (
-        <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-900 text-white px-4 py-2 flex items-center justify-between text-xs font-bold border-b border-purple-500/30 shadow-md">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-            <span>👁️ Guest Demo Mode (Read-Only) — Viewing as: <strong>{currentUser?.name}</strong></span>
-          </div>
-          <button
-            onClick={logout}
-            className="px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-[11px] font-bold shadow transition-all active:scale-95"
-          >
-            🔒 Switch to Admin / Staff Login
-          </button>
-        </div>
-      )}
+      {/* Guest 15-Day Free Demo Lifecycle Banner */}
+      <TrialBanner />
 
       {/* Mobile Install Quick Banner on Phones */}
       <div className="md:hidden bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 px-4 py-2 flex items-center justify-between text-xs font-bold shadow-sm">
@@ -146,6 +150,16 @@ const MainPortal: React.FC = () => {
       <FirebaseSyncModal
         isOpen={isFirebaseModalOpen}
         onClose={() => setIsFirebaseModalOpen(false)}
+      />
+
+      <GuestOnboardingModal
+        isOpen={isGuestOnboardingOpen}
+        onClose={() => setIsGuestOnboardingOpen(false)}
+      />
+
+      <GuestLeadsModal
+        isOpen={isGuestLeadsOpen}
+        onClose={() => setIsGuestLeadsOpen(false)}
       />
 
       {selectedTask && (

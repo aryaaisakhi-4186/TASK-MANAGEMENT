@@ -66,6 +66,7 @@ interface TaskContextType {
   purgeAuditLogs: () => void;
   resetAllData: () => void;
   fullAppReset: () => void;
+  resetToBlankForGuestDemo: () => void;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -805,6 +806,13 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSettings(StorageService.getSettings());
   };
 
+  const resetToBlankForGuestDemo = () => {
+    setClients([]);
+    setTasks([]);
+    setExtraWork([]);
+    setDocuments([]);
+  };
+
   return (
     <TaskContext.Provider value={{
       clients,
@@ -847,7 +855,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       startLunchBreak,
       endLunchBreak,
       resetAllData,
-      fullAppReset
+      fullAppReset,
+      resetToBlankForGuestDemo
     }}>
       {children}
     </TaskContext.Provider>

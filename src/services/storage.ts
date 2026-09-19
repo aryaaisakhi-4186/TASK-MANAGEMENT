@@ -1,4 +1,4 @@
-import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord, AIMemoryItem } from '../types';
+import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord, AIMemoryItem, GuestLead } from '../types';
 import { SEED_CLIENTS, SEED_TASKS, SEED_TEAM_MEMBERS, SEED_EXTRA_WORK, SEED_DOCUMENTS, SEED_AUDIT_LOGS, INITIAL_SYSTEM_SETTINGS } from '../data/seedData';
 
 const KEYS = {
@@ -14,6 +14,7 @@ const KEYS = {
   THEME: 'taskvaani_theme_v1',
   CLIENT_REMINDERS: 'taskvaani_client_reminders_v1',
   AI_LEARNED_MEMORY: 'taskvaani_ai_learned_memory_v1',
+  GUEST_LEADS: 'taskvaani_guest_leads_v1',
 };
 
 // Safe JSON parser
@@ -87,6 +88,72 @@ export const StorageService = {
   // Auth Session
   getAuthSession: (): UserProfile | null => safeGet<UserProfile | null>(KEYS.AUTH_SESSION, null),
   saveAuthSession: (user: UserProfile | null) => safeSet(KEYS.AUTH_SESSION, user),
+
+  // Guest Leads & 15-Day Trial Records
+  getGuestLeads: (): GuestLead[] => safeGet<GuestLead[]>(KEYS.GUEST_LEADS, []),
+  saveGuestLeads: (leads: GuestLead[]) => safeSet(KEYS.GUEST_LEADS, leads),
+  getGuestLeadByPhone: (phone: string): GuestLead | undefined => {
+    const leads = StorageService.getGuestLeads();
+    const clean = phone.replace(/[^0-9]/g, '');
+    return leads.find(l => l.phone.replace(/[^0-9]/g, '') === clean);
+  },
+  addOrUpdateGuestLead: (leadData: Partial<GuestLead> & { phone: string; name: string }): GuestLead => {
+    const leads = StorageService.getGuestLeads();
+    const cleanPhone = leadData.phone.replace(/[^0-9]/g, '');
+    const existingIndex = leads.findIndex(l => l.phone.replace(/[^0-9]/g, '') === cleanPhone);
+
+    const now = new Date();
+    const expiry = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000); // 15 days trial
+
+    if (existingIndex >= 0) {
+      const existing = leads[existingIndex];
+      const updated: GuestLead = {
+        ...existing,
+        name: leadData.name.trim() || existing.name,
+        email: leadData.email || existing.email,
+        firmName: leadData.firmName || existing.firmName,
+        city: leadData.city || existing.city,
+        notes: leadData.notes || existing.notes,
+        isDemoSetup: leadData.isDemoSetup !== undefined ? leadData.isDemoSetup : existing.isDemoSetup,
+        trialStatus: leadData.trialStatus || existing.trialStatus,
+      };
+      leads[existingIndex] = updated;
+      StorageService.saveGuestLeads(leads);
+      return updated;
+    } else {
+      const newLead: GuestLead = {
+        id: 'lead-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        name: leadData.name.trim(),
+        phone: cleanPhone,
+        email: leadData.email || '',
+        firmName: leadData.firmName || '',
+        city: leadData.city || '',
+        registeredAt: now.toISOString(),
+        trialStartDate: now.toISOString(),
+        trialEndDate: expiry.toISOString(),
+        trialStatus: 'ACTIVE_DEMO',
+        isDemoSetup: leadData.isDemoSetup || false,
+        notes: leadData.notes || 'Registered via Home Page Guest Demo.'
+      };
+      leads.unshift(newLead);
+      StorageService.saveGuestLeads(leads);
+      return newLead;
+    }
+  },
+  extendGuestTrial: (leadId: string, extraDays: number = 15): boolean => {
+    const leads = StorageService.getGuestLeads();
+    const index = leads.findIndex(l => l.id === leadId);
+    if (index >= 0) {
+      const currentExpiry = new Date(leads[index].trialEndDate);
+      const baseDate = currentExpiry.getTime() > Date.now() ? currentExpiry : new Date();
+      const newExpiry = new Date(baseDate.getTime() + extraDays * 24 * 60 * 60 * 1000);
+      leads[index].trialEndDate = newExpiry.toISOString();
+      leads[index].trialStatus = 'ACTIVE_DEMO';
+      StorageService.saveGuestLeads(leads);
+      return true;
+    }
+    return false;
+  },
 
 
   // AI Learned Memory & Long-Term Knowledge

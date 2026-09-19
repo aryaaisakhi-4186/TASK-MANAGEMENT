@@ -3,10 +3,14 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNotification } from '../../context/NotificationContext';
 import { useTasks } from '../../context/TaskContext';
-import { Bell, ShieldCheck, Sun, Moon, LogOut, Sparkles, Scale, Coffee, Utensils, Play, Power, Flame, Cloud } from 'lucide-react';
+import { Bell, ShieldCheck, Sun, Moon, LogOut, Sparkles, Scale, Coffee, Utensils, Play, Power, Flame, Cloud, Users } from 'lucide-react';
 import { AnalogClock } from './AnalogClock';
 
-export const Navbar: React.FC<{ onOpenRoleModal: () => void; onOpenFirebaseModal?: () => void }> = ({ onOpenRoleModal, onOpenFirebaseModal }) => {
+export const Navbar: React.FC<{ 
+  onOpenRoleModal: () => void; 
+  onOpenFirebaseModal?: () => void;
+  onOpenGuestLeads?: () => void;
+}> = ({ onOpenRoleModal, onOpenFirebaseModal, onOpenGuestLeads }) => {
   const { currentUser, currentRole, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { triggerMorningAlarm } = useNotification();
@@ -139,6 +143,18 @@ export const Navbar: React.FC<{ onOpenRoleModal: () => void; onOpenFirebaseModal
         {/* Right Action Icons & User Status */}
         <div className="flex items-center gap-2 md:gap-3">
           
+          {/* Admin Guest Leads Button */}
+          {currentRole === 'ADMIN' && onOpenGuestLeads && (
+            <button
+              onClick={onOpenGuestLeads}
+              title="View Guest Demo Leads & 15-Day Trial Records"
+              className="p-2 rounded-xl bg-purple-500/10 dark:bg-purple-500/15 border border-purple-500/30 text-purple-600 dark:text-purple-400 hover:bg-purple-500 hover:text-white dark:hover:bg-purple-500 dark:hover:text-slate-950 transition-all hover:scale-105 shadow-sm flex items-center gap-1.5 text-xs font-bold"
+            >
+              <Users size={16} className="text-purple-500 group-hover:text-white" />
+              <span className="hidden lg:inline">Guest Leads</span>
+            </button>
+          )}
+
           {/* Firebase Cloud Sync Button */}
           {onOpenFirebaseModal && (
             <button
