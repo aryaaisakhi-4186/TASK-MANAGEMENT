@@ -22,6 +22,9 @@ import { useTasks } from '../../context/TaskContext';
 import { 
   parseClientsFromFile, 
   parseClientsFromGoogleSheet, 
+  fetchGoogleSheetData,
+  classifyRawTabularData,
+  mapRawDataToClients,
   ParsedClientRow, 
   downloadClientExcelTemplate,
   detectEntityCategoryFromPANAndGSTIN
@@ -133,8 +136,36 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
     }
 
     try {
-      const rows = await parseClientsFromGoogleSheet(urlToFetch);
-      setParsedRows(rows);
+      const rawData = await fetchGoogleSheetData(urlToFetch);
+      if (!rawData || rawData.length === 0) {
+        throw new Error('The Google Sheet contains no data rows.');
+      }
+
+      const classification = classifyRawTabularData(rawData, 'Google Drive Master Sheet');
+
+      if (classification.domain === 'TEAM_DIRECTORY') {
+        setMisclassificationAlert({
+          fileName: 'Google Drive Sheet',
+          domain: 'Team Directory',
+          title: classification.detectedType,
+          summary: classification.summary
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (classification.domain === 'DOCUMENT_VAULT') {
+        setMisclassificationAlert({
+          fileName: 'Google Drive Sheet',
+          domain: 'Document Vault',
+          title: classification.detectedType,
+          summary: classification.summary
+        });
+        setLoading(false);
+        return;
+      }
+
+      setParsedRows(mapRawDataToClients(rawData));
     } catch (err: any) {
       console.warn('Google Sheet parse error:', err);
       setErrorMsg(err.message || 'Unable to read Google Sheet. Ensure link sharing is set to "Anyone with the link can view".');

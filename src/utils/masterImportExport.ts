@@ -402,6 +402,138 @@ export const mapRawDataToTeam = (rawData: any[]): ParsedTeamRow[] => {
 };
 
 // 1. Fetch & Parse Direct from Google Sheet URL or ID (Drive Cloud Storage)
+
+export interface TabularClassificationResult {
+  domain: 'CLIENT_MASTER' | 'TEAM_DIRECTORY' | 'DOCUMENT_VAULT' | 'UNKNOWN';
+  confidence: number;
+  detectedType: string;
+  summary: string;
+  sampleEntities: string[];
+  suggestedAction: 'IMPORT_CLIENT' | 'IMPORT_TEAM' | 'STORE_VAULT' | 'REVIEW_MANUAL';
+  clientRows?: ParsedClientRow[];
+  teamRows?: ParsedTeamRow[];
+}
+
+// ---------------------------------------------------------------------------
+// UNIVERSAL TABULAR & SPREADSHEET DATASET CLASSIFIER
+// ---------------------------------------------------------------------------
+export const classifyRawTabularData = (rawData: any[], sourceName: string = ''): TabularClassificationResult => {
+  if (!rawData || rawData.length === 0) {
+    return {
+      domain: 'UNKNOWN',
+      confidence: 0,
+      detectedType: 'Empty Dataset',
+      summary: 'No data rows found in the sheet/file.',
+      sampleEntities: [],
+      suggestedAction: 'REVIEW_MANUAL'
+    };
+  }
+
+  const allHeaders = Array.from(
+    new Set(rawData.flatMap(r => Object.keys(r || {})).map(k => k.toLowerCase().replace(/[^a-z0-9]/g, '')))
+  );
+  const headerStr = allHeaders.join(' ');
+  const lowerSource = sourceName.toLowerCase();
+
+  // Scan row values across first 50 rows
+  let gstCount = 0;
+  let panCount = 0;
+  let tradeNameKeywordCount = 0;
+  let designationKeywordCount = 0;
+  const sampleEntities: string[] = [];
+
+  const businessKeywords = [
+    'agency', 'agencies', 'pvt', 'ltd', 'limited', 'llp', 'traders', 'enterprise', 
+    'enterprises', 'industries', 'company', 'store', 'stores', 'corporation', 
+    'sales', 'associates', 'firm', 'group', 'services', 'motors', 'steel', 'cloth', 'jewel'
+  ];
+
+  const designationKeywords = [
+    'ca', 'partner', 'associate', 'article', 'assistant', 'accountant', 'manager', 
+    'trainee', 'intern', 'executive', 'clerk', 'developer', 'staff'
+  ];
+
+  for (let i = 0; i < Math.min(rawData.length, 50); i++) {
+    const row = rawData[i];
+    const values = Object.values(row).map(v => String(v).trim());
+
+    for (const val of values) {
+      if (/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/i.test(val)) {
+        gstCount++;
+      }
+      if (/^[A-Z]{5}[0-9]{4}[A-Z]$/i.test(val)) {
+        panCount++;
+      }
+      if (businessKeywords.some(bk => val.toLowerCase().includes(bk))) {
+        tradeNameKeywordCount++;
+      }
+      if (designationKeywords.some(dk => val.toLowerCase() === dk || val.toLowerCase().includes(dk))) {
+        designationKeywordCount++;
+      }
+    }
+
+    // Capture sample entity name
+    const nameVal = values.find(v => v.length > 3 && !/^[0-9+@.]/.test(v) && !v.includes('@') && !v.includes('http') && !/^[0-9]{2}[A-Z]{5}/.test(v));
+    if (nameVal && sampleEntities.length < 4 && !sampleEntities.includes(nameVal)) {
+      sampleEntities.push(nameVal);
+    }
+  }
+
+  // Domain 1: Bank Statement / Ledger / Transaction Vouchers
+  const isBankOrVoucher = headerStr.includes('withdrawal') || headerStr.includes('deposit') || 
+    headerStr.includes('txndate') || headerStr.includes('chequeno') || headerStr.includes('taxablevalue') || 
+    (headerStr.includes('balance') && headerStr.includes('narration')) ||
+    (headerStr.includes('invoiceno') && headerStr.includes('cgst'));
+
+  if (isBankOrVoucher) {
+    const isInvoice = headerStr.includes('invoiceno') || headerStr.includes('taxablevalue');
+    return {
+      domain: 'DOCUMENT_VAULT',
+      confidence: 95,
+      detectedType: isInvoice ? 'Sales / Purchase Voucher Spreadsheet' : 'Bank Statement / Account Ledger',
+      summary: `Spreadsheet contains ${rawData.length} financial transaction / voucher entries.`,
+      sampleEntities,
+      suggestedAction: 'STORE_VAULT'
+    };
+  }
+
+  // Domain 2: Team Directory (Staff Roster)
+  const hasTeamHeaders = (headerStr.includes('designation') || headerStr.includes('salary') || headerStr.includes('empid') || headerStr.includes('employeeid') || headerStr.includes('doj')) &&
+    !headerStr.includes('gstin') && !headerStr.includes('tradename');
+
+  const isTeamExplicit = (hasTeamHeaders || designationKeywordCount > 3 || lowerSource.includes('team') || lowerSource.includes('staff')) && gstCount === 0 && tradeNameKeywordCount <= 1;
+
+  if (isTeamExplicit) {
+    const teamRows = mapRawDataToTeam(rawData);
+    return {
+      domain: 'TEAM_DIRECTORY',
+      confidence: 94,
+      detectedType: 'Staff / Team Roster Spreadsheet',
+      summary: `Found ${rawData.length} staff member records with designations and roles.`,
+      sampleEntities,
+      suggestedAction: 'IMPORT_TEAM',
+      teamRows
+    };
+  }
+
+  // Domain 3: Client Master (GSTIN, Trade Names, Agencies, PAN, Entities)
+  const isClientMaster = gstCount > 0 || tradeNameKeywordCount >= 2 || 
+    headerStr.includes('gstin') || headerStr.includes('tradename') || headerStr.includes('clientname') || 
+    headerStr.includes('legalname') || headerStr.includes('constitution') || headerStr.includes('proprietor') ||
+    headerStr.includes('tan') || headerStr.includes('cin') || panCount > 0;
+
+  const clientRows = mapRawDataToClients(rawData);
+  return {
+    domain: 'CLIENT_MASTER',
+    confidence: isClientMaster ? 98 : 85,
+    detectedType: 'Client Master Database Sheet',
+    summary: `Found ${rawData.length} client business profiles (e.g., ${sampleEntities.slice(0, 3).join(', ')}) with GST/PAN and statutory data.`,
+    sampleEntities,
+    suggestedAction: 'IMPORT_CLIENT',
+    clientRows
+  };
+};
+
 export const fetchGoogleSheetData = async (sheetUrlOrId: string): Promise<any[]> => {
   const trimmed = sheetUrlOrId.trim();
   if (!trimmed) throw new Error('Please enter a Google Sheet URL or ID');
