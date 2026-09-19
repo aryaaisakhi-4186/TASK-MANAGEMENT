@@ -1,37 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTasks } from '../../context/TaskContext';
-import { Settings, Shield, Bell, Save, Check, Mail, Cloud, Eye, EyeOff, RefreshCw, Trash2, AlertTriangle, AlertCircle } from 'lucide-react';
+import { FirebaseService } from '../../services/firebaseService';
+import { StorageService } from '../../services/storage';
+import { Settings, Flame, Shield, Bell, Save, Check, Mail, Cloud, Eye, EyeOff, RefreshCw, Trash2, AlertTriangle, AlertCircle } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 
 export const FirmSettingsModal: React.FC = () => {
   const { settings, updateSettings, resetAllData, fullAppReset } = useTasks();
 
-  const [firmName, setFirmName] = useState(settings.firmName);
-  const [firmEmail, setFirmEmail] = useState(settings.firmEmail);
-  const [firmPhone, setFirmPhone] = useState(settings.firmPhone);
+  const [firmName, setFirmName] = useState(settings.firmName || '');
+  const [firmEmail, setFirmEmail] = useState(settings.firmEmail || '');
+  const [firmPhone, setFirmPhone] = useState(settings.firmPhone || '');
   const [alarmTime, setAlarmTime] = useState(settings.morningAlarmTime || '10:30');
-  const [enableSound, setEnableSound] = useState(settings.enableSoundChime);
-  const [adminPassword, setAdminPassword] = useState(settings.adminPasswordHash);
+  const [enableSound, setEnableSound] = useState(settings.enableSoundChime ?? true);
+  const [adminPassword, setAdminPassword] = useState(settings.adminPasswordHash || 'admin123');
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [cloudStorageEmail, setCloudStorageEmail] = useState(settings.cloudStorageEmail || 'arya.taskmanagement@gmail.com');
   const [googleDriveSync, setGoogleDriveSync] = useState(settings.googleDriveSyncEnabled ?? true);
   const [saved, setSaved] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  // Sync internal form state whenever settings are updated or loaded from Cloud
+  useEffect(() => {
+    if (settings) {
+      if (settings.firmName) setFirmName(settings.firmName);
+      if (settings.firmEmail) setFirmEmail(settings.firmEmail);
+      if (settings.firmPhone) setFirmPhone(settings.firmPhone);
+      if (settings.morningAlarmTime) setAlarmTime(settings.morningAlarmTime);
+      if (typeof settings.enableSoundChime === 'boolean') setEnableSound(settings.enableSoundChime);
+      if (settings.adminPasswordHash) setAdminPassword(settings.adminPasswordHash);
+      if (settings.cloudStorageEmail) setCloudStorageEmail(settings.cloudStorageEmail);
+      if (typeof settings.googleDriveSyncEnabled === 'boolean') setGoogleDriveSync(settings.googleDriveSyncEnabled);
+    }
+  }, [settings]);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateSettings({
-      firmName,
-      firmEmail,
-      firmPhone,
+    const updatedPayload = {
+      firmName: firmName.trim(),
+      firmEmail: firmEmail.trim(),
+      firmPhone: firmPhone.trim(),
       morningAlarmTime: alarmTime,
       enableSoundChime: enableSound,
       adminPasswordHash: adminPassword,
-      cloudStorageEmail,
+      cloudStorageEmail: cloudStorageEmail.trim(),
       googleDriveSyncEnabled: googleDriveSync,
       lastCloudSyncTimestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+    };
+
+    // 1. Update React Context state
+    updateSettings(updatedPayload);
+
+    // 2. Write directly to persistent LocalStorage
+    StorageService.saveSettings({
+      ...settings,
+      ...updatedPayload
     });
+
+    // 3. Sync to Firebase Firestore online cloud if configured
+    try {
+      if (FirebaseService.isConfigured()) {
+        await FirebaseService.upsertDoc('system', 'settings', updatedPayload);
+      }
+    } catch (err) {
+      console.warn('Firebase settings save note:', err);
+    }
+
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setTimeout(() => setSaved(false), 3000);
   };
 
   return (

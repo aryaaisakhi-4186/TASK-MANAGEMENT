@@ -81,6 +81,20 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [clientReminders, setClientReminders] = useState<ClientReminder[]>(() => StorageService.getClientReminders());
   const [settings, setSettings] = useState<SystemSettings>(() => StorageService.getSettings());
 
+  // On Startup: Pull Cloud Settings from Firebase if configured
+  useEffect(() => {
+    if (FirebaseService.isConfigured()) {
+      FirebaseService.pullAllFromCloud().then(res => {
+        if (res.settings) {
+          setSettings(res.settings);
+          StorageService.saveSettings(res.settings);
+        }
+      }).catch(err => {
+        console.warn('Initial cloud sync check:', err);
+      });
+    }
+  }, []);
+
   // Office Shift & Lunch Break State
   const [officeShiftState, setOfficeShiftState] = useState<{
     status: 'LOGGED_OFF' | 'LOGGED_IN' | 'ON_LUNCH_BREAK';
@@ -752,7 +766,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateSettings = (updates: Partial<SystemSettings>) => {
-    setSettings((prev: SystemSettings) => ({ ...prev, ...updates }));
+    setSettings((prev: SystemSettings) => {
+      const updated = { ...prev, ...updates };
+      StorageService.saveSettings(updated);
+      if (FirebaseService.isConfigured()) {
+        FirebaseService.upsertDoc('system', 'settings', updated);
+      }
+      return updated;
+    });
   };
 
   const purgeAuditLogs = () => {

@@ -2,6 +2,7 @@ import {
   collection, 
   doc, 
   setDoc, 
+  getDoc, 
   getDocs, 
   deleteDoc, 
   onSnapshot, 
@@ -98,7 +99,17 @@ export const FirebaseService = {
     const attSnap = await getDocs(collection(db, 'attendance'));
     const attendanceRecords = attSnap.docs.map(d => d.data() as AttendanceRecord);
 
-    return { clients, tasks, team, extraWork, attendanceRecords };
+    let settings: SystemSettings | undefined = undefined;
+    try {
+      const settingsSnap = await getDoc(doc(db, 'system', 'settings'));
+      if (settingsSnap.exists()) {
+        settings = settingsSnap.data() as SystemSettings;
+      }
+    } catch (e) {
+      console.warn('Firebase settings pull note:', e);
+    }
+
+    return { clients, tasks, team, extraWork, attendanceRecords, settings };
   },
 
   // 3. Realtime Listener for Live Cross-Device Sync
