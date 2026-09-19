@@ -193,7 +193,12 @@ export const parseDocumentTextToClient = (rawText: string, fileName?: string): P
 // Robust Fuzzy & Token Matcher to find any Client from natural query
 export const findBestMatchingClient = (query: string, clients: Client[]): { client: Client; score: number } | null => {
   const qClean = query.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
-  const stopWords = new Set(['batao', 'dikhao', 'profile', 'details', 'poori', 'karo', 'hai', 'hain', 'status', 'kya', 'info', 'check', 'ka', 'ki', 'ke', 'aur', 'ko', 'par', 'se', 'the', 'for', 'about', 'show', 'give', 'me', 'please', 'sir', 'madam', 'search', 'find', 'view', 'full', 'all', 'information']);
+  const stopWords = new Set([
+    'batao', 'dikhao', 'profile', 'details', 'poori', 'karo', 'hai', 'hain', 'status', 'kya', 'info', 
+    'check', 'ka', 'ki', 'ke', 'aur', 'ko', 'par', 'se', 'the', 'for', 'about', 'show', 'give', 
+    'me', 'please', 'sir', 'madam', 'search', 'find', 'view', 'full', 'all', 'information',
+    'extra', 'work', 'tracker', 'fee', 'total', 'payable', 'jod', 'do', 'add', 'provisional', 'balance', 'sheet'
+  ]);
   const qTokens = qClean.split(/\s+/).filter(w => w.length >= 2 && !stopWords.has(w));
 
   if (qTokens.length === 0 && query.trim().length < 3) return null;
@@ -220,12 +225,10 @@ export const findBestMatchingClient = (query: string, clients: Client[]): { clie
     if (gstin && gstin.length >= 10 && query.toLowerCase().includes(gstin)) score += 120;
 
     // Token matching
-    const clientCombined = `${tName} ${lName} ${contact} ${pan}`;
     let matchedTokenCount = 0;
-
     for (const token of qTokens) {
       if (tName.includes(token)) {
-        score += 30;
+        score += 35;
         matchedTokenCount++;
       } else if (lName.includes(token)) {
         score += 25;
@@ -242,7 +245,7 @@ export const findBestMatchingClient = (query: string, clients: Client[]): { clie
       }
     }
 
-    // Boost if multiple tokens matched (e.g. "shri ganesh charitable")
+    // Boost if multiple tokens matched
     if (matchedTokenCount >= 2) {
       score += matchedTokenCount * 30;
     }
@@ -269,10 +272,77 @@ export const processAgenticCommand = async (
   // 1. DIRECT ACTION RECOGNITION (COMMANDS TO EXECUTE IN APP)
   // =========================================================================
 
-  // Action A: Create Client
+  // Action A: Record Financial Extra Work / Ad-hoc Billing (e.g. "cloud wave ka extra work provisional balance sheet ki fee total 10000 payable jod do")
+  if (
+    (lower.includes('extra work') || lower.includes('extra billing') || lower.includes('ad-hoc') || lower.includes('provisional balance sheet') || lower.includes('balance sheet') || lower.includes('cma') || lower.includes('notice reply') || lower.includes('project report') || (lower.includes('fee') && (lower.includes('jod') || lower.includes('add') || lower.includes('record')))) &&
+    (lower.includes('jod') || lower.includes('add') || lower.includes('record') || lower.includes('create') || lower.includes('banao') || lower.includes('payable') || lower.includes('tracker') || /\b\d{3,7}\b/.test(q))
+  ) {
+    const match = findBestMatchingClient(q, contextData.clients);
+    const targetClient = match ? match.client : contextData.clients[0];
+
+    if (targetClient) {
+      // Extract Fee Amount
+      const feeMatch = q.match(/(?:rs\.?|inr|₹|amount|fee|total|payable)?\s*(\d{3,7})/i);
+      const agreedFee = feeMatch ? parseInt(feeMatch[1], 10) : 10000;
+
+      // Extract / Infer Assignment Title
+      let taskTitle = 'Advisory & Financial Consulting Working';
+      let category = 'Advisory & ROC';
+
+      if (lower.includes('provisional balance sheet')) {
+        taskTitle = 'Provisional Balance Sheet & Financial Statements';
+        category = 'Accounting & CMA';
+      } else if (lower.includes('balance sheet')) {
+        taskTitle = 'Balance Sheet & Final Accounts Preparation';
+        category = 'Accounting & CMA';
+      } else if (lower.includes('cma') || lower.includes('project report')) {
+        taskTitle = 'Bank CMA Data & Loan Project Report';
+        category = 'Banking & Finance';
+      } else if (lower.includes('notice') || lower.includes('scrutiny')) {
+        taskTitle = 'GST / Income Tax Scrutiny Notice Reply';
+        category = 'Litigation & Notice';
+      } else if (lower.includes('roc') || lower.includes('mca')) {
+        taskTitle = 'MCA ROC Compliance & Filing Working';
+        category = 'ROC & Corporate';
+      }
+
+      const extraWorkData: Partial<ExtraWorkItem> = {
+        clientId: targetClient.id,
+        clientName: targetClient.tradeName,
+        taskTitle,
+        category,
+        agreedFee,
+        advanceReceived: 0,
+        balanceDue: agreedFee,
+        status: 'PENDING',
+        assignedTeamName: targetClient.assignedTeamName || contextData.team[0]?.name || 'Assigned Staff',
+        createdDate: new Date().toISOString().split('T')[0],
+        targetCompletionDate: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0]
+      };
+
+      return {
+        replyText: `Maine **${extraWorkData.clientName}** ke liye **${extraWorkData.taskTitle}** ka extra work ₹${extraWorkData.agreedFee?.toLocaleString('en-IN')} fee ke sath **Extra Work Tracker** me add kar diya hai!
+
+• **Client:** ${extraWorkData.clientName}
+• **Assignment:** ${extraWorkData.taskTitle}
+• **Total Agreed Fee:** ₹${extraWorkData.agreedFee?.toLocaleString('en-IN')}
+• **Balance Payable:** ₹${extraWorkData.balanceDue?.toLocaleString('en-IN')}
+• **Status:** PENDING`,
+        action: {
+          type: 'RECORD_EXTRA_WORK',
+          title: `Extra Work Logged: ₹${extraWorkData.agreedFee?.toLocaleString('en-IN')}`,
+          description: `${extraWorkData.taskTitle} for ${extraWorkData.clientName}`,
+          data: extraWorkData,
+          executed: false
+        }
+      };
+    }
+  }
+
+  // Action B: Create New Client
   if (
     (lower.includes('create client') || lower.includes('add client') || lower.includes('naya client') || lower.includes('client banao') || lower.includes('client jodo')) &&
-    !lower.includes('task')
+    !lower.includes('task') && !lower.includes('extra work')
   ) {
     const panMatch = q.match(/\b([A-Z]{5}[0-9]{4}[A-Z])\b/i);
     const gstinMatch = q.match(/\b([0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z])\b/i);
@@ -317,10 +387,11 @@ export const processAgenticCommand = async (
     };
   }
 
-  // Action B: Create Compliance Task
+  // Action C: Create Compliance Task
   if (
     (lower.includes('task') || lower.includes('compliance') || lower.includes('gstr') || lower.includes('itr') || lower.includes('tds') || lower.includes('audit')) &&
-    (lower.includes('create') || lower.includes('add') || lower.includes('banao') || lower.includes('jodo') || lower.includes('assign') || lower.includes('schedule'))
+    (lower.includes('create') || lower.includes('add') || lower.includes('banao') || lower.includes('jodo') || lower.includes('assign') || lower.includes('schedule')) &&
+    !lower.includes('extra work')
   ) {
     const match = findBestMatchingClient(q, contextData.clients);
     const targetClient = match ? match.client : contextData.clients[0];
@@ -367,7 +438,7 @@ export const processAgenticCommand = async (
     }
   }
 
-  // Action C: Update Task Status
+  // Action D: Update Task Status
   if (
     (lower.includes('complete') || lower.includes('done') || lower.includes('ho gaya') || lower.includes('khatam') || lower.includes('in progress') || lower.includes('shuru')) &&
     (lower.includes('task') || lower.includes('gst') || lower.includes('tds') || lower.includes('itr') || lower.includes('audit'))
@@ -397,7 +468,7 @@ export const processAgenticCommand = async (
     }
   }
 
-  // Action D: Office Shift / Attendance
+  // Action E: Office Shift / Attendance
   if (lower.includes('login') || lower.includes('shift in') || lower.includes('punch in') || lower.includes('lunch') || lower.includes('log off') || lower.includes('logoff')) {
     let shiftAction = 'LOGIN';
     let shiftTitle = '🟢 Office Login (Shift IN)';
@@ -492,7 +563,7 @@ export const processAgenticCommand = async (
 
 Aap mujhse:
 • Kisi bhi client ki details (PAN, GSTIN, Phone, Profile) puch sakte hain
-• Naye task ya client create karwa sakte hain
+• Naye task ya extra billing add karwa sakte hain
 • Income Tax, GST aur MCA statutory rules par advice le sakte hain
 • Office login, lunch break aur attendance mark karwa sakte hain.`
     };
@@ -505,9 +576,11 @@ Aap mujhse:
     };
   }
 
-  // D. Robust Client Profile & Information Lookup (Fuzzy Matched for ANY client)
+  // D. Robust Client Profile & Information Lookup (When specifically asking for client info / details / profile)
+  const isProfileInquiry = lower.includes('profile') || lower.includes('detail') || lower.includes('phone') || lower.includes('number') || lower.includes('pan') || lower.includes('gstin') || lower.includes('address') || lower.includes('contact') || lower.includes('koun hai') || lower.includes('kya hai') || lower.includes('batao') || lower.includes('dikhao') || lower.includes('check');
   const clientMatch = findBestMatchingClient(q, contextData.clients);
-  if (clientMatch) {
+
+  if (clientMatch && isProfileInquiry) {
     const c = clientMatch.client;
     const clientTasks = contextData.tasks.filter(t => t.clientId === c.id || (t.clientName && t.clientName.toLowerCase().includes(c.tradeName.toLowerCase())));
     const clientPending = clientTasks.filter(t => t.status === 'PENDING' || t.status === 'IN_PROGRESS');
@@ -551,9 +624,9 @@ Kya aap inka koi naya compliance task schedule karna chahte hain ya details upda
       replyText: `Main aapki firm ke liye ek senior practice assistant ki tarah kaam karta hoon. Yahan kuch mukhya cheezein hain jo main kar sakta hoon:
 
 1. **📄 GST & PAN PDF Reading**: GST Certificate (REG-06) ya PAN PDF upload karein — main bina kisi dummy data ke accurate trade name, PAN, GSTIN aur constitution extract kar dunga.
-2. **✅ Task Scheduling & Updates**: "Apex Tools ka GSTR-3B task banao" ya "Rakhi Agency ka GST complete mark karo".
-3. **🔍 Instant Client & Staff Lookups**: Kisi bhi client (e.g. "Shri Ganesh Charitable", "Rakhi Agency") ka naam bolkar unki poori profile, PAN, mobile number, ya pending tasks puchen.
-4. **💰 Extra Billing Tracking**: "Client X ka ₹15,000 ka notice reply work add karo" — fees aur balance due track hoga.
+2. **💰 Extra Work & Billing Tracking**: "CloudWave ka extra work provisional balance sheet fee 10000 jod do" — instantly Extra Work Tracker me add karega.
+3. **✅ Task Scheduling & Updates**: "Apex Tools ka GSTR-3B task banao" ya "Rakhi Agency ka GST complete mark karo".
+4. **🔍 Instant Client Lookups**: Kisi bhi client ka naam bolkar unki poori profile, PAN, mobile number, ya pending tasks puchen.
 5. **⏱️ Office Shifts & Lunch Timers**: "Office login", "Lunch break shuru", "Log off".
 6. **⚖️ Statutory CA Guidance**: TDS under 194Q, 206AB, Section 44AB audit limits, aur DRC-01 notices par technical guidance.`
     };
@@ -598,7 +671,7 @@ Kya aap inka koi naya compliance task schedule karna chahte hain ya details upda
   // H. Billing & Balance Fees
   if (lower.includes('extra work') || lower.includes('billing') || lower.includes('fee') || lower.includes('balance') || lower.includes('fees') || lower.includes('paisa')) {
     if (contextData.extraWork.length === 0) {
-      return { replyText: 'Abhi tak koi Extra Work ya Ad-hoc billing record nahi kiya gaya hai. Aap "Client X ka ₹15,000 ka extra work add karo" bolkar naya billing assignment create kar sakte hain.' };
+      return { replyText: 'Abhi tak koi Extra Work ya Ad-hoc billing record nahi kiya gaya hai. Aap "CloudWave ka extra work provisional balance sheet fee 10000 jod do" bolkar naya billing assignment create kar sakte hain.' };
     }
     const totalAgreed = contextData.extraWork.reduce((s, e) => s + (e.agreedFee || 0), 0);
     const totalBal = contextData.extraWork.reduce((s, e) => s + (e.balanceDue || 0), 0);
@@ -645,6 +718,6 @@ Aap Extra Work Tracker tab me jakar client-wise invoice dekh sakte hain.`
   return {
     replyText: `Main aapki baat samajh gaya! Is samay aapki firm me **${contextData.clients.length} Clients** aur **${contextData.tasks.length} Compliance Tasks** active hain. 
 
-Aap mujhse kisi bhi client (jaise "Shri Ganesh Charitable", "Rakhi Agency", "Apex Tools") ka naam bolkar unka profile aur pending tasks dekh sakte hain!`
+Aap mujhse kisi bhi client (jaise "CloudWave Technologies", "Shri Ganesh Charitable", "Rakhi Agency") ka naam bolkar unka profile dekh sakte hain ya naya task/extra work jod sakte hain!`
   };
 };
