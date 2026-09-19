@@ -8,6 +8,9 @@ export interface AgenticAction {
   type: 
     | 'PREVIEW_CLIENT'
     | 'CREATE_CLIENT' 
+    | 'UPDATE_CLIENT'
+    | 'STORE_VAULT'
+    | 'IMPORT_TEAM'
     | 'CREATE_TASK' 
     | 'UPDATE_TASK_STATUS' 
     | 'RECORD_EXTRA_WORK' 

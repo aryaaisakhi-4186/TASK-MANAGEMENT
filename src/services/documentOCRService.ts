@@ -462,3 +462,409 @@ Important Rules:
     return parseRawTextToClientData('', file.name);
   }
 };
+
+import * as XLSX from 'xlsx';
+
+export type DocumentDomain = 'CLIENT_MASTER' | 'TEAM_DIRECTORY' | 'DOCUMENT_VAULT' | 'UNKNOWN';
+
+export type DocumentSubType = 
+  | 'GST_CERTIFICATE' 
+  | 'PAN_CARD' 
+  | 'INCORPORATION_CERTIFICATE' 
+  | 'MSME_CERTIFICATE' 
+  | 'CLIENT_MASTER_EXCEL'
+  | 'TEAM_ROSTER_EXCEL'
+  | 'STAFF_PROFILE_PDF'
+  | 'BANK_STATEMENT' 
+  | 'SALE_VOUCHER' 
+  | 'PURCHASE_VOUCHER' 
+  | 'TAX_INVOICE' 
+  | 'FINANCIAL_STATEMENT' 
+  | 'TAX_NOTICE' 
+  | 'GENERAL_DOCUMENT';
+
+export interface DocumentClassificationResult {
+  domain: DocumentDomain;
+  subType: DocumentSubType;
+  confidence: number;
+  title: string;
+  summary: string;
+  matchedClientId?: string;
+  matchedClientName?: string;
+  isExistingClient?: boolean;
+  clientData?: Partial<Client>;
+  teamData?: Array<{ name: string; designation?: string; role: 'ADMIN' | 'TEAM'; phone?: string; email?: string; pin?: string }>;
+  vaultData?: {
+    documentTitle: string;
+    category: string;
+    period?: string;
+    amount?: number;
+  };
+  validationWarning?: string;
+  suggestedAction: 'CREATE_CLIENT' | 'UPDATE_CLIENT' | 'IMPORT_TEAM' | 'STORE_VAULT' | 'REVIEW_MANUAL';
+}
+
+// ---------------------------------------------------------------------------
+// UNIVERSAL DOCUMENT & SPREADSHEET CLASSIFIER & FIELD EXTRACTOR
+// ---------------------------------------------------------------------------
+export const classifyAndExtractDocument = async (
+  file: File,
+  existingClients: Client[] = [],
+  existingTeam: any[] = []
+): Promise<DocumentClassificationResult> => {
+  const isExcel = /\.(xlsx|xls|csv)$/i.test(file.name);
+  const isPdf = /\.pdf$/i.test(file.name);
+  const isImage = /\.(png|jpe?g|webp|bmp)$/i.test(file.name);
+  const lowerName = file.name.toLowerCase();
+
+  // =========================================================================
+  // DOMAIN 1: SPREADSHEET ANALYSIS (Excel / CSV)
+  // =========================================================================
+  if (isExcel) {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rawRows: any[] = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+
+      if (rawRows.length > 0) {
+        const headers = Object.keys(rawRows[0]).map(h => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
+        const headerStr = headers.join(' ');
+
+        // Check A: Team Roster
+        const isTeamSheet = (
+          (headerStr.includes('designation') || headerStr.includes('salary') || headerStr.includes('role') || headerStr.includes('empid') || headerStr.includes('staff')) &&
+          !headerStr.includes('gstin') && !headerStr.includes('tradename')
+        ) || lowerName.includes('team') || lowerName.includes('staff') || lowerName.includes('employee');
+
+        if (isTeamSheet) {
+          const teamList = rawRows.map(r => {
+            const keys = Object.keys(r);
+            const nameKey = keys.find(k => /name|staff|employee/i.test(k)) || keys[0];
+            const desigKey = keys.find(k => /desig|post|role|position/i.test(k));
+            const phoneKey = keys.find(k => /phone|mobile|contact/i.test(k));
+            const emailKey = keys.find(k => /email|mail/i.test(k));
+            const roleKey = keys.find(k => /role|admin|partner/i.test(k));
+
+            const rawRole = roleKey ? String(r[roleKey]).toUpperCase() : '';
+            const role: 'ADMIN' | 'TEAM' = (rawRole.includes('ADMIN') || rawRole.includes('PARTNER')) ? 'ADMIN' : 'TEAM';
+
+            return {
+              name: String(r[nameKey] || 'Staff Member').trim(),
+              designation: desigKey ? String(r[desigKey]).trim() : 'Staff Associate',
+              role,
+              phone: phoneKey ? String(r[phoneKey]).trim() : '',
+              email: emailKey ? String(r[emailKey]).trim() : '',
+              pin: '1234'
+            };
+          }).filter(t => t.name.length > 1 && t.name !== 'Staff Member');
+
+          return {
+            domain: 'TEAM_DIRECTORY',
+            subType: 'TEAM_ROSTER_EXCEL',
+            confidence: 95,
+            title: 'Staff / Team Roster Spreadsheet',
+            summary: `Found ${teamList.length} staff records with designations & contact details.`,
+            teamData: teamList,
+            suggestedAction: 'IMPORT_TEAM'
+          };
+        }
+
+        // Check B: Bank Statement / Ledger Excel
+        const isBankOrVoucher = headerStr.includes('balance') || headerStr.includes('withdrawal') || headerStr.includes('deposit') || headerStr.includes('txndate') || headerStr.includes('chequeno') || headerStr.includes('invoiceno');
+        if (isBankOrVoucher) {
+          let subType: DocumentSubType = 'BANK_STATEMENT';
+          let category = 'Bank Statements';
+          if (headerStr.includes('invoiceno') || headerStr.includes('taxablevalue')) {
+            subType = 'SALE_VOUCHER';
+            category = 'Sales & Invoices';
+          }
+
+          // Match client
+          let matchedClient: Client | undefined = undefined;
+          for (const c of existingClients) {
+            if (lowerName.includes(c.tradeName.toLowerCase()) || (c.pan && lowerName.includes(c.pan.toLowerCase()))) {
+              matchedClient = c;
+              break;
+            }
+          }
+
+          return {
+            domain: 'DOCUMENT_VAULT',
+            subType,
+            confidence: 90,
+            title: `${subType === 'BANK_STATEMENT' ? 'Bank Statement' : 'Transaction Voucher'} Spreadsheet`,
+            summary: `Contains ${rawRows.length} transaction entries.`,
+            matchedClientId: matchedClient?.id,
+            matchedClientName: matchedClient?.tradeName,
+            vaultData: {
+              documentTitle: file.name.replace(/\.[^/.]+$/, ''),
+              category,
+              amount: rawRows.length
+            },
+            suggestedAction: 'STORE_VAULT'
+          };
+        }
+
+        // Check C: Client Master Excel
+        const clientData = parseRawTextToClientData('', file.name);
+        return {
+          domain: 'CLIENT_MASTER',
+          subType: 'CLIENT_MASTER_EXCEL',
+          confidence: 85,
+          title: 'Client Master Spreadsheet',
+          summary: `Spreadsheet with ${rawRows.length} client rows ready for Master import.`,
+          clientData,
+          suggestedAction: 'CREATE_CLIENT'
+        };
+      }
+    } catch (e) {
+      console.warn('Excel parse note:', e);
+    }
+  }
+
+  // =========================================================================
+  // DOMAIN 2: PDF & IMAGE DEEP TEXT & MULTIMODAL CLASSIFICATION
+  // =========================================================================
+  let rawText = '';
+  let clientData: Partial<Client> = {};
+
+  try {
+    clientData = await extractDocumentDataDirectly(file);
+  } catch (e) {
+    console.warn('Direct extraction note:', e);
+  }
+
+  try {
+    if (isPdf) {
+      rawText = await extractPdfJsText(file) || await extractBinaryPdfText(file) || '';
+    }
+  } catch {}
+
+  const combinedText = (rawText + ' ' + JSON.stringify(clientData) + ' ' + lowerName).toLowerCase();
+
+  // 1. Check if Document is a Bank Statement
+  if (
+    combinedText.includes('bank statement') || 
+    combinedText.includes('account statement') ||
+    combinedText.includes('opening balance') ||
+    combinedText.includes('closing balance') ||
+    combinedText.includes('available balance') ||
+    combinedText.includes('ifsc code') ||
+    combinedText.includes('hdfc bank') ||
+    combinedText.includes('icici bank') ||
+    combinedText.includes('state bank of india') ||
+    combinedText.includes('axis bank') ||
+    combinedText.includes('kotak mahindra') ||
+    combinedText.includes('punjab national bank') ||
+    combinedText.includes('canara bank') ||
+    combinedText.includes('bank of baroda') ||
+    (combinedText.includes('withdrawal') && combinedText.includes('deposit'))
+  ) {
+    // Match client from existingClients
+    let matchedClient: Client | undefined = undefined;
+    for (const c of existingClients) {
+      const cName = c.tradeName.toLowerCase();
+      const cLegal = (c.legalName || '').toLowerCase();
+      if (
+        (cName.length > 3 && combinedText.includes(cName)) ||
+        (cLegal.length > 3 && combinedText.includes(cLegal)) ||
+        (c.pan && combinedText.includes(c.pan.toLowerCase())) ||
+        (c.gstin && combinedText.includes(c.gstin.toLowerCase()))
+      ) {
+        matchedClient = c;
+        break;
+      }
+    }
+
+    return {
+      domain: 'DOCUMENT_VAULT',
+      subType: 'BANK_STATEMENT',
+      confidence: 95,
+      title: 'Banking & Account Statement',
+      summary: `Bank Statement detected for ${matchedClient ? matchedClient.tradeName : 'Client'}. Ready to archive in Document Vault.`,
+      matchedClientId: matchedClient?.id,
+      matchedClientName: matchedClient?.tradeName,
+      vaultData: {
+        documentTitle: `Bank Statement - ${file.name.replace(/\.[^/.]+$/, '')}`,
+        category: 'Bank Statements'
+      },
+      suggestedAction: 'STORE_VAULT'
+    };
+  }
+
+  // 2. Check if Document is a Sale / Purchase Voucher / Tax Invoice
+  if (
+    combinedText.includes('tax invoice') ||
+    combinedText.includes('sales invoice') ||
+    combinedText.includes('bill of supply') ||
+    combinedText.includes('invoice no') ||
+    combinedText.includes('purchase voucher') ||
+    combinedText.includes('purchase bill') ||
+    combinedText.includes('debit note') ||
+    combinedText.includes('credit note') ||
+    (combinedText.includes('place of supply') && combinedText.includes('hsn'))
+  ) {
+    const isPurchase = combinedText.includes('purchase') || combinedText.includes('vendor') || combinedText.includes('goods received');
+    const subType: DocumentSubType = isPurchase ? 'PURCHASE_VOUCHER' : 'TAX_INVOICE';
+    const category = isPurchase ? 'Purchase & Expense Vouchers' : 'Sales & Invoices';
+
+    let matchedClient: Client | undefined = undefined;
+    for (const c of existingClients) {
+      if (
+        combinedText.includes(c.tradeName.toLowerCase()) ||
+        (c.pan && combinedText.includes(c.pan.toLowerCase())) ||
+        (c.gstin && combinedText.includes(c.gstin.toLowerCase()))
+      ) {
+        matchedClient = c;
+        break;
+      }
+    }
+
+    return {
+      domain: 'DOCUMENT_VAULT',
+      subType,
+      confidence: 92,
+      title: isPurchase ? 'Purchase Voucher / Bill' : 'Tax / Sales Invoice',
+      summary: `${isPurchase ? 'Purchase Voucher' : 'Tax Invoice'} detected. Ready to index in Document Vault under ${matchedClient ? matchedClient.tradeName : 'Client'}.`,
+      matchedClientId: matchedClient?.id,
+      matchedClientName: matchedClient?.tradeName,
+      vaultData: {
+        documentTitle: `${isPurchase ? 'Purchase Voucher' : 'Invoice'} - ${file.name.replace(/\.[^/.]+$/, '')}`,
+        category
+      },
+      suggestedAction: 'STORE_VAULT'
+    };
+  }
+
+  // 3. Check if Document is a Tax Notice / Scrutiny Demand
+  if (
+    combinedText.includes('drc-01') ||
+    combinedText.includes('asmt-10') ||
+    combinedText.includes('notice under section') ||
+    combinedText.includes('scrutiny assessment') ||
+    combinedText.includes('income tax notice')
+  ) {
+    let matchedClient: Client | undefined = undefined;
+    for (const c of existingClients) {
+      if (combinedText.includes(c.tradeName.toLowerCase()) || (c.pan && combinedText.includes(c.pan.toLowerCase()))) {
+        matchedClient = c;
+        break;
+      }
+    }
+
+    return {
+      domain: 'DOCUMENT_VAULT',
+      subType: 'TAX_NOTICE',
+      confidence: 94,
+      title: 'Statutory Notice & Scrutiny Order',
+      summary: `Tax Notice detected. Archiving in Document Vault under Notices & Litigation.`,
+      matchedClientId: matchedClient?.id,
+      matchedClientName: matchedClient?.tradeName,
+      vaultData: {
+        documentTitle: `Statutory Notice - ${file.name.replace(/\.[^/.]+$/, '')}`,
+        category: 'Notices & Scrutiny'
+      },
+      suggestedAction: 'STORE_VAULT'
+    };
+  }
+
+  // 4. Check if Document is a Staff Resume / Joining Document
+  if (
+    combinedText.includes('curriculum vitae') ||
+    combinedText.includes('resume') ||
+    combinedText.includes('articleship agreement') ||
+    combinedText.includes('form 102') ||
+    combinedText.includes('form 103')
+  ) {
+    return {
+      domain: 'TEAM_DIRECTORY',
+      subType: 'STAFF_PROFILE_PDF',
+      confidence: 90,
+      title: 'Staff / Candidate Profile Document',
+      summary: 'Candidate / Staff profile detected. Ready to register in Team Directory.',
+      teamData: [{
+        name: clientData.contactPerson || file.name.replace(/\.[^/.]+$/, ''),
+        designation: 'Staff Associate / Article Assistant',
+        role: 'TEAM',
+        phone: clientData.phone || '',
+        email: clientData.email || '',
+        pin: '1234'
+      }],
+      suggestedAction: 'IMPORT_TEAM'
+    };
+  }
+
+  // 5. Default Domain: Client Master (GST Registration REG-06, PAN Card, Incorporation)
+  let subType: DocumentSubType = 'GST_CERTIFICATE';
+  if (combinedText.includes('income tax department') || combinedText.includes('permanent account number card')) {
+    subType = 'PAN_CARD';
+  } else if (combinedText.includes('certificate of incorporation') || combinedText.includes('registrar of companies')) {
+    subType = 'INCORPORATION_CERTIFICATE';
+  } else if (combinedText.includes('udyam registration') || combinedText.includes('msme')) {
+    subType = 'MSME_CERTIFICATE';
+  }
+
+  // Check if client ALREADY EXISTS (DUPLICATE SAFETY CHECK)
+  const normPan = clientData.pan?.toUpperCase().trim();
+  const normGst = clientData.gstin?.toUpperCase().trim();
+  const normTrade = clientData.tradeName?.toLowerCase().trim();
+
+  let existingMatch: Client | undefined = undefined;
+
+  for (const c of existingClients) {
+    const cPan = c.pan?.toUpperCase().trim();
+    const cGst = c.gstin?.toUpperCase().trim();
+    const cTrade = c.tradeName.toLowerCase().trim();
+
+    if (normPan && normPan.length === 10 && cPan === normPan) {
+      existingMatch = c;
+      break;
+    }
+    if (normGst && normGst.length === 15 && cGst === normGst) {
+      existingMatch = c;
+      break;
+    }
+    if (normTrade && normTrade.length > 3 && (cTrade === normTrade || cTrade.includes(normTrade) || normTrade.includes(cTrade))) {
+      existingMatch = c;
+      break;
+    }
+  }
+
+  if (existingMatch) {
+    return {
+      domain: 'CLIENT_MASTER',
+      subType,
+      confidence: 98,
+      title: `Update Client Profile: ${existingMatch.tradeName}`,
+      summary: `Client already exists in database (${existingMatch.tradeName} | PAN: ${existingMatch.pan}). Details will be updated without creating any duplicate rows.`,
+      isExistingClient: true,
+      matchedClientId: existingMatch.id,
+      matchedClientName: existingMatch.tradeName,
+      clientData: {
+        ...existingMatch,
+        tradeName: clientData.tradeName || existingMatch.tradeName,
+        legalName: clientData.legalName || existingMatch.legalName || existingMatch.tradeName,
+        pan: clientData.pan || existingMatch.pan,
+        gstin: clientData.gstin || existingMatch.gstin,
+        category: clientData.category || existingMatch.category,
+        contactPerson: clientData.contactPerson || existingMatch.contactPerson,
+        phone: clientData.phone || existingMatch.phone,
+        email: clientData.email || existingMatch.email,
+        formationDate: clientData.formationDate || existingMatch.formationDate
+      },
+      suggestedAction: 'UPDATE_CLIENT'
+    };
+  }
+
+  return {
+    domain: 'CLIENT_MASTER',
+    subType,
+    confidence: 95,
+    title: `New Client Profile: ${clientData.tradeName || file.name}`,
+    summary: 'New client registration certificate detected. Ready to create master profile.',
+    isExistingClient: false,
+    clientData,
+    suggestedAction: 'CREATE_CLIENT'
+  };
+};

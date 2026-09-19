@@ -27,7 +27,8 @@ import {
   detectEntityCategoryFromPANAndGSTIN
 } from '../../utils/masterImportExport';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
-import { ClientCategory } from '../../types';
+import { ClientCategory, Client } from '../../types';
+import { classifyAndExtractDocument, DocumentClassificationResult } from '../../services/documentOCRService';
 
 interface Props {
   isOpen: boolean;
@@ -37,7 +38,7 @@ interface Props {
 const DEFAULT_MASTER_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1GcG1ekpVnewJo034_yttoP92qIYEeO_2uBacAgpwCqU/edit?pli=1&gid=0#gid=0';
 
 export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
-  const { addClient, settings, updateSettings, team } = useTasks();
+  const { clients, addClient, updateClient, settings, updateSettings, team } = useTasks();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEscapeKey(onClose, isOpen);
@@ -52,6 +53,8 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const [parsedRows, setParsedRows] = useState<ParsedClientRow[]>([]);
   const [sourceName, setSourceName] = useState<string>('');
   const [importSuccessCount, setImportSuccessCount] = useState<number | null>(null);
+  const [importSuccessSummary, setImportSuccessSummary] = useState<string | null>(null);
+  const [misclassificationAlert, setMisclassificationAlert] = useState<{ fileName: string; domain: string; title: string; summary: string } | null>(null);
 
   // Row Editing State
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -65,16 +68,31 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const handleMultipleFilesProcess = async (files: File[]) => {
+  const handleMultipleFilesProcess = async (files: File[], bypassCheck: boolean = false) => {
     if (!files || files.length === 0) return;
     setLoading(true);
     setErrorMsg(null);
+    setMisclassificationAlert(null);
     setImportSuccessCount(null);
+    setImportSuccessSummary(null);
     setSourceName(files.length === 1 ? files[0].name : `${files.length} Files (${files.map(f => f.name).slice(0, 3).join(', ')}${files.length > 3 ? '...' : ''})`);
 
     try {
       let allRows: ParsedClientRow[] = [];
       for (const file of files) {
+        if (!bypassCheck) {
+          const classification = await classifyAndExtractDocument(file, clients, team);
+          if (classification.domain === 'TEAM_DIRECTORY' || classification.domain === 'DOCUMENT_VAULT') {
+            setMisclassificationAlert({
+              fileName: file.name,
+              domain: classification.domain === 'TEAM_DIRECTORY' ? 'Team Directory' : 'Document Vault',
+              title: classification.title,
+              summary: classification.summary
+            });
+            setLoading(false);
+            return;
+          }
+        }
         const rows = await parseClientsFromFile(file);
         allRows = [...allRows, ...rows];
       }
@@ -192,34 +210,66 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
     const validRows = parsedRows.filter(r => r.isValid);
     if (validRows.length === 0) return;
 
+    let updatedCount = 0;
+    let createdCount = 0;
+
     validRows.forEach(row => {
-      addClient({
-        tradeName: row.tradeName,
-        legalName: row.legalName || row.tradeName,
-        pan: row.pan,
-        gstin: row.gstin,
-        tan: row.tan,
-        vatNumber: row.vatNumber,
-        category: row.category,
-        status: 'ACTIVE',
-        contactPerson: row.contactPerson || '',
-        phone: row.phone || '',
-        email: row.email || '',
-        employeeName: row.employeeName,
-        employeePhone: row.employeePhone,
-        aadharNumber: row.aadharNumber,
-        dob: row.dob,
-        formationDate: row.formationDate,
-        assignedTeamId: '',
-        assignedTeamName: row.assignedTeamName || 'Assigned Staff',
-        portalPassword: 'client' + (row.phone ? row.phone.slice(-4) : '123'),
-        googleDriveFolderId: row.googleDriveFolderId || '',
-        googleDriveFolderUrl: row.googleDriveFolderUrl || '',
-        customFields: []
+      const normPan = row.pan?.trim().toUpperCase();
+      const normGst = row.gstin?.trim().toUpperCase();
+      const normName = row.tradeName?.trim().toLowerCase();
+
+      const existingMatch = clients.find(c => {
+        if (normPan && normPan !== 'PAN-PENDING' && c.pan?.trim().toUpperCase() === normPan) return true;
+        if (normGst && c.gstin?.trim().toUpperCase() === normGst) return true;
+        if (normName && c.tradeName?.trim().toLowerCase() === normName) return true;
+        return false;
       });
+
+      if (existingMatch) {
+        updateClient(existingMatch.id, {
+          tradeName: row.tradeName || existingMatch.tradeName,
+          legalName: row.legalName || existingMatch.legalName || row.tradeName,
+          pan: (normPan && normPan !== 'PAN-PENDING') ? normPan : existingMatch.pan,
+          gstin: row.gstin || existingMatch.gstin,
+          tan: row.tan || existingMatch.tan,
+          category: row.category || existingMatch.category,
+          contactPerson: row.contactPerson || existingMatch.contactPerson,
+          phone: row.phone || existingMatch.phone,
+          email: row.email || existingMatch.email,
+          formationDate: row.formationDate || existingMatch.formationDate
+        });
+        updatedCount++;
+      } else {
+        addClient({
+          tradeName: row.tradeName,
+          legalName: row.legalName || row.tradeName,
+          pan: row.pan,
+          gstin: row.gstin,
+          tan: row.tan,
+          vatNumber: row.vatNumber,
+          category: row.category,
+          status: 'ACTIVE',
+          contactPerson: row.contactPerson || '',
+          phone: row.phone || '',
+          email: row.email || '',
+          employeeName: row.employeeName,
+          employeePhone: row.employeePhone,
+          aadharNumber: row.aadharNumber,
+          dob: row.dob,
+          formationDate: row.formationDate,
+          assignedTeamId: '',
+          assignedTeamName: row.assignedTeamName || 'Assigned Staff',
+          portalPassword: 'client' + (row.phone ? row.phone.slice(-4) : '123'),
+          googleDriveFolderId: row.googleDriveFolderId || '',
+          googleDriveFolderUrl: row.googleDriveFolderUrl || '',
+          customFields: []
+        });
+        createdCount++;
+      }
     });
 
     setImportSuccessCount(validRows.length);
+    setImportSuccessSummary(`✨ ${createdCount} New Clients created, 🔄 ${updatedCount} Existing Profiles updated (0 Duplicate Records).`);
     setParsedRows([]);
   };
 
@@ -611,16 +661,29 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
-                    {parsedRows.map((row, idx) => (
+                    {parsedRows.map((row, idx) => {
+                      const isExisting = clients.some(c => 
+                        (row.pan && row.pan !== 'PAN-PENDING' && c.pan?.toUpperCase() === row.pan.toUpperCase()) ||
+                        (row.gstin && c.gstin?.toUpperCase() === row.gstin.toUpperCase()) ||
+                        (row.tradeName && c.tradeName.toLowerCase() === row.tradeName.toLowerCase())
+                      );
+
+                      return (
                       <tr 
                         key={idx} 
                         className={`hover:bg-slate-50 dark:hover:bg-slate-800/40 ${!row.isValid ? 'bg-red-500/10' : ''} ${editingIndex === idx ? 'bg-amber-500/15' : ''}`}
                       >
                         <td className="p-2.5">
                           {row.isValid ? (
-                            <span className="text-emerald-500 font-bold flex items-center gap-1">
-                              <Check size={14} /> Ready
-                            </span>
+                            isExisting ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-700 dark:text-blue-300 text-[10px] font-bold border border-blue-500/30">
+                                🔄 Update
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
+                                ✨ New
+                              </span>
+                            )
                           ) : (
                             <span className="text-red-500 font-bold text-[10px]" title={row.validationError}>
                               ⚠ {row.validationError}
@@ -628,7 +691,8 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                           )}
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 dark:text-white">
-                          {row.tradeName}
+                          <div>{row.tradeName}</div>
+                          {isExisting && <div className="text-[10px] text-blue-600 dark:text-blue-400 font-normal">Existing profile will be updated</div>}
                         </td>
                         <td className="p-2.5 font-mono font-bold text-amber-600 dark:text-amber-400">
                           {row.pan}
@@ -669,7 +733,8 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    );
+                    })}
                   </tbody>
                 </table>
               </div>

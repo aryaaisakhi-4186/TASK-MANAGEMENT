@@ -15,6 +15,7 @@ import {
   Database
 } from 'lucide-react';
 import { useTasks } from '../../context/TaskContext';
+import { classifyAndExtractDocument } from '../../services/documentOCRService';
 import { 
   parseTeamFromFile, 
   parseTeamFromGoogleSheet, 
@@ -31,7 +32,7 @@ interface Props {
 const DEFAULT_MASTER_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1GcG1ekpVnewJo034_yttoP92qIYEeO_2uBacAgpwCqU/edit?pli=1&gid=0#gid=0';
 
 export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
-  const { addTeamMember, settings, updateSettings } = useTasks();
+  const { clients, team, addTeamMember, settings, updateSettings } = useTasks();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEscapeKey(onClose, isOpen);
@@ -46,6 +47,7 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const [parsedRows, setParsedRows] = useState<ParsedTeamRow[]>([]);
   const [sourceName, setSourceName] = useState<string>('');
   const [importSuccessCount, setImportSuccessCount] = useState<number | null>(null);
+  const [misclassificationAlert, setMisclassificationAlert] = useState<{ fileName: string; domain: string; title: string; summary: string } | null>(null);
 
   useEffect(() => {
     if (settings.masterGoogleSheetUrl) {
@@ -58,10 +60,23 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const handleFileProcess = async (file: File) => {
     setLoading(true);
     setErrorMsg(null);
+    setMisclassificationAlert(null);
     setImportSuccessCount(null);
     setSourceName(file.name);
 
     try {
+      const classification = await classifyAndExtractDocument(file, clients, team);
+      if (classification.domain === 'CLIENT_MASTER' || classification.domain === 'DOCUMENT_VAULT') {
+        setMisclassificationAlert({
+          fileName: file.name,
+          domain: classification.domain === 'CLIENT_MASTER' ? 'Client Master' : 'Document Vault',
+          title: classification.title,
+          summary: classification.summary
+        });
+        setLoading(false);
+        return;
+      }
+
       const rows = await parseTeamFromFile(file);
       setParsedRows(rows);
     } catch (err: any) {

@@ -1,5 +1,5 @@
 import { getStoredGeminiKey, setStoredGeminiKey } from '../../services/clientAIService';
-import { extractDocumentDataDirectly } from '../../services/documentOCRService';
+import { extractDocumentDataDirectly, classifyAndExtractDocument, DocumentClassificationResult } from '../../services/documentOCRService';
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Bot,
@@ -71,6 +71,8 @@ export const CACompliBot: React.FC<{
     team, 
     extraWork, 
     addClient, 
+    updateClient, 
+    addDocument, 
     addTask, 
     updateTaskStatus, 
     addExtraWork, 
@@ -200,6 +202,49 @@ export const CACompliBot: React.FC<{
     try {
       if (action.type === 'CREATE_CLIENT' || action.type === 'PREVIEW_CLIENT') {
         addClient(action.data);
+      } else if (action.type === 'UPDATE_CLIENT') {
+        const clientId = action.data.id || action.data.matchedClientId;
+        if (clientId) {
+          updateClient(clientId, action.data);
+        } else {
+          addClient(action.data);
+        }
+      } else if (action.type === 'STORE_VAULT') {
+        addDocument({
+          title: action.data.documentTitle || action.data.title || 'Archived Document',
+          category: action.data.category || 'General Documents',
+          clientId: action.data.matchedClientId || '',
+          clientName: action.data.matchedClientName || 'General Vault',
+          fileUrl: '',
+          fileSize: '1.2 MB',
+          fileType: 'PDF',
+          uploadedBy: currentUser?.name || 'Agentic AI',
+          tags: [action.data.category || 'Vault', 'AI-Classified']
+        });
+      } else if (action.type === 'IMPORT_TEAM') {
+        if (Array.isArray(action.data)) {
+          action.data.forEach((member: any) => {
+            addTeamMember({
+              name: member.name,
+              role: member.role || 'TEAM',
+              designation: member.designation || 'Staff Associate',
+              phone: member.phone || '',
+              email: member.email || '',
+              pin: member.pin || '1234',
+              assignedClientIds: []
+            });
+          });
+        } else if (action.data) {
+          addTeamMember({
+            name: action.data.name,
+            role: action.data.role || 'TEAM',
+            designation: action.data.designation || 'Staff Associate',
+            phone: action.data.phone || '',
+            email: action.data.email || '',
+            pin: action.data.pin || '1234',
+            assignedClientIds: []
+          });
+        }
       } else if (action.type === 'CREATE_TASK') {
         addTask(action.data);
       } else if (action.type === 'UPDATE_TASK_STATUS') {
@@ -220,29 +265,34 @@ export const CACompliBot: React.FC<{
     }
   };
 
-  // Confirm and Commit Preview Client to Master Directory
-  const handleConfirmPreviewImport = (msgId: string, clientData: Partial<Client>) => {
+  // Confirm and Commit Preview Client to Master Directory (with duplicate protection)
+  const handleConfirmPreviewImport = (msgId: string, clientData: Partial<Client>, isUpdate: boolean = false, existingId?: string) => {
     const currentData = previewFormData[msgId] || clientData;
+    const targetId = existingId || (currentData as any).id;
     
-    addClient({
-      tradeName: currentData.tradeName || 'New Client',
-      legalName: currentData.legalName || currentData.tradeName || 'New Client',
-      pan: currentData.pan || 'PAN-PENDING',
-      gstin: currentData.gstin,
-      tan: currentData.tan,
-      category: currentData.category || 'PVT_LTD',
-      status: 'ACTIVE',
-      contactPerson: currentData.contactPerson || 'Authorized Representative',
-      phone: currentData.phone || '+91 98000 00000',
-      email: currentData.email || 'accounts@client.com',
-      formationDate: currentData.formationDate || new Date().toISOString().split('T')[0],
-      assignedTeamId: '',
-      assignedTeamName: currentData.assignedTeamName || 'Assigned Staff',
-      portalPassword: 'client' + (currentData.phone ? currentData.phone.slice(-4) : '123'),
-      googleDriveFolderId: currentData.googleDriveFolderId || '',
-      googleDriveFolderUrl: currentData.googleDriveFolderUrl || '',
-      customFields: []
-    });
+    if (isUpdate && targetId) {
+      updateClient(targetId, currentData);
+    } else {
+      addClient({
+        tradeName: currentData.tradeName || 'New Client',
+        legalName: currentData.legalName || currentData.tradeName || 'New Client',
+        pan: currentData.pan || 'PAN-PENDING',
+        gstin: currentData.gstin,
+        tan: currentData.tan,
+        category: currentData.category || 'PVT_LTD',
+        status: 'ACTIVE',
+        contactPerson: currentData.contactPerson || 'Authorized Representative',
+        phone: currentData.phone || '+91 98000 00000',
+        email: currentData.email || 'accounts@client.com',
+        formationDate: currentData.formationDate || new Date().toISOString().split('T')[0],
+        assignedTeamId: '',
+        assignedTeamName: currentData.assignedTeamName || 'Assigned Staff',
+        portalPassword: 'client' + (currentData.phone ? currentData.phone.slice(-4) : '123'),
+        googleDriveFolderId: currentData.googleDriveFolderId || '',
+        googleDriveFolderUrl: currentData.googleDriveFolderUrl || '',
+        customFields: []
+      });
+    }
 
     setMessages(prev => prev.map(m => {
       if (m.id === msgId && m.action) {
@@ -251,7 +301,7 @@ export const CACompliBot: React.FC<{
           action: {
             ...m.action,
             executed: true,
-            title: `Client Saved: ${currentData.tradeName}`,
+            title: isUpdate ? `Client Profile Updated: ${currentData.tradeName}` : `Client Created: ${currentData.tradeName}`,
             description: `PAN: ${currentData.pan} • GSTIN: ${currentData.gstin || 'None'} • Type: ${currentData.category}`
           }
         };
@@ -260,7 +310,7 @@ export const CACompliBot: React.FC<{
     }));
   };
 
-  // Process Multiple Document Files (PDF, Images, Excel) with Multi-Engine OCR & Document Intelligence
+  // Process Multiple Document Files (PDF, Images, Excel) with Universal Document Intelligence
   const handleMultipleFilesUpload = async (files: File[]) => {
     if (!files || files.length === 0) return;
     setLoading(true);
@@ -271,9 +321,9 @@ export const CACompliBot: React.FC<{
         id: Date.now().toString(),
         sender: 'user',
         text: files.length === 1
-          ? `Please analyze "${files[0].name}" and extract all client profile fields (PAN, GSTIN, Trade Name, Legal Name, Contact, Phone, Category) with Live Preview before importing.`
-          : `Please analyze these ${files.length} uploaded documents (${fileNames}) and extract client profiles with Live Preview for all of them before importing.`,
-        attachedFileName: files.length === 1 ? files[0].name : `${files.length} Documents Attached`,
+          ? `Please analyze "${files[0].name}" with Universal Document Classifier and route to the correct destination.`
+          : `Please analyze these ${files.length} uploaded files (${fileNames}) with Universal Document Classifier and route each file properly.`,
+        attachedFileName: files.length === 1 ? files[0].name : `${files.length} Files Attached`,
         timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
       };
 
@@ -283,41 +333,114 @@ export const CACompliBot: React.FC<{
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const clientData = await extractDocumentDataDirectly(file);
+        const classification: DocumentClassificationResult = await classifyAndExtractDocument(file, clients, team);
         const msgId = (Date.now() + i + 1).toString();
 
-        const isExisting = clients.some(c => 
-          (clientData.pan && clientData.pan !== 'PAN-PENDING' && c.pan?.toUpperCase() === clientData.pan?.toUpperCase()) ||
-          (clientData.gstin && c.gstin?.toUpperCase() === clientData.gstin?.toUpperCase())
-        );
+        if (classification.domain === 'CLIENT_MASTER') {
+          const clientData = classification.clientData || {};
+          const isExisting = !!classification.isExistingClient;
+          const matchedClientId = classification.matchedClientId;
 
-        const action: AgenticAction = {
-          type: 'PREVIEW_CLIENT',
-          title: isExisting ? `Update Profile: ${clientData.tradeName || file.name}` : `New Client: ${clientData.tradeName || file.name}`,
-          description: `PAN: ${clientData.pan || 'Pending'} • GSTIN: ${clientData.gstin || 'None'} • Type: ${clientData.category || 'PVT_LTD'} • Contact: ${clientData.contactPerson || 'N/A'}`,
-          data: clientData,
-          executed: false
-        };
+          const action: AgenticAction = {
+            type: isExisting ? 'UPDATE_CLIENT' : 'PREVIEW_CLIENT',
+            title: isExisting 
+              ? `🔄 Update Profile: ${classification.matchedClientName || clientData.tradeName || file.name}` 
+              : `✨ New Client: ${clientData.tradeName || file.name}`,
+            description: `PAN: ${clientData.pan || 'Pending'} • GSTIN: ${clientData.gstin || 'None'} • Type: ${clientData.category || 'PVT_LTD'} • Contact: ${clientData.contactPerson || 'N/A'}`,
+            data: {
+              ...clientData,
+              id: matchedClientId
+            },
+            executed: false,
+            targetTab: 'clients'
+          };
 
-        setPreviewFormData(prev => ({ ...prev, [msgId]: clientData }));
+          setPreviewFormData(prev => ({ ...prev, [msgId]: clientData }));
 
-        const botReply: ChatMessage = {
-          id: msgId,
-          sender: 'bot',
-          text: `📄 [${i + 1}/${files.length}] **${file.name}** successfully parsed! ✨\n\n` +
-            `• **Trade Name:** ${clientData.tradeName || 'N/A'}\n` +
-            `• **Legal Name:** ${clientData.legalName || clientData.tradeName || 'N/A'}\n` +
-            `• **PAN Number:** ${clientData.pan ? clientData.pan : '⚠️ Not detected'}\n` +
-            `• **GSTIN Number:** ${clientData.gstin ? clientData.gstin : '⚪ None / Unregistered'}\n` +
-            `• **Entity Constitution:** ${clientData.category || 'PVT_LTD'}\n` +
-            `• **Contact Person:** ${clientData.contactPerson || 'Authorized Representative'}\n` +
-            `• **Phone / Email:** ${clientData.phone || 'None'} • ${clientData.email || 'None'}\n\n` +
-            `Niche diye gaye **Live Preview** me details verify karein aur fir **"Confirm & Import Client"** par click karein:`,
-          action,
-          timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-        };
+          const botReply: ChatMessage = {
+            id: msgId,
+            sender: 'bot',
+            text: isExisting
+              ? `🔄 [${i + 1}/${files.length}] **${file.name}** is a **Client Master Document** for **${classification.matchedClientName || clientData.tradeName}**!\n\n` +
+                `• **Status:** 🛡️ Client already exists in database (PAN: \`${clientData.pan || 'N/A'}\`).\n` +
+                `• **Action:** Updating existing profile (Zero duplicate records created).\n` +
+                `• **Trade Name:** ${clientData.tradeName || 'N/A'}\n` +
+                `• **GSTIN:** ${clientData.gstin || 'None / Unregistered'}\n` +
+                `• **Constitution:** ${clientData.category || 'PVT_LTD'}\n` +
+                `• **Contact / Phone:** ${clientData.contactPerson || 'N/A'} • ${clientData.phone || 'N/A'}\n\n` +
+                `Niche diye gaye Live Preview me verify karein aur **"🔄 Merge & Update Existing Profile"** par click karein:`
+              : `📄 [${i + 1}/${files.length}] **${file.name}** is a **New Client Registration Document**! ✨\n\n` +
+                `• **Status:** ✨ New client detected.\n` +
+                `• **Trade Name:** ${clientData.tradeName || 'N/A'}\n` +
+                `• **Legal Name:** ${clientData.legalName || clientData.tradeName || 'N/A'}\n` +
+                `• **PAN Number:** ${clientData.pan ? clientData.pan : '⚠️ Not detected'}\n` +
+                `• **GSTIN Number:** ${clientData.gstin ? clientData.gstin : '⚪ None / Unregistered'}\n` +
+                `• **Constitution:** ${clientData.category || 'PVT_LTD'}\n` +
+                `• **Contact Person:** ${clientData.contactPerson || 'Authorized Representative'}\n` +
+                `• **Phone / Email:** ${clientData.phone || 'None'} • ${clientData.email || 'None'}\n\n` +
+                `Niche diye gaye Live Preview me verify karein aur fir **"✨ Confirm & Create Client"** par click karein:`,
+            action,
+            timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+          };
 
-        newBotMessages.push(botReply);
+          newBotMessages.push(botReply);
+        } else if (classification.domain === 'DOCUMENT_VAULT') {
+          const action: AgenticAction = {
+            type: 'STORE_VAULT',
+            title: `📂 Archive to Vault: ${classification.title}`,
+            description: `${classification.vaultData?.category || 'General'} • Linked to: ${classification.matchedClientName || 'General Firm Vault'}`,
+            data: {
+              ...classification.vaultData,
+              matchedClientId: classification.matchedClientId,
+              matchedClientName: classification.matchedClientName,
+              fileName: file.name
+            },
+            executed: false,
+            targetTab: 'documents'
+          };
+
+          const botReply: ChatMessage = {
+            id: msgId,
+            sender: 'bot',
+            text: `📂 [${i + 1}/${files.length}] **${file.name}** classified as **Document Vault File** (${classification.title})!\n\n` +
+              `• **Document Type:** ${classification.title} (${classification.subType})\n` +
+              `• **Category:** 📁 ${classification.vaultData?.category || 'General Documents'}\n` +
+              `• **Linked Client:** ${classification.matchedClientName ? `🏢 **${classification.matchedClientName}** (Matched by AI)` : '⚪ General Firm Vault'}\n` +
+              `• **AI Summary:** ${classification.summary}\n\n` +
+              `Ye client master ya team list nahi hai, balki **Document Vault** ka document hai. Sahi folder me save karne ke liye niche **"📁 Save to Document Vault"** par click karein:`,
+            action,
+            timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+          };
+
+          newBotMessages.push(botReply);
+        } else if (classification.domain === 'TEAM_DIRECTORY') {
+          const teamCount = classification.teamData?.length || 0;
+          const action: AgenticAction = {
+            type: 'IMPORT_TEAM',
+            title: `👥 Import Team: ${classification.title}`,
+            description: `${teamCount} Staff Member(s) ready to import to Team Directory`,
+            data: classification.teamData,
+            executed: false,
+            targetTab: 'team'
+          };
+
+          const memberPreview = (classification.teamData || []).slice(0, 3).map(m => `• **${m.name}** (${m.designation || 'Staff'} • ${m.role})`).join('\n');
+
+          const botReply: ChatMessage = {
+            id: msgId,
+            sender: 'bot',
+            text: `👥 [${i + 1}/${files.length}] **${file.name}** classified as **Team / Staff Directory Document**!\n\n` +
+              `• **Document Type:** ${classification.title}\n` +
+              `• **Staff Detected:** ${teamCount} Team Member(s)\n` +
+              (memberPreview ? `${memberPreview}${teamCount > 3 ? `\n• ...aur ${teamCount - 3} more members` : ''}\n\n` : '\n') +
+              `• **AI Summary:** ${classification.summary}\n\n` +
+              `Ye client master nahi hai, balki **Team Directory** ka document hai. Team members register karne ke liye niche **"👥 Import to Team Directory"** par click karein:`,
+            action,
+            timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+          };
+
+          newBotMessages.push(botReply);
+        }
       }
 
       setMessages(prev => [...prev, ...newBotMessages]);
@@ -694,8 +817,11 @@ export const CACompliBot: React.FC<{
         {/* Chat Messages Log */}
         <div className="flex-1 overflow-y-auto space-y-4 p-2">
           {messages.map(msg => {
-            const isPreviewAction = msg.action?.type === 'PREVIEW_CLIENT' && !msg.action?.executed;
+            const isClientPreviewAction = (msg.action?.type === 'PREVIEW_CLIENT' || msg.action?.type === 'UPDATE_CLIENT') && !msg.action?.executed;
+            const isVaultAction = msg.action?.type === 'STORE_VAULT' && !msg.action?.executed;
+            const isTeamAction = msg.action?.type === 'IMPORT_TEAM' && !msg.action?.executed;
             const currentPreview = previewFormData[msg.id] || msg.action?.data || {};
+            const isUpdate = msg.action?.type === 'UPDATE_CLIENT';
 
             return (
               <div
@@ -774,18 +900,22 @@ export const CACompliBot: React.FC<{
                     </div>
                   )}
 
-                  {/* 1. Interactive Live Editable Preview Card for Client Setup */}
-                  {isPreviewAction && (
+                  {/* 1. Interactive Live Editable Preview Card for Client Setup / Update */}
+                  {isClientPreviewAction && (
                     <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-900/90 border-2 border-amber-500/40 shadow-xl space-y-3.5 animate-in zoom-in-95">
                       <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
                         <div className="flex items-center gap-2">
                           <Building className="text-amber-500" size={16} />
                           <span className="font-bold text-xs text-slate-900 dark:text-white">
-                            Live Extracted Client Preview
+                            {isUpdate ? '🔄 Update Existing Client Profile' : '✨ New Client Registration'}
                           </span>
                         </div>
-                        <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold border border-amber-500/30">
-                          Review & Confirm
+                        <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border ${
+                          isUpdate 
+                            ? 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30' 
+                            : 'bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-500/30'
+                        }`}>
+                          {isUpdate ? '🔄 Existing Profile Merge' : '✨ New Client'}
                         </span>
                       </div>
 
@@ -882,14 +1012,104 @@ export const CACompliBot: React.FC<{
                       {/* Action Commit Button */}
                       <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
                         <span className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
-                          <ShieldCheck size={13} className="text-emerald-500" /> Duplicate Safe (No Duplicate Rows)
+                          <ShieldCheck size={13} className="text-emerald-500" /> Duplicate Safe (Zero Duplication)
                         </span>
 
                         <button
-                          onClick={() => handleConfirmPreviewImport(msg.id, currentPreview)}
-                          className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/25 transition-all active:scale-95"
+                          onClick={() => handleConfirmPreviewImport(msg.id, currentPreview, isUpdate, (msg.action?.data as any)?.id)}
+                          className={`px-5 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95 ${
+                            isUpdate
+                              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/25'
+                              : 'bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-amber-500/25'
+                          }`}
                         >
-                          <Check size={14} /> Confirm & Import Client
+                          <Check size={14} /> {isUpdate ? '🔄 Merge & Update Profile' : '✨ Confirm & Create Client'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. Interactive Document Vault Staging Card */}
+                  {isVaultAction && msg.action && (
+                    <div className="p-4 rounded-3xl bg-blue-50/80 dark:bg-slate-900/90 border-2 border-blue-500/40 shadow-xl space-y-3 animate-in zoom-in-95">
+                      <div className="flex items-center justify-between pb-2 border-b border-blue-200 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <Folder className="text-blue-500" size={16} />
+                          <span className="font-bold text-xs text-slate-900 dark:text-white">
+                            📂 Document Vault Staging
+                          </span>
+                        </div>
+                        <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-700 dark:text-blue-300 font-bold border border-blue-500/30">
+                          {msg.action.data?.category || 'General Documents'}
+                        </span>
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-white dark:bg-slate-950 border border-blue-200 dark:border-slate-800 text-xs space-y-1.5">
+                        <div className="flex items-center justify-between font-semibold">
+                          <span className="text-slate-500 text-[11px]">Title:</span>
+                          <span className="text-slate-900 dark:text-white font-bold">{msg.action.data?.documentTitle || msg.action.data?.fileName}</span>
+                        </div>
+                        <div className="flex items-center justify-between font-semibold">
+                          <span className="text-slate-500 text-[11px]">Matched Client:</span>
+                          <span className="text-blue-600 dark:text-blue-400 font-bold">{msg.action.data?.matchedClientName || 'General Firm Vault'}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[10px] text-slate-500">
+                          Correct domain: Document Vault
+                        </span>
+                        <button
+                          onClick={() => {
+                            executeAction(msg.action!);
+                            setMessages(prev => prev.map(m => m.id === msg.id && m.action ? { ...m, action: { ...m.action, executed: true } } : m));
+                            if (onNavigateTab) onNavigateTab('documents');
+                          }}
+                          className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-blue-600/25 transition-all active:scale-95"
+                        >
+                          <Check size={14} /> 📁 Save to Document Vault
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 3. Interactive Team Directory Staging Card */}
+                  {isTeamAction && msg.action && (
+                    <div className="p-4 rounded-3xl bg-indigo-50/80 dark:bg-slate-900/90 border-2 border-indigo-500/40 shadow-xl space-y-3 animate-in zoom-in-95">
+                      <div className="flex items-center justify-between pb-2 border-b border-indigo-200 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                          <UserCheck className="text-indigo-500" size={16} />
+                          <span className="font-bold text-xs text-slate-900 dark:text-white">
+                            👥 Team Directory Staging
+                          </span>
+                        </div>
+                        <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold border border-indigo-500/30">
+                          {Array.isArray(msg.action.data) ? `${msg.action.data.length} Member(s)` : '1 Member'}
+                        </span>
+                      </div>
+
+                      <div className="p-2.5 rounded-2xl bg-white dark:bg-slate-950 border border-indigo-200 dark:border-slate-800 text-xs space-y-1 max-h-32 overflow-y-auto">
+                        {Array.isArray(msg.action.data) && msg.action.data.map((m: any, idx: number) => (
+                          <div key={idx} className="flex items-center justify-between py-0.5 border-b border-slate-100 dark:border-slate-900 last:border-0 text-[11px]">
+                            <span className="font-bold text-slate-800 dark:text-slate-200">{m.name}</span>
+                            <span className="text-indigo-600 dark:text-indigo-400 font-semibold">{m.designation || 'Staff'} ({m.role})</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[10px] text-slate-500">
+                          Correct domain: Team Directory
+                        </span>
+                        <button
+                          onClick={() => {
+                            executeAction(msg.action!);
+                            setMessages(prev => prev.map(m => m.id === msg.id && m.action ? { ...m, action: { ...m.action, executed: true } } : m));
+                            if (onNavigateTab) onNavigateTab('team');
+                          }}
+                          className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/25 transition-all active:scale-95"
+                        >
+                          <Check size={14} /> 👥 Import to Team Directory
                         </button>
                       </div>
                     </div>
