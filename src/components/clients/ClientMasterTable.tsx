@@ -13,7 +13,8 @@ import {
   Edit3, 
   Trash2, 
   FileText,
-  FileSpreadsheet
+  FileSpreadsheet,
+  FolderKanban
 } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { ClientFormModal } from './ClientFormModal';
@@ -28,6 +29,7 @@ export const ClientMasterTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedClientForEdit, setSelectedClientForEdit] = useState<Client | null | 'NEW'>(null);
+  const [modalInitialTab, setModalInitialTab] = useState<'DETAILS' | 'REPOSITORY'>('DETAILS');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const filteredClients = clients.filter(c => {
@@ -100,10 +102,23 @@ export const ClientMasterTable: React.FC = () => {
         {canEditClients && (
           <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => setSelectedClientForEdit('NEW')}
+              onClick={() => {
+                setModalInitialTab('DETAILS');
+                setSelectedClientForEdit('NEW');
+              }}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 transition-all"
             >
               <Plus size={16} /> Add New Client
+            </button>
+
+            <button
+              onClick={() => {
+                setModalInitialTab('REPOSITORY');
+                setSelectedClientForEdit('NEW');
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500 border border-emerald-500/40 text-emerald-800 dark:text-emerald-300 hover:text-slate-950 font-bold text-xs shadow-sm transition-all"
+            >
+              <FolderKanban size={15} /> Client Repository (GST/PAN/TAN)
             </button>
 
             <button
@@ -272,9 +287,23 @@ export const ClientMasterTable: React.FC = () => {
                   {/* Actions */}
                   <td className="p-3.5 text-right">
                     <div className="flex items-center justify-end gap-1.5">
+                      <button
+                        onClick={() => {
+                          setModalInitialTab('REPOSITORY');
+                          setSelectedClientForEdit(client);
+                        }}
+                        title="Open Client Statutory Document Repository (GST, PAN, Aadhar, TAN)"
+                        className="p-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500 text-emerald-800 dark:text-emerald-300 hover:text-slate-950 font-bold transition-all border border-emerald-500/30 flex items-center gap-1 text-[11px] px-2"
+                      >
+                        <FolderKanban size={13} /> Repo ({client.repositoryDocs?.length || 0})
+                      </button>
+
                       {canEditClients && (
                         <button
-                          onClick={() => setSelectedClientForEdit(client)}
+                          onClick={() => {
+                            setModalInitialTab('DETAILS');
+                            setSelectedClientForEdit(client);
+                          }}
                           title="Edit Client Master Details"
                           className="p-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-900 dark:text-amber-300 hover:text-slate-950 font-bold transition-all border border-amber-500/30 flex items-center gap-1 text-[11px] px-2"
                         >
@@ -313,6 +342,7 @@ export const ClientMasterTable: React.FC = () => {
       <ClientFormModal
         isOpen={selectedClientForEdit !== null}
         client={selectedClientForEdit === 'NEW' ? null : selectedClientForEdit}
+        initialTab={modalInitialTab}
         onClose={() => setSelectedClientForEdit(null)}
       />
 

@@ -13,14 +13,18 @@ function onlineDeployPlugin(): Plugin {
         }
         res.setHeader('Content-Type', 'application/json');
 
-        const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-        // Run git commit/push (if changes exist, excluding .github) + npm run deploy
-        const cmd = `git add src public index.html package.json vite.config.ts && (git diff --cached --quiet || git commit -m "One-click online update from TASK-VAANI App") && git push origin main && ${npmCmd} run deploy`;
+        const isWin = process.platform === 'win32';
+        const buildAndDeployCmd = isWin
+          ? `.\\node_modules\\.bin\\tsc.cmd -b && .\\node_modules\\.bin\\vite.cmd build && .\\node_modules\\.bin\\gh-pages.cmd -d dist`
+          : `npx tsc -b && npx vite build && npx gh-pages -d dist`;
+
+        // Run git commit/push (if changes exist, excluding .github) + build & deploy
+        const cmd = `git add src public index.html package.json vite.config.ts && (git diff --cached --quiet || git commit -m "One-click online update from TASK-VAANI App") && git push origin main && ${buildAndDeployCmd}`;
 
         exec(cmd, { cwd: process.cwd() }, (error, stdout, stderr) => {
           if (error) {
-            // Fallback to direct npm run deploy if git push had nothing or minor warning
-            exec(`${npmCmd} run deploy`, { cwd: process.cwd() }, (deployErr, deployOut, deployStderr) => {
+            // Fallback to direct build & deploy if git push had nothing or minor warning
+            exec(buildAndDeployCmd, { cwd: process.cwd() }, (deployErr, deployOut, deployStderr) => {
               if (deployErr) {
                 res.statusCode = 500;
                 res.end(JSON.stringify({

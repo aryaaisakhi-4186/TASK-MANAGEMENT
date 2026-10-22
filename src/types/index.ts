@@ -48,6 +48,20 @@ export interface CustomField {
   value: string;
 }
 
+export type ClientRepoDocType = 'GST_REG' | 'PAN_CARD' | 'AADHAR_CARD' | 'TAN_LETTER' | 'INCORPORATION_DEED' | 'UDYAM_MSME' | 'OTHER_KYC';
+
+export interface ClientRepoDoc {
+  id: string;
+  docType: ClientRepoDocType;
+  title: string;
+  docNumber?: string;
+  fileType: string;           // 'IMAGE_WEBP' | 'PDF' | 'CLOUD_LINK'
+  originalSizeKB?: number;
+  compressedSizeKB: number;   // Ultra-low size in KB (e.g. 18 KB, or 0 KB for cloud link)
+  dataUrl: string;            // Ultra-compressed base64 or Google Drive URL
+  uploadedAt: string;
+}
+
 export interface Client {
   id: string;
   tradeName: string;
@@ -72,6 +86,7 @@ export interface Client {
   googleDriveFolderId?: string;   // Google Drive Folder ID for this client
   googleDriveFolderUrl?: string;  // Direct URL to client's Drive folder
   customFields?: CustomField[];
+  repositoryDocs?: ClientRepoDoc[]; // Ultra-light KYC & Statutory Document Repository
   createdAt: string;
 }
 

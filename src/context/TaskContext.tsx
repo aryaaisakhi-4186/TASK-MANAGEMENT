@@ -226,7 +226,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         employeePhone: clientData.employeePhone || existing.employeePhone,
         formationDate: clientData.formationDate || existing.formationDate,
         googleDriveFolderId: clientData.googleDriveFolderId || existing.googleDriveFolderId,
-        googleDriveFolderUrl: clientData.googleDriveFolderUrl || existing.googleDriveFolderUrl
+        googleDriveFolderUrl: clientData.googleDriveFolderUrl || existing.googleDriveFolderUrl,
+        repositoryDocs: clientData.repositoryDocs || existing.repositoryDocs || []
       };
 
       const updated = [...clients];

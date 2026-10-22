@@ -80,13 +80,12 @@ export const OnlineUpdateModal: React.FC<OnlineUpdateModalProps> = ({ isOpen, on
         }
       }
 
-      if (settings.googleDriveSyncEnabled && settings.googleAppsScriptWebhookUrl) {
+      if (settings.googleDriveSyncEnabled) {
         try {
           await GoogleDriveService.syncComplianceMatrixToGoogleSheets(
             clients,
             tasks,
-            settings.cloudStorageEmail,
-            settings.googleAppsScriptWebhookUrl
+            settings.cloudStorageEmail
           );
         } catch (sheetErr) {
           console.warn('Google Sheet sync note:', sheetErr);
