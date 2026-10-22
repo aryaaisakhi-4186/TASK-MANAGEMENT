@@ -706,57 +706,34 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
                 </div>
 
                 {/* Applicable Tax Compliances (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
-                <div className="pt-3 border-t border-slate-200 dark:border-slate-800/80 space-y-2.5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                    <label className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-                      <ShieldCheck size={14} className="text-emerald-500" />
-                      <span>Applicable Tax Compliances (Click Button or Select Applicable / Not Applicable)</span>
-                    </label>
-                    <div className="flex items-center gap-2 text-[10px] font-bold">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-600 text-white">● ACTIVE / APPLICABLE</span>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-600 text-white">● INACTIVE / NOT APPLICABLE</span>
-                    </div>
-                  </div>
+                <div className="pt-3 border-t border-slate-200 dark:border-slate-800/80 space-y-2">
+                  <label className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                    <ShieldCheck size={14} className="text-emerald-500" />
+                    <span>Applicable Tax Compliances (Green = ON / Red = OFF)</span>
+                  </label>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                       const isApp = complianceApplicability[item.key];
                       return (
-                        <div
+                        <button
                           key={item.key}
-                          className={`p-2 rounded-xl border transition-all flex flex-col gap-1.5 ${
-                            isApp
-                              ? 'bg-emerald-500/10 border-emerald-500/50 dark:bg-emerald-950/30'
-                              : 'bg-red-500/10 border-red-500/50 dark:bg-red-950/30'
-                          }`}
+                          type="button"
+                          onClick={() => handleToggleApplicability(item.key)}
+                          title={item.fullTitle}
+                          className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-400 transition-all inline-flex items-center gap-2 cursor-pointer shadow-sm"
                         >
-                          <button
-                            type="button"
-                            onClick={() => handleToggleApplicability(item.key)}
-                            title={`${item.fullTitle} — Click to toggle ACTIVE (Green) / INACTIVE (Red)`}
-                            className={`w-full py-1.5 px-2 rounded-lg font-black text-[10px] uppercase tracking-wider shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1 ${
-                              isApp
-                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
-                                : 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/20'
+                          <span className="font-mono font-bold text-[10px] uppercase text-slate-800 dark:text-slate-200">
+                            {item.label}
+                          </span>
+                          <span
+                            className={`w-7 h-4 rounded-full p-0.5 flex items-center transition-colors duration-200 ${
+                              isApp ? 'bg-emerald-500 justify-end' : 'bg-red-500 justify-start'
                             }`}
                           >
-                            <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                            <span>{item.label}</span>
-                          </button>
-
-                          <select
-                            value={isApp ? 'APPLICABLE' : 'NOT_APPLICABLE'}
-                            onChange={(e) => handleToggleApplicability(item.key, e.target.value === 'APPLICABLE')}
-                            className={`w-full px-1 py-1 rounded-md text-[9px] font-black uppercase border focus:outline-none cursor-pointer ${
-                              isApp
-                                ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-400/50'
-                                : 'bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-400/50'
-                            }`}
-                          >
-                            <option value="APPLICABLE">🟢 APPLICABLE</option>
-                            <option value="NOT_APPLICABLE">🔴 NOT APPLICABLE</option>
-                          </select>
-                        </div>
+                            <span className="w-3 h-3 rounded-full bg-white shadow-sm block" />
+                          </span>
+                        </button>
                       );
                     })}
                   </div>

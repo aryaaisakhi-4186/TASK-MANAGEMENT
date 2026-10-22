@@ -635,8 +635,8 @@ export const TaskMatrixGrid: React.FC<{
                           {client.legalName} • <span className="font-semibold text-slate-700 dark:text-slate-300">{client.category}</span> • Assigned: <span className="text-amber-700 dark:text-amber-400 font-bold">{client.assignedTeamName || 'General Staff'}</span>
                         </p>
 
-                        {/* 7 Applicable Tax Compliances Buttons (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
-                        <div className="flex flex-wrap items-center gap-1.5 mt-2" onClick={(e) => e.stopPropagation()}>
+                        {/* 7 Applicable Tax Compliances Mini ON/OFF Switches (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
+                        <div className="flex flex-wrap items-center gap-1 mt-1.5" onClick={(e) => e.stopPropagation()}>
                           {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                             const appMap = resolveClientApplicability(client);
                             const isApp = appMap[item.key];
@@ -655,16 +655,19 @@ export const TaskMatrixGrid: React.FC<{
                                     });
                                   }
                                 }}
-                                title={`${item.fullTitle}: ${isApp ? 'APPLICABLE (ACTIVE)' : 'NOT APPLICABLE (INACTIVE)'} — Click to toggle`}
-                                className={`px-2 py-0.5 rounded-md font-mono font-black text-[9px] uppercase tracking-wider transition-all active:scale-95 flex items-center gap-1 shadow-sm border ${
-                                  isApp
-                                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500'
-                                    : 'bg-red-600 hover:bg-red-500 text-white border-red-500'
-                                }`}
+                                title={item.fullTitle}
+                                className="px-1.5 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-400 transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm"
                               >
-                                <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                                <span>{item.label}</span>
-                                <span className="text-[8px] opacity-90">({isApp ? 'ACTIVE' : 'N/A'})</span>
+                                <span className="font-mono font-bold text-[9px] uppercase text-slate-800 dark:text-slate-200">
+                                  {item.label}
+                                </span>
+                                <span
+                                  className={`w-6 h-3.5 rounded-full p-0.5 flex items-center transition-colors duration-200 ${
+                                    isApp ? 'bg-emerald-500 justify-end' : 'bg-red-500 justify-start'
+                                  }`}
+                                >
+                                  <span className="w-2.5 h-2.5 rounded-full bg-white shadow-sm block" />
+                                </span>
                               </button>
                             );
                           })}

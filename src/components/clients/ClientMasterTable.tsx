@@ -260,9 +260,9 @@ export const ClientMasterTable: React.FC = () => {
                     </div>
                   </td>
 
-                  {/* 7 Applicable Tax Compliances Buttons (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
-                  <td className="p-3.5 min-w-[230px]">
-                    <div className="flex flex-wrap gap-1.5">
+                  {/* 7 Applicable Tax Compliances Mini ON/OFF Switches (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
+                  <td className="p-3.5 min-w-[205px]">
+                    <div className="flex flex-wrap gap-1">
                       {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                         const isApp = appMap[item.key];
                         return (
@@ -270,16 +270,19 @@ export const ClientMasterTable: React.FC = () => {
                             key={item.key}
                             type="button"
                             onClick={() => handleToggleClientCompliance(client, item.key)}
-                            title={`${item.fullTitle}: ${isApp ? 'APPLICABLE (ACTIVE)' : 'NOT APPLICABLE (INACTIVE)'} — Click to toggle`}
-                            className={`px-2 py-1 rounded-lg font-mono font-black text-[9px] uppercase tracking-wider transition-all active:scale-95 flex items-center gap-1 shadow-sm border ${
-                              isApp
-                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-emerald-600/20'
-                                : 'bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-red-600/20'
-                            }`}
+                            title={item.fullTitle}
+                            className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 hover:border-slate-400 transition-all inline-flex items-center gap-1.5 cursor-pointer"
                           >
-                            <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                            <span>{item.label}</span>
-                            <span className="text-[8px] opacity-90">({isApp ? 'ACTIVE' : 'N/A'})</span>
+                            <span className="font-mono font-bold text-[9px] uppercase text-slate-800 dark:text-slate-200">
+                              {item.label}
+                            </span>
+                            <span
+                              className={`w-6 h-3.5 rounded-full p-0.5 flex items-center transition-colors duration-200 ${
+                                isApp ? 'bg-emerald-500 justify-end' : 'bg-red-500 justify-start'
+                              }`}
+                            >
+                              <span className="w-2.5 h-2.5 rounded-full bg-white shadow-sm block" />
+                            </span>
                           </button>
                         );
                       })}
