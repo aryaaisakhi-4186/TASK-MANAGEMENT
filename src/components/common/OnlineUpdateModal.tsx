@@ -14,6 +14,7 @@ import {
 import { useTasks } from '../../context/TaskContext';
 import { StorageService } from '../../services/storage';
 import { FirebaseService } from '../../services/firebaseService';
+import { getSavedFirebaseConfig } from '../../firebase/config';
 import { GoogleDriveService } from '../../services/googleDriveService';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 
@@ -64,17 +65,21 @@ export const OnlineUpdateModal: React.FC<OnlineUpdateModalProps> = ({ isOpen, on
       StorageService.saveSettings(updatedSettings);
       updateSettings({ lastCloudSyncTimestamp: nowStamp });
 
+      const databaseSnapshot = {
+        clients,
+        tasks,
+        team,
+        extraWork,
+        documents,
+        attendanceRecords,
+        settings: updatedSettings,
+        guestLeads: StorageService.getGuestLeads(),
+        firebaseConfig: getSavedFirebaseConfig()
+      };
+
       if (FirebaseService.isConfigured()) {
         try {
-          await FirebaseService.syncAllToCloud({
-            clients,
-            tasks,
-            team,
-            extraWork,
-            documents,
-            attendanceRecords,
-            settings: updatedSettings
-          });
+          await FirebaseService.syncAllToCloud(databaseSnapshot);
         } catch (cloudErr) {
           console.warn('Cloud sync note:', cloudErr);
         }
@@ -94,7 +99,7 @@ export const OnlineUpdateModal: React.FC<OnlineUpdateModalProps> = ({ isOpen, on
 
       setStep1Status('DONE');
       setStep2Status('RUNNING');
-      setStatusDetails('Publishing app changes & updating live online build (GitHub Pages)...');
+      setStatusDetails('Publishing app changes & updating live online database (GitHub Pages)...');
 
       // STEP 2: Trigger Live Online Build & Deploy via Vite Server Middleware (if on Admin PC)
       // or perform Live Cloud & Cache Refresh (if already on github.io)
@@ -109,7 +114,8 @@ export const OnlineUpdateModal: React.FC<OnlineUpdateModalProps> = ({ isOpen, on
         try {
           const response = await fetch('/api/deploy-online', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ databaseSnapshot })
           });
           if (response.ok) {
             const data = await response.json();

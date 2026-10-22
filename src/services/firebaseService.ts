@@ -9,7 +9,7 @@ import {
   writeBatch 
 } from 'firebase/firestore';
 import { firestoreDb, getSavedFirebaseConfig, initFirebase } from '../firebase/config';
-import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord } from '../types';
+import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord, GuestLead } from '../types';
 
 export const FirebaseService = {
   isConfigured: (): boolean => {
@@ -25,6 +25,7 @@ export const FirebaseService = {
     documents: DocumentItem[];
     attendanceRecords: AttendanceRecord[];
     settings: SystemSettings;
+    guestLeads?: GuestLead[];
   }): Promise<{ success: boolean; message: string }> => {
     const { db } = initFirebase();
     if (!db) {
@@ -52,12 +53,24 @@ export const FirebaseService = {
         await setDoc(doc(db, 'extraWork', item.id), item);
       }
 
-      // E. Sync Attendance
+      // E. Sync Documents
+      for (const docItem of data.documents) {
+        await setDoc(doc(db, 'documents', docItem.id), docItem);
+      }
+
+      // F. Sync Attendance
       for (const att of data.attendanceRecords) {
         await setDoc(doc(db, 'attendance', att.id), att);
       }
 
-      // F. Sync Settings
+      // G. Sync Guest Leads
+      if (data.guestLeads) {
+        for (const lead of data.guestLeads) {
+          await setDoc(doc(db, 'guestLeads', lead.id), lead);
+        }
+      }
+
+      // H. Sync Settings
       await setDoc(doc(db, 'system', 'settings'), data.settings);
 
       return {
@@ -76,7 +89,9 @@ export const FirebaseService = {
     tasks: TaskItem[];
     team: UserProfile[];
     extraWork: ExtraWorkItem[];
+    documents: DocumentItem[];
     attendanceRecords: AttendanceRecord[];
+    guestLeads: GuestLead[];
     settings?: SystemSettings;
   }> => {
     const { db } = initFirebase();
@@ -96,8 +111,14 @@ export const FirebaseService = {
     const extraWorkSnap = await getDocs(collection(db, 'extraWork'));
     const extraWork = extraWorkSnap.docs.map(d => d.data() as ExtraWorkItem);
 
+    const docsSnap = await getDocs(collection(db, 'documents'));
+    const documents = docsSnap.docs.map(d => d.data() as DocumentItem);
+
     const attSnap = await getDocs(collection(db, 'attendance'));
     const attendanceRecords = attSnap.docs.map(d => d.data() as AttendanceRecord);
+
+    const leadsSnap = await getDocs(collection(db, 'guestLeads'));
+    const guestLeads = leadsSnap.docs.map(d => d.data() as GuestLead);
 
     let settings: SystemSettings | undefined = undefined;
     try {
@@ -109,7 +130,7 @@ export const FirebaseService = {
       console.warn('Firebase settings pull note:', e);
     }
 
-    return { clients, tasks, team, extraWork, attendanceRecords, settings };
+    return { clients, tasks, team, extraWork, documents, attendanceRecords, guestLeads, settings };
   },
 
   // 3. Realtime Listener for Live Cross-Device Sync

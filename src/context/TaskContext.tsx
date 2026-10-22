@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord, TaskStatus, ClientReminder } from '../types';
 import { StorageService } from '../services/storage';
 import { FirebaseService } from '../services/firebaseService';
+import { OnlineDataService } from '../services/onlineDataService';
 import { AudioService } from '../services/audioService';
 import { GoogleDriveService } from '../services/googleDriveService';
 import { detectEntityCategoryFromPANAndGSTIN } from '../utils/masterImportExport';
@@ -105,19 +106,79 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  // On Startup: Pull Cloud Settings from Firebase if configured
+  // On Startup: Pull All Live Online Data (Server online-db.json + Firebase Cloud) & attach Real-Time Listeners
   useEffect(() => {
-    if (FirebaseService.isConfigured()) {
-      FirebaseService.pullAllFromCloud().then(res => {
-        if (res.settings) {
-          setSettings(res.settings);
-          StorageService.saveSettings(res.settings);
+    const isGuestDemo = currentUser?.role === 'GUEST' && !!currentUser?.phone;
+    if (isGuestDemo) return;
+
+    let unsubscribers: Array<() => void> = [];
+
+    OnlineDataService.pullLiveOnlineData().then(onlineData => {
+      if (onlineData) {
+        if (Array.isArray(onlineData.clients) && onlineData.clients.length > 0) {
+          setClients(onlineData.clients);
+          StorageService.saveClients(onlineData.clients);
         }
-      }).catch(err => {
-        console.warn('Initial cloud sync check:', err);
-      });
-    }
-  }, []);
+        if (Array.isArray(onlineData.tasks) && onlineData.tasks.length > 0) {
+          setTasks(onlineData.tasks);
+          StorageService.saveTasks(onlineData.tasks);
+        }
+        if (Array.isArray(onlineData.team) && onlineData.team.length > 0) {
+          setTeam(onlineData.team);
+          StorageService.saveTeam(onlineData.team);
+        }
+        if (Array.isArray(onlineData.extraWork) && onlineData.extraWork.length > 0) {
+          setExtraWork(onlineData.extraWork);
+          StorageService.saveExtraWork(onlineData.extraWork);
+        }
+        if (Array.isArray(onlineData.documents) && onlineData.documents.length > 0) {
+          setDocuments(onlineData.documents);
+          StorageService.saveDocuments(onlineData.documents);
+        }
+        if (Array.isArray(onlineData.attendanceRecords) && onlineData.attendanceRecords.length > 0) {
+          setAttendanceRecords(onlineData.attendanceRecords);
+          StorageService.saveAttendance(onlineData.attendanceRecords);
+        }
+        if (Array.isArray(onlineData.guestLeads) && onlineData.guestLeads.length > 0) {
+          StorageService.saveGuestLeads(onlineData.guestLeads);
+        }
+        if (onlineData.settings) {
+          setSettings(onlineData.settings);
+          StorageService.saveSettings(onlineData.settings);
+        }
+      }
+
+      // Attach Real-Time Firebase Listeners if Firebase is configured
+      if (FirebaseService.isConfigured()) {
+        unsubscribers.push(
+          FirebaseService.subscribeToCollection<Client>('clients', (items) => {
+            if (items.length > 0) setClients(items);
+          }),
+          FirebaseService.subscribeToCollection<TaskItem>('tasks', (items) => {
+            if (items.length > 0) setTasks(items);
+          }),
+          FirebaseService.subscribeToCollection<UserProfile>('team', (items) => {
+            if (items.length > 0) setTeam(items);
+          }),
+          FirebaseService.subscribeToCollection<ExtraWorkItem>('extraWork', (items) => {
+            if (items.length > 0) setExtraWork(items);
+          }),
+          FirebaseService.subscribeToCollection<DocumentItem>('documents', (items) => {
+            if (items.length > 0) setDocuments(items);
+          }),
+          FirebaseService.subscribeToCollection<AttendanceRecord>('attendance', (items) => {
+            if (items.length > 0) setAttendanceRecords(items);
+          })
+        );
+      }
+    }).catch(err => {
+      console.warn('Initial online data sync check:', err);
+    });
+
+    return () => {
+      unsubscribers.forEach(unsub => unsub());
+    };
+  }, [currentUser?.role, currentUser?.phone]);
 
   // Office Shift & Lunch Break State
   const [officeShiftState, setOfficeShiftState] = useState<{
@@ -153,7 +214,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {}
   };
 
-  // Synchronize state changes to Storage
+  // Synchronize state changes to Storage + Live Online Database
   useEffect(() => { StorageService.saveClients(clients); }, [clients]);
   useEffect(() => { StorageService.saveTasks(tasks); }, [tasks]);
   useEffect(() => { StorageService.saveTeam(team); }, [team]);
@@ -162,6 +223,23 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => { StorageService.saveAttendance(attendanceRecords); }, [attendanceRecords]);
   useEffect(() => { StorageService.saveSettings(settings); }, [settings]);
   useEffect(() => { StorageService.saveClientReminders(clientReminders); }, [clientReminders]);
+
+  // Auto-sync all master data changes to Online Database in real time
+  useEffect(() => {
+    const isGuestDemo = currentUser?.role === 'GUEST' && !!currentUser?.phone;
+    if (isGuestDemo) return;
+
+    OnlineDataService.scheduleAutoOnlineSync({
+      clients,
+      tasks,
+      team,
+      extraWork,
+      documents,
+      attendanceRecords,
+      settings,
+      guestLeads: StorageService.getGuestLeads()
+    });
+  }, [clients, tasks, team, extraWork, documents, attendanceRecords, settings, currentUser?.role, currentUser?.phone]);
 
   // Auto-correct any existing clients with inaccurate category on startup using PAN/GSTIN
   useEffect(() => {
@@ -307,6 +385,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ];
     setTasks(prev => [...sampleTasks, ...prev]);
 
+    const isGuestDemo = currentUser?.role === 'GUEST' && !!currentUser?.phone;
+    if (!isGuestDemo && FirebaseService.isConfigured()) {
+      FirebaseService.upsertDoc('clients', newClient.id, newClient);
+      sampleTasks.forEach(st => FirebaseService.upsertDoc('tasks', st.id, st));
+    }
+
     StorageService.addAuditLog({
       actorId: 'admin',
       actorName: 'Admin',
@@ -321,7 +405,16 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateClient = (id: string, updates: Partial<Client>) => {
     if (!checkGuestWriteAllowed()) return;
-    setClients(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
+    setClients(prev => prev.map(c => {
+      if (c.id === id) {
+        const updated = { ...c, ...updates };
+        if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
+          FirebaseService.upsertDoc('clients', id, updated);
+        }
+        return updated;
+      }
+      return c;
+    }));
     StorageService.addAuditLog({
       actorId: 'admin',
       actorName: 'Admin',
@@ -336,8 +429,13 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const deleteClient = (id: string) => {
     if (!checkGuestWriteAllowed()) return;
     const target = clients.find(c => c.id === id);
+    const clientTaskIds = tasks.filter(t => t.clientId === id).map(t => t.id);
     setClients(prev => prev.filter(c => c.id !== id));
     setTasks(prev => prev.filter(t => t.clientId !== id));
+    if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
+      FirebaseService.deleteDoc('clients', id);
+      clientTaskIds.forEach(tid => FirebaseService.deleteDoc('tasks', tid));
+    }
     StorageService.addAuditLog({
       actorId: 'admin',
       actorName: 'Admin',
@@ -359,6 +457,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: 'tsk-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
     };
     setTasks(prev => [newTask, ...prev]);
+    if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
+      FirebaseService.upsertDoc('tasks', newTask.id, newTask);
+    }
     StorageService.addAuditLog({
       actorId: 'system',
       actorName: 'System',
@@ -377,12 +478,16 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (t.id === taskId) {
         const isDone = status === 'DONE';
         if (isDone) AudioService.playSuccessSound();
-        return {
+        const updatedTask: TaskItem = {
           ...t,
           status,
           completedAt: isDone ? new Date().toISOString() : undefined,
           completedBy: isDone ? completedBy : undefined
         };
+        if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
+          FirebaseService.upsertDoc('tasks', taskId, updatedTask);
+        }
+        return updatedTask;
       }
       return t;
     }));
@@ -399,17 +504,38 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateTask = (id: string, updates: Partial<TaskItem>) => {
     if (!checkGuestWriteAllowed()) return;
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
+    setTasks(prev => prev.map(t => {
+      if (t.id === id) {
+        const updated = { ...t, ...updates };
+        if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
+          FirebaseService.upsertDoc('tasks', id, updated);
+        }
+        return updated;
+      }
+      return t;
+    }));
   };
 
   const deleteTask = (id: string) => {
     if (!checkGuestWriteAllowed()) return;
     setTasks(prev => prev.filter(t => t.id !== id));
+    if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
+      FirebaseService.deleteDoc('tasks', id);
+    }
   };
 
   const bulkUpdateTasks = (taskIds: string[], status: TaskStatus) => {
     if (!checkGuestWriteAllowed()) return;
-    setTasks(prev => prev.map(t => taskIds.includes(t.id) ? { ...t, status, completedAt: status === 'DONE' ? new Date().toISOString() : undefined } : t));
+    setTasks(prev => prev.map(t => {
+      if (taskIds.includes(t.id)) {
+        const updated = { ...t, status, completedAt: status === 'DONE' ? new Date().toISOString() : undefined };
+        if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
+          FirebaseService.upsertDoc('tasks', t.id, updated);
+        }
+        return updated;
+      }
+      return t;
+    }));
   };
 
   // Team

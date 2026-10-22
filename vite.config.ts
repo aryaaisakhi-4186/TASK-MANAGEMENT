@@ -1,29 +1,112 @@
 import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
 import { exec } from 'child_process';
 
-function onlineDeployPlugin(): Plugin {
+function readJsonBody(req: any): Promise<any> {
+  return new Promise((resolve) => {
+    let body = '';
+    req.on('data', (chunk: any) => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      if (!body) return resolve({});
+      try {
+        resolve(JSON.parse(body));
+      } catch {
+        resolve({});
+      }
+    });
+    req.on('error', () => resolve({}));
+  });
+}
+
+function onlineDataAndDeployPlugin(): Plugin {
+  const onlineDbPath = path.resolve(process.cwd(), 'public', 'online-db.json');
+
   return {
-    name: 'task-vaani-online-deploy',
+    name: 'task-vaani-online-data-and-deploy',
     configureServer(server) {
-      server.middlewares.use('/api/deploy-online', (req, res, next) => {
+      // 1. Real-Time Online DB Sync Endpoint (/api/online-db)
+      server.middlewares.use('/api/online-db', async (req, res, next) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+
+        if (req.method === 'GET') {
+          try {
+            if (fs.existsSync(onlineDbPath)) {
+              const raw = fs.readFileSync(onlineDbPath, 'utf-8');
+              res.statusCode = 200;
+              res.end(raw);
+              return;
+            }
+          } catch (e) {
+            console.warn('Read online-db warning:', e);
+          }
+          res.statusCode = 200;
+          res.end(JSON.stringify({ empty: true }));
+          return;
+        }
+
+        if (req.method === 'POST') {
+          try {
+            const payload = await readJsonBody(req);
+            if (payload && typeof payload === 'object' && Object.keys(payload).length > 0) {
+              const snapshot = {
+                ...payload,
+                updatedAt: new Date().toISOString(),
+                updatedAtIST: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+              };
+              fs.mkdirSync(path.dirname(onlineDbPath), { recursive: true });
+              fs.writeFileSync(onlineDbPath, JSON.stringify(snapshot, null, 2), 'utf-8');
+            }
+            res.statusCode = 200;
+            res.end(JSON.stringify({ success: true }));
+            return;
+          } catch (err: any) {
+            res.statusCode = 500;
+            res.end(JSON.stringify({ success: false, error: err?.message }));
+            return;
+          }
+        }
+
+        next();
+      });
+
+      // 2. 1-Click Online App & Database Publisher (/api/deploy-online)
+      server.middlewares.use('/api/deploy-online', async (req, res, next) => {
         if (req.method !== 'POST') {
           return next();
         }
         res.setHeader('Content-Type', 'application/json');
+
+        // Save latest database snapshot sent from the browser into public/online-db.json before building
+        try {
+          const body = await readJsonBody(req);
+          if (body && body.databaseSnapshot) {
+            const snapshot = {
+              ...body.databaseSnapshot,
+              updatedAt: new Date().toISOString(),
+              updatedAtIST: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+            };
+            fs.mkdirSync(path.dirname(onlineDbPath), { recursive: true });
+            fs.writeFileSync(onlineDbPath, JSON.stringify(snapshot, null, 2), 'utf-8');
+          }
+        } catch (snapErr) {
+          console.warn('Snapshot save warning before deploy:', snapErr);
+        }
 
         const isWin = process.platform === 'win32';
         const buildAndDeployCmd = isWin
           ? `.\\node_modules\\.bin\\tsc.cmd -b && .\\node_modules\\.bin\\vite.cmd build && .\\node_modules\\.bin\\gh-pages.cmd -d dist`
           : `npx tsc -b && npx vite build && npx gh-pages -d dist`;
 
-        // Run git commit/push (if changes exist, excluding .github) + build & deploy
-        const cmd = `git add src public index.html package.json vite.config.ts && (git diff --cached --quiet || git commit -m "One-click online update from TASK-VAANI App") && git push origin main && ${buildAndDeployCmd}`;
+        // Run git commit/push (including public/online-db.json, excluding .github) + build & deploy
+        const cmd = `git add src public index.html package.json vite.config.ts && (git diff --cached --quiet || git commit -m "One-click online app & data update from TASK-VAANI") && git push origin main && ${buildAndDeployCmd}`;
 
         exec(cmd, { cwd: process.cwd() }, (error, stdout, stderr) => {
           if (error) {
-            // Fallback to direct build & deploy if git push had nothing or minor warning
             exec(buildAndDeployCmd, { cwd: process.cwd() }, (deployErr, deployOut, deployStderr) => {
               if (deployErr) {
                 res.statusCode = 500;
@@ -37,7 +120,7 @@ function onlineDeployPlugin(): Plugin {
                 res.end(JSON.stringify({
                   success: true,
                   mode: 'LIVE_GITHUB_DEPLOY',
-                  message: 'App built & published live to GitHub Pages!',
+                  message: 'App & Online Database built and published live to GitHub Pages!',
                   output: deployOut || stdout,
                   timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
                 }));
@@ -50,7 +133,7 @@ function onlineDeployPlugin(): Plugin {
           res.end(JSON.stringify({
             success: true,
             mode: 'LIVE_GITHUB_DEPLOY',
-            message: 'All code & app changes committed and deployed live to GitHub Pages!',
+            message: 'All app & database changes committed and deployed live to GitHub Pages!',
             output: stdout,
             timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
           }));
@@ -62,7 +145,7 @@ function onlineDeployPlugin(): Plugin {
 
 export default defineConfig({
   base: './', // Ensures assets load correctly on GitHub Pages subpaths
-  plugins: [react(), onlineDeployPlugin()],
+  plugins: [react(), onlineDataAndDeployPlugin()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
