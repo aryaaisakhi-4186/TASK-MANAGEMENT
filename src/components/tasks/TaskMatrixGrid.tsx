@@ -636,7 +636,7 @@ export const TaskMatrixGrid: React.FC<{
                         </p>
 
                         {/* 8 Compliances in Up-Down Vertical Columns (4 per column: AUDIT, GST, TDS, ITR | VAT, E-INVOICE, RCM, 86B) */}
-                        <div className="grid grid-rows-4 grid-flow-col gap-1 mt-1.5 w-fit" onClick={(e) => e.stopPropagation()}>
+                        <div className="grid grid-rows-4 grid-flow-col gap-0.5 mt-1 w-fit" onClick={(e) => e.stopPropagation()}>
                           {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                             const appMap = resolveClientApplicability(client);
                             const isApp = appMap[item.key];
@@ -656,17 +656,17 @@ export const TaskMatrixGrid: React.FC<{
                                   }
                                 }}
                                 title={item.fullTitle}
-                                className="px-1.5 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-400 transition-all flex items-center justify-between gap-2 cursor-pointer shadow-sm min-w-[82px]"
+                                className="px-1 py-[2px] rounded bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 hover:border-slate-400 transition-all flex items-center justify-between gap-1 cursor-pointer whitespace-nowrap leading-none"
                               >
-                                <span className="font-mono font-bold text-[9px] uppercase text-slate-800 dark:text-slate-200">
+                                <span className="font-mono font-bold text-[8px] leading-none uppercase text-slate-800 dark:text-slate-200 whitespace-nowrap">
                                   {item.label}
                                 </span>
                                 <span
-                                  className={`w-6 h-3.5 rounded-full p-0.5 flex items-center shrink-0 transition-colors duration-200 ${
+                                  className={`w-4 h-2.5 rounded-full p-[1px] flex items-center shrink-0 transition-colors duration-200 ${
                                     isApp ? 'bg-emerald-500 justify-end' : 'bg-red-500 justify-start'
                                   }`}
                                 >
-                                  <span className="w-2.5 h-2.5 rounded-full bg-white shadow-sm block" />
+                                  <span className="w-2 h-2 rounded-full bg-white shadow-sm block" />
                                 </span>
                               </button>
                             );
