@@ -184,7 +184,7 @@ export const ClientMasterTable: React.FC = () => {
               <tr className="bg-slate-100/90 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider">
                 <th className="p-3.5">Client & Legal Name</th>
                 <th className="p-3.5">Statutory IDs (PAN / GST / TAN / VAT)</th>
-                <th className="p-3.5">Applicable Compliances (Green = Active / Red = N/A)</th>
+                <th className="p-3.5">Compliances</th>
                 <th className="p-3.5">Entity Status / Type</th>
                 <th className="p-3.5">Contact Person</th>
                 <th className="p-3.5">Client Employee (Sub-Login)</th>

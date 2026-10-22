@@ -705,11 +705,11 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
                   </p>
                 </div>
 
-                {/* Applicable Tax Compliances (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
+                {/* Compliances (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-800/80 space-y-2">
                   <label className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                     <ShieldCheck size={14} className="text-emerald-500" />
-                    <span>Applicable Tax Compliances (Green = ON / Red = OFF)</span>
+                    <span>Compliances</span>
                   </label>
 
                   <div className="flex flex-wrap items-center gap-2">
