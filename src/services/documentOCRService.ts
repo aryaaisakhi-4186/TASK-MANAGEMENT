@@ -139,7 +139,7 @@ export const extractBinaryPdfText = async (file: File): Promise<string> => {
     const gstinMatches = latin1.match(/\b([0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z])\b/g);
     const panMatches = latin1.match(/\b([A-Z]{5}[0-9]{4}[A-Z])\b/g);
 
-    let fullOutput = textPieces.join(' ') + '\n' + latin1;
+    let fullOutput = textPieces.join('\n') + '\n' + latin1;
     if (gstinMatches && gstinMatches.length > 0) {
       fullOutput += '\nGSTIN_LIST: ' + gstinMatches.join(' ');
     }
@@ -154,7 +154,117 @@ export const extractBinaryPdfText = async (file: File): Promise<string> => {
   }
 };
 
-// Text Extractor with PDF.js
+// Clean & Sanitize Extracted Legal Name or Trade Name (100% strips any address, PIN code, or form labels)
+export const cleanExtractedEntityName = (rawName: string | undefined | null): string => {
+  if (!rawName) return '';
+
+  let s = String(rawName)
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Strip leading field numbers, colons, dashes, or quotes
+  s = s.replace(/^(?:[1-9]\.?\s*)?(?:Legal\s*Name(?:\s*of\s*Business)?|Trade\s*Name(?:\s*,\s*if\s*any)?|Business\s*Name|Name\s*of\s*(?:the\s*)?(?:Enterprise|Assessee|Applicant))[\s:\-]*/i, '');
+  s = s.replace(/^[\s:\-;,.#"']+/g, '').trim();
+
+  // 1. Cut off immediately at any subsequent GST REG-06 / Statutory Form field labels
+  const formLabelCutoffPatterns: RegExp[] = [
+    /\s+(?:[1-9]\.\s*)?(?:Legal\s*Name|Trade\s*Name(?:\s*,\s*if\s*any)?|Constitution\s*of\s*Business|Address\s*of\s*Principal\s*Place|Date\s*of\s*Liability|Period\s*of\s*Validity|Type\s*of\s*Registration|Particulars\s*of\s*Approving\s*Authority)\b/i,
+    /\s+(?:Details\s*of\s*Additional\s*Places(?:\s*of\s*Business)?|Additional\s*Place(?:s)?\s*of\s*Business|Principal\s*Place\s*of\s*Business|Details\s*of\s*(?:Proprietor|Partners|Managing|Authorized))\b/i,
+    /\s+(?:Constitution\s*[:\-]|Registration\s*Number|GSTIN\s*[:\-]?|PAN\s*(?:No\.?|Number)?\s*[:\-]|Permanent\s*Account\s*Number|State\s*Jurisdiction|Center\s*Jurisdiction|Centre\s*Jurisdiction|Sr\.?\s*No\.?\s+Address)\b/i,
+    /\s+(?:Father'?s?\s*Name|Date\s*of\s*(?:Birth|Incorporation|Registration|Formation)|Major\s*Activity|Social\s*Category|Official\s*address\s*of\s*Enterprise)\b/i,
+  ];
+  for (const pat of formLabelCutoffPatterns) {
+    const idx = s.search(pat);
+    if (idx !== -1) {
+      s = s.substring(0, idx).trim();
+    }
+  }
+
+  // 2. Cut off immediately at explicit Address field labels or prefixes
+  const addressLabelCutoffPatterns: RegExp[] = [
+    /\s*[,;\-]?\s*\b(?:Address|Add\.?|Regd\.?\s*Off(?:ice)?|Registered\s*Office|Corporate\s*Office|Head\s*Office|Branch\s*Office|Office\s*Address|Principal\s*Address|Factory\s*Address)\s*[:\-]/i,
+    /\s*[,;\-]?\s*\b(?:Building\s*No\.?(?:\/Flat\s*No\.?)?|Flat\s*No\.?(?:\/Door\s*No\.?)?|Floor\s*No\.?|Door\s*No\.?|House\s*No\.?|Plot\s*No\.?|Shop\s*No\.?|Gala\s*No\.?|Office\s*No\.?|Unit\s*No\.?|Block\s*No\.?|Ward\s*No\.?|Survey\s*No\.?|Khasra\s*No\.?|Gata\s*No\.?|Room\s*No\.?|Booth\s*No\.?|SCO\s*No\.?|SCF\s*No\.?|Premises\s*No\.?|H\.?\s*No\.?|D\.?\s*No\.?|Bldg\.?\s*No\.?|S\.?\s*No\.?)\s*[:\-.,\dA-Za-z]/i,
+    /\s*[,;\-]?\s*\b(?:Name\s*Of\s*Premises(?:\/Building)?|Road\/Street|Locality\/Sub\s*Locality|City\/Town\/Village|Sub\s*District|District\s*:|State\s*:|PIN\s*Code|Pincode|Postal\s*Code)\b/i,
+    /\s*[,;\-]?\s*\b(?:Ground\s*Floor|First\s*Floor|Second\s*Floor|Third\s*Floor|Fourth\s*Floor|1st\s*Floor|2nd\s*Floor|3rd\s*Floor|4th\s*Floor|5th\s*Floor|Basement|Upper\s*Ground|Lower\s*Ground|Mezzanine\s*Floor)\b/i,
+    /\s*[,;\-]?\s*\b(?:Near\s+|Opp\.?\s+|Opposite\s+|Behind\s+|Beside\s+|Next\s+to\s+|Adjacent\s+to\s+|In\s+front\s+of\s+|At\s+Post\s+|Post\s+Office\s+|P\.?\s*O\.?\s+|Tehsil\s+|Taluka\s+|Taluk\s+|Mandal\s+|Distt\.?\s+|District\s+|S\/o\s+|D\/o\s+|W\/o\s+|C\/o\s+|R\/o\s+)/i,
+  ];
+  for (const pat of addressLabelCutoffPatterns) {
+    const idx = s.search(pat);
+    if (idx !== -1) {
+      s = s.substring(0, idx).trim();
+    }
+  }
+
+  // 3. If the entity is a Company or LLP, its legal/trade name ends right at PRIVATE LIMITED / PVT LTD / LIMITED / LLP
+  const corpSuffixMatch = s.match(/^(.*?\b(?:(?:\(OPC\)\s*)?PRIVATE\s+LIMITED|PVT\.?\s*LTD\.?|LIMITED\s+LIABILITY\s+PARTNERSHIP|LLP|PUBLIC\s+LIMITED|LIMITED|LTD\.?))(?:\s*[,;\-]|\s+).*$/i);
+  if (corpSuffixMatch && corpSuffixMatch[1] && corpSuffixMatch[1].trim().length >= 5) {
+    s = corpSuffixMatch[1].trim();
+  }
+
+  // 4. If a common business suffix is followed by street/door numbers or address words, truncate right after the business suffix
+  const bizSuffixAddressMatch = s.match(
+    /^(.*?\b(?:ENTERPRISES|ENTERPRISE|TRADERS|TRADING\s+CO(?:MPANY)?|AGENCIES|AGENCY|INDUSTRIES|ASSOCIATES|CORPORATION|SOLUTIONS|SERVICES|CONSULTANTS|LOGISTICS|MOTORS|AUTOMOBILES|PHARMA|PHARMACEUTICALS|MEDICAL\s+STORE|MEDICO|GENERAL\s+STORE|KIRANA\s+STORE|STORES|STORE|MART|EMPORIUM|GARMENTS|TEXTILES|FABRICS|JEWELLERS|SWEETS|BAKERS|FOODS|AGRO|CHEMICALS|ELECTRICALS|ELECTRONICS|COMPUTERS|HARDWARE|STEELS|METALS|CEMENT|CONSTRUCTIONS|BUILDERS|DEVELOPERS|INFRASTRUCTURE|INFRA|DISTRIBUTORS|EXPORTS|IMPORTS|TRANSPORTS|PRINTERS|WORKS|MILLS|ENGINEERING|COMPANY|&\s*CO\.?|&\s*SONS|BROTHERS))(?:\s*[,;\-]+\s*.*|\s+(?:\d+|No\.?\b|Plot\b|Shop\b|Flat\b|House\b|Bldg\b|Building\b|Floor\b|Gali\b|Lane\b|Road\b|Rd\b|Street\b|St\b|Marg\b|Nagar\b|Colony\b|Vihar\b|Puram\b|Pura\b|Ganj\b|Bazar\b|Bazaar\b|Market\b|Chowk\b|Sector\b|Phase\b|Block\b|Ward\b|Area\b|Estate\b|MIDC\b|GIDC\b|RIICO\b|Vill\b|Village\b|Town\b|City\b|Dist\b|District\b|Tehsil\b|Taluka\b|State\b|Pin\b).*)$/i
+  );
+  if (bizSuffixAddressMatch && bizSuffixAddressMatch[1] && bizSuffixAddressMatch[1].trim().length >= 4) {
+    s = bizSuffixAddressMatch[1].trim();
+  }
+
+  // 5. If there is a comma followed by address indicators (digits, road/area/city/state words, or multiple commas), keep only the name before the first comma
+  if (s.includes(',')) {
+    const commaParts = s.split(',');
+    const firstPart = commaParts[0].trim();
+    const restParts = commaParts.slice(1).join(',').trim();
+    const hasAddressInRest =
+      commaParts.length >= 3 ||
+      /\d/.test(restParts) ||
+      /\b(?:road|rd|street|st|marg|lane|gali|nagar|colony|vihar|puram|pura|ganj|bazar|bazaar|market|chowk|compound|complex|estate|industrial|area|phase|sector|block|ward|enclave|park|garden|society|tower|plaza|arcade|chambers|bhavan|bhawan|flat|floor|shop|plot|house|bldg|building|office|vill|village|town|city|dist|district|tehsil|taluka|post|pin|midc|gidc|riico|east|west|north|south|central|cantt|camp|maharashtra|gujarat|delhi|rajasthan|uttar\s*pradesh|madhya\s*pradesh|karnataka|tamil\s*nadu|telangana|andhra\s*pradesh|west\s*bengal|bihar|jharkhand|odisha|chhattisgarh|punjab|haryana|himachal|uttarakhand|kerala|assam|goa|chandigarh|india)\b/i.test(restParts);
+
+    if (firstPart.length >= 3 && !/^(?:1|2|3|4|5|M\/s)$/i.test(firstPart) && hasAddressInRest) {
+      s = firstPart;
+    }
+  }
+
+  // 6. Strip unlabelled door/plot numbers & street address tails (e.g. "SHARMA TRADERS 12/4 MG Road...")
+  const doorNumberTailMatch = s.match(/^([A-Za-z][A-Za-z0-9 .&'()\-]{2,}?)\s+(?:\d{1,4}[\/\-][A-Za-z0-9\/\-]+|[A-Za-z]{1,2}[\-\/]\d{1,4}|\d{1,4}\s+[A-Za-z]+\s+(?:Road|Rd|Street|St|Marg|Nagar|Colony|Market|Bazar|Bazaar|Gali|Lane|Chowk|Sector|Phase))\b.*$/i);
+  if (doorNumberTailMatch && doorNumberTailMatch[1] && doorNumberTailMatch[1].trim().length >= 3) {
+    s = doorNumberTailMatch[1].trim();
+  }
+
+  // 7. Strip any trailing 6-digit PIN code or State name
+  s = s.replace(/\s*[,;\-]?\s*\b[1-9]\d{5}\b.*$/i, '').trim();
+
+  // Final cleanup of trailing punctuation or stray numbering
+  s = s
+    .replace(/^[\s:\-;,.#"']+|[\s:\-;,.#"']+$/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  // Reject invalid placeholder values
+  const upper = s.toUpperCase();
+  if (
+    !s ||
+    s.length < 2 ||
+    upper === 'NA' ||
+    upper === 'N/A' ||
+    upper === 'NIL' ||
+    upper === 'NONE' ||
+    upper === 'NOT APPLICABLE' ||
+    upper === '-' ||
+    upper === 'LEGAL NAME' ||
+    upper === 'TRADE NAME' ||
+    upper === 'IF ANY' ||
+    upper.startsWith('CONSTITUTION OF BUSINESS') ||
+    upper.startsWith('ADDRESS OF PRINCIPAL') ||
+    upper.startsWith('BUILDING NO')
+  ) {
+    return '';
+  }
+
+  return s;
+};
+
+// Text Extractor with PDF.js (Preserves Y/X Visual Table Rows AND Stream Line Breaks)
 export const extractPdfJsText = async (file: File): Promise<string> => {
   try {
     const pdfjs = await loadPdfJsFromCdn();
@@ -164,14 +274,81 @@ export const extractPdfJsText = async (file: File): Promise<string> => {
     const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
     const pdfDoc = await loadingTask.promise;
     
-    let text = '';
+    let visualText = '';
+    let streamText = '';
+
     for (let i = 1; i <= pdfDoc.numPages; i++) {
       const page = await pdfDoc.getPage(i);
       const content = await page.getTextContent();
-      const pageText = content.items.map((item: any) => item.str || '').join(' ');
-      text += pageText + '\n';
+      const rawItems = (content.items || []) as any[];
+
+      // A. Stream-order line reconstruction (inserts \n on Y change or EOL)
+      let pageStream = '';
+      let lastY: number | null = null;
+      let lastX: number | null = null;
+
+      const positionedItems: Array<{ str: string; x: number; y: number }> = [];
+
+      for (const item of rawItems) {
+        const str = typeof item.str === 'string' ? item.str : '';
+        const curX = Array.isArray(item.transform) ? Number(item.transform[4]) : null;
+        const curY = Array.isArray(item.transform) ? Number(item.transform[5]) : null;
+
+        if (str.trim() && curX !== null && curY !== null) {
+          positionedItems.push({ str: str.trim(), x: curX, y: curY });
+        }
+
+        if (!str) {
+          if (item.hasEOL) pageStream += '\n';
+          continue;
+        }
+
+        if (lastY !== null && curY !== null && Math.abs(curY - lastY) > 2.5) {
+          pageStream += '\n';
+        } else if (lastX !== null && curX !== null && curX < lastX - 15) {
+          pageStream += '\n';
+        } else if (pageStream.length > 0 && !pageStream.endsWith('\n') && !pageStream.endsWith(' ')) {
+          pageStream += ' ';
+        }
+
+        pageStream += str;
+        if (item.hasEOL) {
+          pageStream += '\n';
+        }
+
+        if (curY !== null) lastY = curY;
+        if (curX !== null) lastX = curX;
+      }
+
+      streamText += pageStream + '\n';
+
+      // B. Visual Y/X Row-Sorted reconstruction (handles PDFs where labels and values are stored in separate blocks)
+      if (positionedItems.length > 0) {
+        // Sort top-to-bottom (descending Y)
+        const sortedByY = [...positionedItems].sort((a, b) => b.y - a.y);
+        const rows: Array<{ y: number; items: Array<{ str: string; x: number; y: number }> }> = [];
+
+        for (const pt of sortedByY) {
+          const existingRow = rows.find(r => Math.abs(r.y - pt.y) <= 3.5);
+          if (existingRow) {
+            existingRow.items.push(pt);
+          } else {
+            rows.push({ y: pt.y, items: [pt] });
+          }
+        }
+
+        const pageVisual = rows
+          .map(r => {
+            r.items.sort((a, b) => a.x - b.x);
+            return r.items.map(it => it.str).join('   ');
+          })
+          .join('\n');
+
+        visualText += pageVisual + '\n';
+      }
     }
-    return text;
+
+    return `${visualText}\n===STREAM_TEXT===\n${streamText}`;
   } catch (e) {
     console.warn('PDF.js text parse note:', e);
     return '';
@@ -197,9 +374,22 @@ export const extractServerPdfText = async (file: File): Promise<string> => {
   }
 };
 
+// Helper to check if a line is just another statutory form label rather than an entity name value
+const isStatutoryLabelLine = (line: string): boolean => {
+  const clean = line.trim();
+  if (!clean) return true;
+  return /^(?:[1-9]\.\s*)?(?:Legal\s*Name|Trade\s*Name|Constitution\s*of\s*Business|Address\s*of\s*Principal|Date\s*of\s*Liability|Period\s*of\s*Validity|Type\s*of\s*Registration|Particulars\s*of\s*Approving|Details\s*of\s*Additional|Details\s*of\s*(?:Proprietor|Partners|Managing)|Registration\s*Number|Form\s*GST|Government\s*of\s*India|Annexure\s*[A-Z]|Building\s*No|Floor\s*No|Flat\s*No|Road\/Street|Locality|City\/Town|District|State|PIN\s*Code)\b/i.test(clean);
+};
+
 // Comprehensive Text Regex Field Parser
 export const parseRawTextToClientData = (rawText: string, fileName?: string): Partial<Client> => {
-  const text = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const normalizedRaw = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+  // Pre-structure text so numbered GST REG-06 fields and address blocks never bleed into the same line
+  const text = normalizedRaw
+    .replace(/\s+(?=[1-9]\.\s*(?:Legal\s*Name|Trade\s*Name|Constitution\s*of\s*Business|Address\s*of\s*Principal|Date\s*of\s*Liability|Period\s*of\s*Validity|Type\s*of\s*Registration|Particulars\s*of\s*Approving))/gi, '\n')
+    .replace(/\s+(?=(?:Trade\s*Name\s*,\s*if\s*any|Constitution\s*of\s*Business|Address\s*of\s*Principal\s*Place|Details\s*of\s*Additional\s*Places|Details\s*of\s*(?:Proprietor|Partners|Managing)|Date\s*of\s*Liability|Period\s*of\s*Validity|Type\s*of\s*Registration|Particulars\s*of\s*Approving\s*Authority)\b)/gi, '\n')
+    .replace(/\s+(?=(?:Building\s*No\.?\/?\s*Flat\s*No\.?|Floor\s*No\.?\s*:|Name\s*Of\s*Premises\/?\s*Building|Road\/?\s*Street\s*:|Locality\/?\s*Sub\s*Locality|City\/?\s*Town\/?\s*Village|PIN\s*Code\s*:)\b)/gi, '\n');
 
   // 1. GSTIN (15-character statutory format)
   let gstin: string | undefined = undefined;
@@ -214,7 +404,7 @@ export const parseRawTextToClientData = (rawText: string, fileName?: string): Pa
   if (gstin && gstin.length === 15) {
     pan = gstin.substring(2, 12);
   } else {
-    const panMatch = text.match(/(?:Permanent\s*Account\s*Number|PAN\s*Number|PAN\s*Card|PAN)[\s:\-\n]+([A-Z]{5}[0-9]{4}[A-Z])/i) ||
+    const panMatch = text.match(/(?:Permanent\s*Account\s*Number|PAN\s*Number|PAN\s*Card|PAN)[\s:\-\n]+([A-Z]{5}[0-9]{4}[A-Z])\b/i) ||
                      text.match(/\b([A-Z]{5}[0-9]{4}[A-Z])\b/i);
     if (panMatch) {
       pan = panMatch[1].toUpperCase();
@@ -228,43 +418,55 @@ export const parseRawTextToClientData = (rawText: string, fileName?: string): Pa
     tan = tanMatch[1].toUpperCase();
   }
 
-  // 4. Legal Name
+  // 4. Legal Name (Exact "1. Legal Name" from GST REG-06 / PAN / Incorporation / MSME PDF)
   let legalName = '';
   const legalNamePatterns = [
-    /(?:1\.?\s*)?Legal\s*Name(?:\s*of\s*Business)?[\s:\-\n]+([^\n\r]+)/i,
-    /Name\s*of\s*(?:the)?\s*Enterprise[\s:\-\n]+([^\n\r]+)/i,
-    /Name\s*of\s*(?:the)?\s*Assessee[\s:\-\n]+([^\n\r]+)/i,
-    /Name\s*of\s*(?:the)?\s*Applicant[\s:\-\n]+([^\n\r]+)/i,
-    /M\/s\.?\s*([^\n\r,;]+)/i
+    // Same-line value after "1. Legal Name"
+    /(?:1\.?\s*)?Legal\s*Name(?:\s*of\s*Business)?[ \t:\-]+([^\n\r]+)/gi,
+    // Next-line value after "1. Legal Name"
+    /(?:1\.?\s*)?Legal\s*Name(?:\s*of\s*Business)?[ \t:\-]*\n\s*([^\n\r]+)/gi,
+    /Name\s*of\s*(?:the\s*)?(?:Enterprise|Assessee|Applicant|Company|Firm)[ \t:\-\n]+([^\n\r]+)/gi,
+    /certify\s*that\s+([A-Z0-9][^\n\r]+?(?:LIMITED|LLP))\s+is\s+incorporated/gi,
+    /M\/s\.?\s*([^\n\r,;]+)/gi
   ];
   for (const pat of legalNamePatterns) {
-    const match = text.match(pat);
-    if (match && match[1]?.trim().length > 2) {
-      const candidate = match[1].trim().replace(/^[:\-\s]+/, '').replace(/[;,.]*$/, '').trim();
-      if (!candidate.toLowerCase().includes('trade name') && !candidate.toLowerCase().includes('form') && candidate.length > 2) {
-        legalName = candidate;
+    const matches = text.matchAll(pat);
+    for (const match of matches) {
+      const rawCandidate = (match[1] || '').trim();
+      if (!rawCandidate || isStatutoryLabelLine(rawCandidate)) continue;
+      const cleaned = cleanExtractedEntityName(rawCandidate);
+      if (cleaned && cleaned.length >= 3 && !cleaned.toLowerCase().includes('form gst')) {
+        legalName = cleaned;
         break;
       }
     }
+    if (legalName) break;
   }
 
-  // 5. Trade Name
+  // 5. Trade Name (Exact "2. Trade Name, if any" from GST REG-06 without any address)
   let tradeName = '';
   const tradeNamePatterns = [
-    /(?:2\.?\s*)?Trade\s*Name(?:,\s*if\s*any)?[\s:\-\n]+([^\n\r]+)/i,
-    /Trade\s*Name[\s:\-\n]+([^\n\r]+)/i,
-    /Business\s*Name[\s:\-\n]+([^\n\r]+)/i,
-    /Enterprise\s*Name[\s:\-\n]+([^\n\r]+)/i
+    // Same-line value after "2. Trade Name, if any"
+    /(?:2\.?\s*)?Trade\s*Name(?:\s*,\s*if\s*any)?[ \t:\-]+([^\n\r]+)/gi,
+    // Next-line value after "2. Trade Name, if any"
+    /(?:2\.?\s*)?Trade\s*Name(?:\s*,\s*if\s*any)?[ \t:\-]*\n\s*([^\n\r]+)/gi,
+    /(?:Name\s*of\s*Unit|Business\s*Name|Enterprise\s*Name)[ \t:\-]+([^\n\r]+)/gi
   ];
   for (const pat of tradeNamePatterns) {
-    const match = text.match(pat);
-    if (match && match[1]?.trim().length > 2) {
-      const candidate = match[1].trim().replace(/^[:\-\s]+/, '').replace(/[;,.]*$/, '').trim();
-      if (candidate && candidate.toUpperCase() !== 'NA' && candidate.toUpperCase() !== 'N/A' && candidate !== '-' && !candidate.toLowerCase().includes('constitution')) {
-        tradeName = candidate;
+    const matches = text.matchAll(pat);
+    for (const match of matches) {
+      const rawCandidate = (match[1] || '').trim();
+      if (!rawCandidate || isStatutoryLabelLine(rawCandidate)) continue;
+      // Ignore if it accidentally captured ", if any" itself with no value
+      const strippedIfAny = rawCandidate.replace(/^,?\s*if\s*any[\s:\-]*/i, '').trim();
+      if (!strippedIfAny || isStatutoryLabelLine(strippedIfAny)) continue;
+      const cleaned = cleanExtractedEntityName(strippedIfAny);
+      if (cleaned && cleaned.length >= 3 && !cleaned.toLowerCase().includes('form gst')) {
+        tradeName = cleaned;
         break;
       }
     }
+    if (tradeName) break;
   }
 
   if (!tradeName && legalName) tradeName = legalName;
@@ -352,24 +554,39 @@ export const parseRawTextToClientData = (rawText: string, fileName?: string): Pa
 export const extractDocumentDataDirectly = async (file: File): Promise<Partial<Client>> => {
   const isPdf = /\.pdf$/i.test(file.name);
 
+  // Pre-extract selectable PDF text via PDF.js if available (provides exact character-level ground truth for GST REG-06)
+  let pdfJsClient: Partial<Client> | null = null;
+  if (isPdf) {
+    try {
+      const pdfJsText = await extractPdfJsText(file);
+      if (pdfJsText && pdfJsText.trim().length > 15) {
+        const parsedPdf = parseRawTextToClientData(pdfJsText, file.name);
+        if (parsedPdf.pan || parsedPdf.gstin || (parsedPdf.tradeName && parsedPdf.tradeName !== 'New Client Profile')) {
+          pdfJsClient = parsedPdf;
+        }
+      }
+    } catch (pdfJsErr) {
+      console.warn('PDF.js pre-parse note:', pdfJsErr);
+    }
+  }
+
   // -------------------------------------------------------------------------
-  // TIER 1: Gemini AI Multimodal Vision (100% Accurate OCR for Scanned / Image PDFs)
+  // TIER 1: Gemini AI Multimodal Vision (100% Accurate OCR for Scanned / Image / Statutory PDFs)
   // -------------------------------------------------------------------------
   const apiKey = getStoredGeminiKey();
   if (apiKey) {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
       const base64Data = await fileToBase64(file);
       const mimeType = file.type || (isPdf ? 'application/pdf' : 'image/jpeg');
 
-      const prompt = `You are an expert Indian Chartered Accountant document OCR parser.
-Analyze this uploaded document (Form GST REG-06, PAN Card, Certificate of Incorporation, MSME Certificate, Bank Statement, Tax Notice, or Tax Invoice).
+      const prompt = `You are an expert Indian Chartered Accountant statutory document OCR parser.
+Analyze this uploaded document (Form GST REG-06 Registration Certificate, PAN Card, Certificate of Incorporation, Udyam MSME Certificate, or Tax Document).
 
 Extract and return ONLY a valid JSON object with the following fields:
 {
-  "tradeName": "Trade / Business Name",
-  "legalName": "Legal Name of Enterprise or Person",
+  "tradeName": "Exact Trade Name from '2. Trade Name, if any' (ONLY the business name, NEVER include address)",
+  "legalName": "Exact Legal Name from '1. Legal Name' (ONLY the legal entity/proprietor name, NEVER include address)",
   "pan": "10-character PAN (e.g. ABCDE1234F)",
   "gstin": "15-character GSTIN (e.g. 07ABCDE1234F1Z5)",
   "tan": "10-character TAN if present",
@@ -381,33 +598,63 @@ Extract and return ONLY a valid JSON object with the following fields:
   "address": "Principal Place of Business address"
 }
 
-Important Rules:
-- If PAN is missing but GSTIN is found, extract characters 3-12 of GSTIN as PAN.
-- If Trade Name is missing or N/A, set tradeName to legalName.
-- Determine category from constitution or 4th character of PAN (P->PROPRIETOR/INDIVIDUAL, C->PVT_LTD, F->PARTNERSHIP, L->LLP, T->TRUST).
-- Return ONLY raw JSON with NO markdown backticks or extra text.`;
+CRITICAL RULES FOR TRADE NAME & LEGAL NAME:
+1. In Form GST REG-06, Field "1. Legal Name" MUST go into "legalName", and Field "2. Trade Name, if any" MUST go into "tradeName".
+2. NEVER copy or append ANY address (Building No, Flat No, Floor, Shop No, Plot No, Road, Street, Locality, City, District, State, or PIN Code) into "tradeName" or "legalName". Keep address strictly in the "address" field only.
+3. If "2. Trade Name, if any" is blank, "NA", or "N/A", set "tradeName" equal to "legalName".
+4. If PAN is missing but GSTIN is found, extract characters 3-12 of GSTIN as PAN.
+5. Determine category from "3. Constitution of Business" or 4th character of PAN (P->PROPRIETOR/INDIVIDUAL, C->PVT_LTD, F->PARTNERSHIP, L->LLP, T->TRUST).
+6. Return ONLY raw JSON with NO markdown backticks or extra text.`;
 
-      const result = await model.generateContent([
-        { inlineData: { data: base64Data, mimeType } },
-        prompt
-      ]);
-
-      const text = result.response.text();
-      const cleanJson = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-      const parsed = JSON.parse(cleanJson);
+      let parsed: any = null;
+      for (const modelName of ['gemini-2.0-flash', 'gemini-1.5-flash']) {
+        try {
+          const model = genAI.getGenerativeModel({ model: modelName });
+          const result = await model.generateContent([
+            { inlineData: { data: base64Data, mimeType } },
+            prompt
+          ]);
+          const text = result.response.text();
+          const cleanJson = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+          parsed = JSON.parse(cleanJson);
+          if (parsed) break;
+        } catch {
+          // Try next model fallback
+        }
+      }
 
       if (parsed && (parsed.pan || parsed.gstin || parsed.tradeName || parsed.legalName)) {
+        const aiTrade = cleanExtractedEntityName(parsed.tradeName);
+        const aiLegal = cleanExtractedEntityName(parsed.legalName);
+        const pdfTrade = pdfJsClient?.tradeName && pdfJsClient.tradeName !== 'New Client Profile' ? cleanExtractedEntityName(pdfJsClient.tradeName) : '';
+        const pdfLegal = pdfJsClient?.legalName && pdfJsClient.legalName !== 'New Client Profile' ? cleanExtractedEntityName(pdfJsClient.legalName) : '';
+
+        const finalLegalName = aiLegal || pdfLegal || aiTrade || pdfTrade || '';
+        const finalTradeName = aiTrade || pdfTrade || finalLegalName || file.name.replace(/\.[^/.]+$/, '');
+
+        // If PDF text clearly found a distinct Legal Name while AI duplicated Trade Name into Legal Name, prefer the distinct PDF Legal Name
+        const resolvedLegalName =
+          (finalLegalName.toUpperCase() === finalTradeName.toUpperCase() && pdfLegal && pdfLegal.toUpperCase() !== finalTradeName.toUpperCase())
+            ? pdfLegal
+            : (finalLegalName || finalTradeName);
+
+        const finalGst = ((parsed.gstin || pdfJsClient?.gstin || '') as string).toUpperCase().trim();
+        let finalPan = ((parsed.pan || pdfJsClient?.pan || '') as string).toUpperCase().trim();
+        if (!finalPan && finalGst.length === 15) {
+          finalPan = finalGst.substring(2, 12);
+        }
+
         return {
-          tradeName: parsed.tradeName || parsed.legalName || file.name.replace(/\.[^/.]+$/, ''),
-          legalName: parsed.legalName || parsed.tradeName || '',
-          pan: (parsed.pan || '').toUpperCase().trim(),
-          gstin: (parsed.gstin || '').toUpperCase().trim(),
-          tan: (parsed.tan || '').toUpperCase().trim() || undefined,
-          category: parsed.category || detectCategory(parsed.pan, parsed.gstin, parsed.tradeName, parsed.legalName),
-          contactPerson: parsed.contactPerson || 'Authorized Signatory',
-          phone: parsed.phone || '',
-          email: parsed.email || '',
-          formationDate: parsed.formationDate || new Date().toISOString().split('T')[0],
+          tradeName: finalTradeName,
+          legalName: resolvedLegalName,
+          pan: finalPan,
+          gstin: finalGst,
+          tan: ((parsed.tan || pdfJsClient?.tan || '') as string).toUpperCase().trim() || undefined,
+          category: parsed.category || pdfJsClient?.category || detectCategory(finalPan, finalGst, finalTradeName, resolvedLegalName),
+          contactPerson: cleanExtractedEntityName(parsed.contactPerson) || pdfJsClient?.contactPerson || 'Authorized Signatory',
+          phone: parsed.phone || pdfJsClient?.phone || '',
+          email: parsed.email || pdfJsClient?.email || '',
+          formationDate: parsed.formationDate || pdfJsClient?.formationDate || new Date().toISOString().split('T')[0],
           status: 'ACTIVE'
         };
       }
@@ -419,18 +666,8 @@ Important Rules:
   // -------------------------------------------------------------------------
   // TIER 2: PDF.js Browser-side Text Extraction
   // -------------------------------------------------------------------------
-  if (isPdf) {
-    try {
-      const pdfJsText = await extractPdfJsText(file);
-      if (pdfJsText && pdfJsText.trim().length > 15) {
-        const client = parseRawTextToClientData(pdfJsText, file.name);
-        if (client.pan || client.gstin || (client.tradeName && client.tradeName !== 'New Client Profile')) {
-          return client;
-        }
-      }
-    } catch (pdfJsErr) {
-      console.warn('PDF.js parse note:', pdfJsErr);
-    }
+  if (pdfJsClient) {
+    return pdfJsClient;
   }
 
   // -------------------------------------------------------------------------

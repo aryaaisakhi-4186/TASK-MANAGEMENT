@@ -25,6 +25,7 @@ import {
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { detectEntityCategoryFromPANAndGSTIN } from '../../utils/masterImportExport';
 import { COMPLIANCE_APPLICABILITY_ITEMS, resolveClientApplicability } from '../../utils/complianceApplicability';
+import { extractDocumentDataDirectly, cleanExtractedEntityName } from '../../services/documentOCRService';
 
 interface Props {
   isOpen: boolean;
@@ -133,8 +134,46 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
   const [docNumberInput, setDocNumberInput] = useState('');
   const [cloudDocUrlInput, setCloudDocUrlInput] = useState('');
   const [isCompressing, setIsCompressing] = useState(false);
+  const [isScanningPdf, setIsScanningPdf] = useState(false);
+  const [scanSuccessBanner, setScanSuccessBanner] = useState<string | null>(null);
   const [repoNotice, setRepoNotice] = useState<string | null>(null);
   const [previewDoc, setPreviewDoc] = useState<ClientRepoDoc | null>(null);
+
+  const handleAutoScanClientPdf = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsScanningPdf(true);
+    setScanSuccessBanner(null);
+    try {
+      const extracted = await extractDocumentDataDirectly(file);
+      const cleanTrade = cleanExtractedEntityName(extracted.tradeName);
+      const cleanLegal = cleanExtractedEntityName(extracted.legalName);
+
+      if (cleanTrade) setTradeName(cleanTrade);
+      if (cleanLegal) setLegalName(cleanLegal);
+      else if (cleanTrade && !legalName) setLegalName(cleanTrade);
+
+      if (extracted.pan) setPan(extracted.pan.toUpperCase());
+      if (extracted.gstin) setGstin(extracted.gstin.toUpperCase());
+      if (extracted.tan) setTan(extracted.tan.toUpperCase());
+      if (extracted.category) setCategory(extracted.category);
+      if (extracted.contactPerson && extracted.contactPerson !== 'Authorized Person' && extracted.contactPerson !== 'Authorized Signatory') {
+        setContactPerson(extracted.contactPerson);
+      }
+      if (extracted.phone) setPhone(extracted.phone);
+      if (extracted.email) setEmail(extracted.email);
+      if (extracted.formationDate) setFormationDate(extracted.formationDate);
+
+      setScanSuccessBanner(
+        `✅ AI Scan Complete! Trade Name: "${cleanTrade || '-'}" | Legal Name: "${cleanLegal || cleanTrade || '-'}"`
+      );
+    } catch (err: any) {
+      alert('PDF Scan note: ' + (err?.message || 'Unable to parse document'));
+    } finally {
+      setIsScanningPdf(false);
+      e.target.value = '';
+    }
+  };
 
   useEffect(() => {
     setActiveTab(initialTab);
@@ -526,9 +565,36 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
             <>
               {/* Section 1: Business Identity */}
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-3">
-                <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <Building size={14} className="text-amber-500" /> Business Identity & Registrations
-                </h4>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h4 className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <Building size={14} className="text-amber-500" /> Business Identity & Registrations
+                  </h4>
+
+                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-800 dark:text-amber-300 hover:text-slate-950 border border-amber-500/40 font-bold text-[11px] cursor-pointer transition-all shadow-sm">
+                    <Zap size={13} />
+                    <span>{isScanningPdf ? 'Scanning PDF...' : '✨ Scan GST / PAN PDF (AI Auto-Fill)'}</span>
+                    <input
+                      type="file"
+                      accept=".pdf,image/*"
+                      onChange={handleAutoScanClientPdf}
+                      disabled={isScanningPdf}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {scanSuccessBanner && (
+                  <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-[11px] font-semibold flex items-center justify-between">
+                    <span>{scanSuccessBanner}</span>
+                    <button
+                      type="button"
+                      onClick={() => setScanSuccessBanner(null)}
+                      className="text-emerald-700 dark:text-emerald-300 hover:underline text-[10px] ml-2 font-bold"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>

@@ -46,7 +46,7 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   useEscapeKey(onClose, isOpen);
 
-  const [activeSource, setActiveSource] = useState<'FILE' | 'GOOGLE_SHEET'>('GOOGLE_SHEET');
+  const [activeSource, setActiveSource] = useState<'FILE' | 'GOOGLE_SHEET'>('FILE');
   const [googleSheetUrl, setGoogleSheetUrl] = useState<string>(() => {
     return settings.masterGoogleSheetUrl || localStorage.getItem('taskvaani_master_google_sheet_url') || DEFAULT_MASTER_SHEET_URL;
   });
@@ -238,7 +238,25 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
   };
 
   const handleCommitImport = () => {
-    const validRows = parsedRows.filter(r => r.isValid);
+    let rowsToProcess = [...parsedRows];
+    if (editingIndex !== null && editFormData && rowsToProcess[editingIndex]) {
+      const tName = editFormData.tradeName.trim();
+      const lName = editFormData.legalName?.trim() || tName;
+      const pNum = editFormData.pan.trim().toUpperCase();
+      const gNum = (editFormData.gstin || '').trim().toUpperCase();
+      const cat = detectEntityCategoryFromPANAndGSTIN(pNum, gNum, tName, lName, editFormData.category);
+      rowsToProcess[editingIndex] = {
+        ...editFormData,
+        tradeName: tName,
+        legalName: lName,
+        pan: pNum,
+        gstin: gNum || undefined,
+        category: cat,
+        isValid: !!tName && (!!pNum || !!gNum),
+      };
+    }
+
+    const validRows = rowsToProcess.filter(r => r.isValid);
     if (validRows.length === 0) return;
 
     let updatedCount = 0;
@@ -682,7 +700,7 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                   <thead className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 font-bold uppercase text-[10px] sticky top-0">
                     <tr>
                       <th className="p-2.5">Status</th>
-                      <th className="p-2.5">Trade Name</th>
+                      <th className="p-2.5">Trade Name & Legal Name</th>
                       <th className="p-2.5">PAN Number</th>
                       <th className="p-2.5">GSTIN</th>
                       <th className="p-2.5">Entity Type</th>
@@ -723,6 +741,9 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                         </td>
                         <td className="p-2.5 font-bold text-slate-900 dark:text-white">
                           <div>{row.tradeName}</div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                            Legal: {row.legalName || row.tradeName}
+                          </div>
                           {isExisting && <div className="text-[10px] text-blue-600 dark:text-blue-400 font-normal">Existing profile will be updated</div>}
                         </td>
                         <td className="p-2.5 font-mono font-bold text-amber-600 dark:text-amber-400">

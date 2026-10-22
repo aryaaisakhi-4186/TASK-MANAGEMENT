@@ -1,4 +1,4 @@
-import { extractDocumentDataDirectly } from '../services/documentOCRService';
+import { extractDocumentDataDirectly, cleanExtractedEntityName, parseRawTextToClientData } from '../services/documentOCRService';
 import * as XLSX from 'xlsx';
 import { Client, ClientCategory, UserProfile } from '../types';
 
@@ -145,137 +145,7 @@ export const detectEntityCategoryFromPANAndGSTIN = (
 
 // 3. Intelligent GST / Tax Document Field Parser
 export const parseDocumentTextToClientData = (rawText: string, fileName?: string): Partial<Client> => {
-  const text = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-  // A. Extract GSTIN (15 characters)
-  const gstinMatch = text.match(/\b([0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z])\b/i);
-  const gstin = gstinMatch ? gstinMatch[1].toUpperCase() : undefined;
-
-  // B. Extract PAN (Characters 3 to 12 of GSTIN or standalone 10-char PAN)
-  let pan: string | undefined = undefined;
-  if (gstin && gstin.length === 15) {
-    pan = gstin.substring(2, 12);
-  } else {
-    const panMatch = text.match(/\b([A-Z]{5}[0-9]{4}[A-Z])\b/i);
-    if (panMatch) pan = panMatch[1].toUpperCase();
-  }
-
-  // C. Extract TAN (10 characters: 4 letters + 5 digits + 1 letter, distinct from PAN)
-  let tan: string | undefined = undefined;
-  const tanMatch = text.match(/\bTAN\s*[:\-\n]*\s*([A-Z]{4}[0-9]{5}[A-Z])\b/i);
-  if (tanMatch && tanMatch[1].toUpperCase() !== pan) {
-    tan = tanMatch[1].toUpperCase();
-  }
-
-  // D. Extract Legal Name (Follows '1. Legal Name' or 'Legal Name')
-  let legalName = '';
-  const legalNamePatterns = [
-    /(?:1\.?\s*)?Legal\s*Name(?:\s*of\s*Business)?[\s:\-\n]+([^\n]+)/i,
-    /Name\s*of\s*(?:the)?\s*Enterprise[\s:\-\n]+([^\n]+)/i,
-    /M\/s\.?\s*([^\n,]+)/i
-  ];
-  for (const pat of legalNamePatterns) {
-    const match = text.match(pat);
-    if (match && match[1]?.trim().length > 2 && !match[1].toLowerCase().includes('trade name')) {
-      legalName = match[1].trim().replace(/^[:\-\s]+/, '').replace(/[;,.]*$/, '').trim();
-      break;
-    }
-  }
-
-  // E. Extract Trade Name (Follows '2. Trade Name' or 'Trade Name')
-  let tradeName = '';
-  const tradeNamePatterns = [
-    /(?:2\.?\s*)?Trade\s*Name(?:,\s*if\s*any)?[\s:\-\n]+([^\n]+)/i,
-    /Trade\s*Name[\s:\-\n]+([^\n]+)/i
-  ];
-  for (const pat of tradeNamePatterns) {
-    const match = text.match(pat);
-    if (match && match[1]?.trim().length > 2 && !match[1].toLowerCase().includes('constitution')) {
-      const candidate = match[1].trim().replace(/^[:\-\s]+/, '').replace(/[;,.]*$/, '').trim();
-      if (candidate && candidate.toUpperCase() !== 'NA' && candidate.toUpperCase() !== 'N/A' && candidate !== '-') {
-        tradeName = candidate;
-        break;
-      }
-    }
-  }
-
-  // Fallbacks for names
-  if (!tradeName && legalName) tradeName = legalName;
-  if (!legalName && tradeName) legalName = tradeName;
-  if (!tradeName && fileName) {
-    const cleanFile = fileName.replace(/\.(pdf|png|jpg|jpeg|xlsx|csv)$/i, '').replace(/[_-]/g, ' ').trim();
-    if (cleanFile.length > 3 && !cleanFile.toLowerCase().includes('scan') && !cleanFile.toLowerCase().includes('document')) {
-      tradeName = cleanFile;
-      legalName = cleanFile;
-    }
-  }
-
-  // F. Extract Constitution of Business / Entity Category
-  const constMatch = text.match(/(?:3\.?\s*)?Constitution\s*of\s*Business[\s:\-\n]+([^\n]+)/i);
-  const rawConst = constMatch ? constMatch[1] : '';
-  const category: ClientCategory = detectEntityCategoryFromPANAndGSTIN(pan, gstin, tradeName, legalName, rawConst);
-
-  // G. Extract Date of Registration / Formation / Liability
-  let formationDate = '';
-  const datePatterns = [
-    /(?:5\.?\s*)?Date\s*of\s*Liability[\s:\-\n]+(\d{2}[\/\-]\d{2}[\/\-]\d{4})/i,
-    /Period\s*of\s*Validity[\s:\-\n]*From[\s:\-\n]+(\d{2}[\/\-]\d{2}[\/\-]\d{4})/i,
-    /Date\s*of\s*(?:Incorporation|Registration|Formation)[\s:\-\n]+(\d{2}[\/\-]\d{2}[\/\-]\d{4}|\d{4}[\/\-]\d{2}[\/\-]\d{2})/i
-  ];
-  for (const pat of datePatterns) {
-    const match = text.match(pat);
-    if (match && match[1]) {
-      const raw = match[1].trim();
-      if (raw.includes('/')) {
-        const parts = raw.split('/');
-        formationDate = parts.length === 3 && parts[2].length === 4 
-          ? `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}` 
-          : raw;
-      } else {
-        formationDate = raw;
-      }
-      break;
-    }
-  }
-
-  // H. Extract Contact Person / Authorized Signatory
-  let contactPerson = '';
-  const contactPatterns = [
-    /(?:Name\s*of\s*(?:the)?\s*(?:Authorized\s*Signatory|Proprietor|Director|Partner))[\s:\-\n]+([A-Za-z\s.]{3,40})(?=\n|$)/i,
-    /(?:Proprietor|Director|Partner)[\s:\-\n]+([A-Za-z\s.]{3,40})(?=\n|$)/i
-  ];
-  for (const pat of contactPatterns) {
-    const match = text.match(pat);
-    if (match && match[1]?.trim().length > 2 && !match[1].toLowerCase().includes('date') && !match[1].toLowerCase().includes('place')) {
-      contactPerson = match[1].trim();
-      break;
-    }
-  }
-
-  // I. Extract Mobile / Phone
-  const phoneMatch = text.match(/(?:\+91[\-\s]?)?([6-9]\d{9})/);
-  const phone = phoneMatch ? `+91 ${phoneMatch[1]}` : '';
-
-  // J. Extract Email
-  const emailMatch = text.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
-  const email = emailMatch ? emailMatch[1].toLowerCase() : '';
-
-  return {
-    tradeName: tradeName || '',
-    legalName: legalName || tradeName || '',
-    pan: pan || '',
-    gstin: gstin || '',
-    tan: tan || '',
-    category,
-    status: 'ACTIVE',
-    contactPerson: contactPerson || '',
-    phone: phone || '',
-    email: email || '',
-    formationDate: formationDate || '',
-    assignedTeamName: '',
-    googleDriveFolderId: '',
-    googleDriveFolderUrl: ''
-  };
+  return parseRawTextToClientData(rawText, fileName);
 };
 
 // Map Raw Objects to ParsedClientRow array (ACCURATE STATUTORY STATUS & ZERO DUMMIES)
@@ -623,7 +493,12 @@ export const parseClientsFromFile = async (file: File): Promise<ParsedClientRow[
   if (isPdf || isImage) {
     const client = await extractDocumentDataDirectly(file);
 
-    let tradeName = client.tradeName || file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ').trim();
+    const cleanedTrade = cleanExtractedEntityName(client.tradeName);
+    const cleanedLegal = cleanExtractedEntityName(client.legalName);
+    const fallbackFileName = cleanExtractedEntityName(file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ').trim());
+
+    let tradeName = cleanedTrade || cleanedLegal || fallbackFileName;
+    let legalName = cleanedLegal || cleanedTrade || tradeName;
     let pan = client.pan || '';
     let gstin = client.gstin || '';
 
@@ -640,11 +515,11 @@ export const parseClientsFromFile = async (file: File): Promise<ParsedClientRow[
       }
     }
 
-    const category = client.category || detectEntityCategoryFromPANAndGSTIN(pan, gstin, tradeName, client.legalName);
+    const category = client.category || detectEntityCategoryFromPANAndGSTIN(pan, gstin, tradeName, legalName);
 
     const row: ParsedClientRow = {
       tradeName: tradeName || 'Extracted Client',
-      legalName: client.legalName || tradeName || 'Extracted Client',
+      legalName: legalName || tradeName || 'Extracted Client',
       pan: pan || '',
       gstin: gstin || undefined,
       tan: client.tan || undefined,
