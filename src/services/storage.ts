@@ -37,26 +37,70 @@ function safeSet<T>(key: string, value: T): void {
   }
 }
 
-export const StorageService = {
-  // Clients
-  getClients: (): Client[] => safeGet<Client[]>(KEYS.CLIENTS, SEED_CLIENTS),
-  saveClients: (clients: Client[]) => safeSet(KEYS.CLIENTS, clients),
+function getActiveGuestPhone(): string | null {
+  try {
+    const raw = localStorage.getItem(KEYS.AUTH_SESSION);
+    if (!raw) return null;
+    const session = JSON.parse(raw) as UserProfile | null;
+    if (session && session.role === 'GUEST' && session.phone) {
+      return session.phone.replace(/[^0-9]/g, '');
+    }
+  } catch {}
+  return null;
+}
 
-  // Tasks
-  getTasks: (): TaskItem[] => safeGet<TaskItem[]>(KEYS.TASKS, SEED_TASKS),
-  saveTasks: (tasks: TaskItem[]) => safeSet(KEYS.TASKS, tasks),
+function getScopedKey(baseKey: string): { key: string; isGuestWorkspace: boolean } {
+  const guestPhone = getActiveGuestPhone();
+  if (guestPhone) {
+    return { key: `${baseKey}_guest_${guestPhone}`, isGuestWorkspace: true };
+  }
+  return { key: baseKey, isGuestWorkspace: false };
+}
+
+export const StorageService = {
+  // Clients (Isolated blank workspace for Guest Demo users, Seed/Master data for Admin/Team)
+  getClients: (): Client[] => {
+    const { key, isGuestWorkspace } = getScopedKey(KEYS.CLIENTS);
+    return safeGet<Client[]>(key, isGuestWorkspace ? [] : SEED_CLIENTS);
+  },
+  saveClients: (clients: Client[]) => {
+    const { key } = getScopedKey(KEYS.CLIENTS);
+    safeSet(key, clients);
+  },
+
+  // Tasks (Isolated blank workspace for Guest Demo users, Seed/Master data for Admin/Team)
+  getTasks: (): TaskItem[] => {
+    const { key, isGuestWorkspace } = getScopedKey(KEYS.TASKS);
+    return safeGet<TaskItem[]>(key, isGuestWorkspace ? [] : SEED_TASKS);
+  },
+  saveTasks: (tasks: TaskItem[]) => {
+    const { key } = getScopedKey(KEYS.TASKS);
+    safeSet(key, tasks);
+  },
 
   // Team
   getTeam: (): UserProfile[] => safeGet<UserProfile[]>(KEYS.TEAM, SEED_TEAM_MEMBERS),
   saveTeam: (team: UserProfile[]) => safeSet(KEYS.TEAM, team),
 
   // Extra Work
-  getExtraWork: (): ExtraWorkItem[] => safeGet<ExtraWorkItem[]>(KEYS.EXTRA_WORK, SEED_EXTRA_WORK),
-  saveExtraWork: (work: ExtraWorkItem[]) => safeSet(KEYS.EXTRA_WORK, work),
+  getExtraWork: (): ExtraWorkItem[] => {
+    const { key, isGuestWorkspace } = getScopedKey(KEYS.EXTRA_WORK);
+    return safeGet<ExtraWorkItem[]>(key, isGuestWorkspace ? [] : SEED_EXTRA_WORK);
+  },
+  saveExtraWork: (work: ExtraWorkItem[]) => {
+    const { key } = getScopedKey(KEYS.EXTRA_WORK);
+    safeSet(key, work);
+  },
 
   // Documents
-  getDocuments: (): DocumentItem[] => safeGet<DocumentItem[]>(KEYS.DOCUMENTS, SEED_DOCUMENTS),
-  saveDocuments: (docs: DocumentItem[]) => safeSet(KEYS.DOCUMENTS, docs),
+  getDocuments: (): DocumentItem[] => {
+    const { key, isGuestWorkspace } = getScopedKey(KEYS.DOCUMENTS);
+    return safeGet<DocumentItem[]>(key, isGuestWorkspace ? [] : SEED_DOCUMENTS);
+  },
+  saveDocuments: (docs: DocumentItem[]) => {
+    const { key } = getScopedKey(KEYS.DOCUMENTS);
+    safeSet(key, docs);
+  },
 
   // Audit Logs
   getAuditLogs: (): AuditLog[] => safeGet<AuditLog[]>(KEYS.AUDIT_LOGS, SEED_AUDIT_LOGS),

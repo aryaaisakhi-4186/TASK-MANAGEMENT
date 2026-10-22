@@ -3,14 +3,15 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNotification } from '../../context/NotificationContext';
 import { useTasks } from '../../context/TaskContext';
-import { Bell, ShieldCheck, Sun, Moon, LogOut, Sparkles, Scale, Coffee, Utensils, Play, Power, Flame, Cloud, Users } from 'lucide-react';
+import { Bell, ShieldCheck, Sun, Moon, LogOut, Sparkles, Scale, Coffee, Utensils, Play, Power, Flame, Cloud, Users, Rocket } from 'lucide-react';
 import { AnalogClock } from './AnalogClock';
 
 export const Navbar: React.FC<{ 
   onOpenRoleModal: () => void; 
   onOpenFirebaseModal?: () => void;
   onOpenGuestLeads?: () => void;
-}> = ({ onOpenRoleModal, onOpenFirebaseModal, onOpenGuestLeads }) => {
+  onOpenOnlineUpdate?: () => void;
+}> = ({ onOpenRoleModal, onOpenFirebaseModal, onOpenGuestLeads, onOpenOnlineUpdate }) => {
   const { currentUser, currentRole, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { triggerMorningAlarm } = useNotification();
@@ -143,6 +144,18 @@ export const Navbar: React.FC<{
         {/* Right Action Icons & User Status */}
         <div className="flex items-center gap-2 md:gap-3">
           
+          {/* 1-Click Update Online Button */}
+          {onOpenOnlineUpdate && (
+            <button
+              onClick={onOpenOnlineUpdate}
+              title="1-Click Publish & Update App Changes Online"
+              className="px-2.5 py-2 rounded-xl bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500 hover:text-slate-950 transition-all hover:scale-105 shadow-sm flex items-center gap-1.5 text-xs font-black"
+            >
+              <Rocket size={16} className="text-emerald-500 group-hover:text-slate-950" />
+              <span className="hidden md:inline">Update Online</span>
+            </button>
+          )}
+
           {/* Admin Guest Leads Button */}
           {currentRole === 'ADMIN' && onOpenGuestLeads && (
             <button

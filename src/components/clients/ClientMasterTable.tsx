@@ -22,7 +22,8 @@ import { VoiceSearchBar } from '../common/VoiceSearchBar';
 
 export const ClientMasterTable: React.FC = () => {
   const { clients, tasks, addClient, deleteClient, settings } = useTasks();
-  const { currentRole } = useAuth();
+  const { currentRole, currentUser } = useAuth();
+  const canEditClients = currentRole === 'ADMIN' || (currentRole === 'GUEST' && !currentUser?.trialInfo?.isExpired);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -96,7 +97,7 @@ export const ClientMasterTable: React.FC = () => {
           </p>
         </div>
 
-        {currentRole === 'ADMIN' && (
+        {canEditClients && (
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setSelectedClientForEdit('NEW')}
@@ -271,13 +272,15 @@ export const ClientMasterTable: React.FC = () => {
                   {/* Actions */}
                   <td className="p-3.5 text-right">
                     <div className="flex items-center justify-end gap-1.5">
-                      <button
-                        onClick={() => setSelectedClientForEdit(client)}
-                        title="Edit Client Master Details"
-                        className="p-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-900 dark:text-amber-300 hover:text-slate-950 font-bold transition-all border border-amber-500/30 flex items-center gap-1 text-[11px] px-2"
-                      >
-                        <Edit3 size={13} /> Edit
-                      </button>
+                      {canEditClients && (
+                        <button
+                          onClick={() => setSelectedClientForEdit(client)}
+                          title="Edit Client Master Details"
+                          className="p-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-900 dark:text-amber-300 hover:text-slate-950 font-bold transition-all border border-amber-500/30 flex items-center gap-1 text-[11px] px-2"
+                        >
+                          <Edit3 size={13} /> Edit
+                        </button>
+                      )}
 
                       <button
                         onClick={() => handleDownloadPDF(client)}
@@ -287,7 +290,7 @@ export const ClientMasterTable: React.FC = () => {
                         <FileText size={14} />
                       </button>
 
-                      {currentRole === 'ADMIN' && (
+                      {canEditClients && (
                         <button
                           onClick={() => handleDelete(client.id, client.tradeName)}
                           title="Delete Client"

@@ -19,7 +19,7 @@ interface Props {
 
 export const GuestOnboardingModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const { currentUser, updateGuestDemoSetup } = useAuth();
-  const { resetToBlankForGuestDemo } = useTasks();
+  const { resetToBlankForGuestDemo, loadSampleForGuestDemo } = useTasks();
 
   const [firmName, setFirmName] = useState(currentUser?.trialInfo?.firmName || '');
   const [city, setCity] = useState(currentUser?.trialInfo?.city || '');
@@ -38,6 +38,8 @@ export const GuestOnboardingModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
     if (demoMode === 'BLANK' && resetToBlankForGuestDemo) {
       resetToBlankForGuestDemo();
+    } else if (demoMode === 'SAMPLE' && loadSampleForGuestDemo) {
+      loadSampleForGuestDemo();
     }
 
     setIsSubmitting(false);

@@ -516,7 +516,7 @@ export const DocumentVault: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Add New Folder / Sub-Folder Button */}
-          {currentRole !== 'GUEST' && (
+          {(currentRole !== 'GUEST' || !currentUser?.trialInfo?.isExpired) && (
             <button
               onClick={() => handleOpenCreateFolderModal(currentFolderId)}
               className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-amber-500 text-slate-800 dark:text-slate-200 hover:text-amber-600 font-bold text-xs shadow-sm transition-all active:scale-95"
@@ -527,7 +527,7 @@ export const DocumentVault: React.FC = () => {
           )}
 
           {/* Upload Document Button */}
-          {currentRole !== 'GUEST' && (
+          {(currentRole !== 'GUEST' || !currentUser?.trialInfo?.isExpired) && (
             <button
               onClick={() => {
                 if (currentFolderId) setUploadFolderId(currentFolderId);
@@ -904,7 +904,7 @@ export const DocumentVault: React.FC = () => {
             </button>
           )}
 
-          {currentRole !== 'GUEST' && (
+          {(currentRole !== 'GUEST' || !currentUser?.trialInfo?.isExpired) && (
             <button
               onClick={() => handleOpenCreateFolderModal(currentFolderId)}
               className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 text-[11px] font-bold border border-amber-500/30 flex items-center gap-1 transition-all"
@@ -944,7 +944,7 @@ export const DocumentVault: React.FC = () => {
 
                     <div className="flex items-center gap-1">
                       {/* Rename / Edit Folder Button */}
-                      {currentRole !== 'GUEST' && (
+                      {(currentRole !== 'GUEST' || !currentUser?.trialInfo?.isExpired) && (
                         <button
                           onClick={(e) => handleOpenEditFolderModal(folder, e)}
                           title="Rename folder"

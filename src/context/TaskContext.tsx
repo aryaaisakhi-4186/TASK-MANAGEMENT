@@ -5,6 +5,8 @@ import { FirebaseService } from '../services/firebaseService';
 import { AudioService } from '../services/audioService';
 import { GoogleDriveService } from '../services/googleDriveService';
 import { detectEntityCategoryFromPANAndGSTIN } from '../utils/masterImportExport';
+import { useAuth } from './AuthContext';
+import { SEED_CLIENTS, SEED_TASKS, SEED_EXTRA_WORK, SEED_DOCUMENTS } from '../data/seedData';
 
 interface TaskContextType {
   clients: Client[];
@@ -67,11 +69,13 @@ interface TaskContextType {
   resetAllData: () => void;
   fullAppReset: () => void;
   resetToBlankForGuestDemo: () => void;
+  loadSampleForGuestDemo: () => void;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { currentUser } = useAuth();
   const [clients, setClients] = useState<Client[]>(() => StorageService.getClients());
   const [tasks, setTasks] = useState<TaskItem[]>(() => StorageService.getTasks());
   const [team, setTeam] = useState<UserProfile[]>(() => StorageService.getTeam());
@@ -81,6 +85,25 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(() => StorageService.getAttendance());
   const [clientReminders, setClientReminders] = useState<ClientReminder[]>(() => StorageService.getClientReminders());
   const [settings, setSettings] = useState<SystemSettings>(() => StorageService.getSettings());
+
+  // Reload isolated workspace whenever user session changes (Admin vs Guest Mobile Demo)
+  useEffect(() => {
+    setClients(StorageService.getClients());
+    setTasks(StorageService.getTasks());
+    setExtraWork(StorageService.getExtraWork());
+    setDocuments(StorageService.getDocuments());
+  }, [currentUser?.id, currentUser?.phone, currentUser?.role]);
+
+  // Guard for 15-Day Guest Trial Expiry (Read/View allowed, Write blocked after 15 days)
+  const checkGuestWriteAllowed = (): boolean => {
+    if (currentUser?.role === 'GUEST' && currentUser?.trialInfo?.isExpired) {
+      alert(
+        '🔒 15-Days Free Demo Expired (Read-Only Mode)!\n\nAapka 15 din ka free demo poora ho chuka hai. Aap apne purane tasks aur records Read / View kar sakte hain.\n\nAage kaam jari rakhne ke liye Administration (+91-8982147763 / arya.taskmanagement@gmail.com) se sampark karein.'
+      );
+      return false;
+    }
+    return true;
+  };
 
   // On Startup: Pull Cloud Settings from Firebase if configured
   useEffect(() => {
@@ -158,6 +181,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Clients
   const addClient = (clientData: Omit<Client, 'id' | 'createdAt'>): Client => {
+    if (!checkGuestWriteAllowed()) {
+      return clients[0] || ({ ...clientData, id: 'blocked', createdAt: '' } as Client);
+    }
     // 1. Check if client already exists by PAN, GSTIN, or Trade Name (NO DUPLICATES)
     const normPan = clientData.pan?.trim().toUpperCase();
     const normGst = clientData.gstin?.trim().toUpperCase();
@@ -293,6 +319,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateClient = (id: string, updates: Partial<Client>) => {
+    if (!checkGuestWriteAllowed()) return;
     setClients(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
     StorageService.addAuditLog({
       actorId: 'admin',
@@ -306,6 +333,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteClient = (id: string) => {
+    if (!checkGuestWriteAllowed()) return;
     const target = clients.find(c => c.id === id);
     setClients(prev => prev.filter(c => c.id !== id));
     setTasks(prev => prev.filter(t => t.clientId !== id));
@@ -322,6 +350,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Tasks
   const addTask = (taskData: Omit<TaskItem, 'id'>): TaskItem => {
+    if (!checkGuestWriteAllowed()) {
+      return tasks[0] || ({ ...taskData, id: 'blocked' } as TaskItem);
+    }
     const newTask: TaskItem = {
       ...taskData,
       id: 'tsk-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
@@ -340,6 +371,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateTaskStatus = (taskId: string, status: TaskStatus, completedBy = 'User') => {
+    if (!checkGuestWriteAllowed()) return;
     setTasks(prev => prev.map(t => {
       if (t.id === taskId) {
         const isDone = status === 'DONE';
@@ -365,14 +397,17 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateTask = (id: string, updates: Partial<TaskItem>) => {
+    if (!checkGuestWriteAllowed()) return;
     setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
   };
 
   const deleteTask = (id: string) => {
+    if (!checkGuestWriteAllowed()) return;
     setTasks(prev => prev.filter(t => t.id !== id));
   };
 
   const bulkUpdateTasks = (taskIds: string[], status: TaskStatus) => {
+    if (!checkGuestWriteAllowed()) return;
     setTasks(prev => prev.map(t => taskIds.includes(t.id) ? { ...t, status, completedAt: status === 'DONE' ? new Date().toISOString() : undefined } : t));
   };
 
@@ -811,6 +846,21 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTasks([]);
     setExtraWork([]);
     setDocuments([]);
+    StorageService.saveClients([]);
+    StorageService.saveTasks([]);
+    StorageService.saveExtraWork([]);
+    StorageService.saveDocuments([]);
+  };
+
+  const loadSampleForGuestDemo = () => {
+    setClients(SEED_CLIENTS);
+    setTasks(SEED_TASKS);
+    setExtraWork(SEED_EXTRA_WORK);
+    setDocuments(SEED_DOCUMENTS);
+    StorageService.saveClients(SEED_CLIENTS);
+    StorageService.saveTasks(SEED_TASKS);
+    StorageService.saveExtraWork(SEED_EXTRA_WORK);
+    StorageService.saveDocuments(SEED_DOCUMENTS);
   };
 
   return (
@@ -856,7 +906,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       endLunchBreak,
       resetAllData,
       fullAppReset,
-      resetToBlankForGuestDemo
+      resetToBlankForGuestDemo,
+      loadSampleForGuestDemo
     }}>
       {children}
     </TaskContext.Provider>

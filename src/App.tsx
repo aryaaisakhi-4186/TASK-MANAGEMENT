@@ -26,6 +26,7 @@ import { HomePageLogin } from './components/auth/HomePageLogin';
 import { TrialBanner } from './components/common/TrialBanner';
 import { GuestOnboardingModal } from './components/auth/GuestOnboardingModal';
 import { GuestLeadsModal } from './components/settings/GuestLeadsModal';
+import { OnlineUpdateModal } from './components/common/OnlineUpdateModal';
 import { TaskItem } from './types';
 import { Smartphone } from 'lucide-react';
 
@@ -42,6 +43,7 @@ const MainPortal: React.FC = () => {
   const [isFirebaseModalOpen, setIsFirebaseModalOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
   const [isGuestLeadsOpen, setIsGuestLeadsOpen] = useState(false);
+  const [isOnlineUpdateOpen, setIsOnlineUpdateOpen] = useState(false);
   const [isGuestOnboardingOpen, setIsGuestOnboardingOpen] = useState(() => {
     return currentRole === 'GUEST' && !currentUser?.trialInfo?.isDemoSetup;
   });
@@ -69,6 +71,7 @@ const MainPortal: React.FC = () => {
         onOpenRoleModal={() => setIsRoleModalOpen(true)} 
         onOpenFirebaseModal={() => setIsFirebaseModalOpen(true)}
         onOpenGuestLeads={() => setIsGuestLeadsOpen(true)}
+        onOpenOnlineUpdate={() => setIsOnlineUpdateOpen(true)}
       />
 
       {/* Guest 15-Day Free Demo Lifecycle Banner */}
@@ -160,6 +163,11 @@ const MainPortal: React.FC = () => {
       <GuestLeadsModal
         isOpen={isGuestLeadsOpen}
         onClose={() => setIsGuestLeadsOpen(false)}
+      />
+
+      <OnlineUpdateModal
+        isOpen={isOnlineUpdateOpen}
+        onClose={() => setIsOnlineUpdateOpen(false)}
       />
 
       {selectedTask && (

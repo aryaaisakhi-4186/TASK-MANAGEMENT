@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { FirebaseService } from '../../services/firebaseService';
 import { StorageService } from '../../services/storage';
-import { Settings, Flame, Shield, Bell, Save, Check, Mail, Cloud, Eye, EyeOff, RefreshCw, Trash2, AlertTriangle, AlertCircle, Users } from 'lucide-react';
+import { Settings, Flame, Shield, Bell, Save, Check, Mail, Cloud, Eye, EyeOff, RefreshCw, Trash2, AlertTriangle, AlertCircle, Users, Rocket } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { GuestLeadsModal } from './GuestLeadsModal';
+import { OnlineUpdateModal } from '../common/OnlineUpdateModal';
 
 export const FirmSettingsModal: React.FC = () => {
   const { settings, updateSettings, resetAllData, fullAppReset } = useTasks();
   const [isGuestLeadsOpen, setIsGuestLeadsOpen] = useState(false);
+  const [isOnlineUpdateOpen, setIsOnlineUpdateOpen] = useState(false);
 
   const [firmName, setFirmName] = useState(settings.firmName || '');
   const [firmEmail, setFirmEmail] = useState(settings.firmEmail || '');
@@ -216,6 +218,32 @@ export const FirmSettingsModal: React.FC = () => {
         </form>
       </GlassCard>
 
+      {/* 1-Click Online App Updater Card */}
+      <GlassCard className="p-6 max-w-2xl mx-auto border-emerald-500/30" variant="elevated">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold shrink-0">
+              <Rocket size={20} />
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm">🚀 1-Click Online App Update & Publish</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Publish app changes directly to GitHub Pages & sync cloud data without running terminal commands.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsOnlineUpdateOpen(true)}
+            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 shrink-0"
+          >
+            <Rocket size={14} />
+            <span>Update App Online</span>
+          </button>
+        </div>
+      </GlassCard>
+
       {/* Guest Demo Leads & Trial Tracking Card */}
       <GlassCard className="p-6 max-w-2xl mx-auto" variant="elevated">
         <div className="flex items-center justify-between">
@@ -245,6 +273,11 @@ export const FirmSettingsModal: React.FC = () => {
       <GuestLeadsModal 
         isOpen={isGuestLeadsOpen}
         onClose={() => setIsGuestLeadsOpen(false)}
+      />
+
+      <OnlineUpdateModal
+        isOpen={isOnlineUpdateOpen}
+        onClose={() => setIsOnlineUpdateOpen(false)}
       />
 
       {/* Danger Zone: App Reset & Full App Reset */}
