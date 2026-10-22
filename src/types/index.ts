@@ -62,12 +62,13 @@ export interface ClientRepoDoc {
   uploadedAt: string;
 }
 
-export type ComplianceApplicabilityKey = 'AUDIT' | 'GST' | 'TDS' | 'VAT' | 'E_INVOICE' | 'RCM' | 'RULE_86B';
+export type ComplianceApplicabilityKey = 'AUDIT' | 'GST' | 'TDS' | 'ITR' | 'VAT' | 'E_INVOICE' | 'RCM' | 'RULE_86B';
 
 export interface ClientComplianceApplicability {
   AUDIT: boolean;
   GST: boolean;
   TDS: boolean;
+  ITR: boolean;
   VAT: boolean;
   E_INVOICE: boolean;
   RCM: boolean;

@@ -260,9 +260,9 @@ export const ClientMasterTable: React.FC = () => {
                     </div>
                   </td>
 
-                  {/* 7 Applicable Tax Compliances Mini ON/OFF Switches (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
-                  <td className="p-3.5 min-w-[205px]">
-                    <div className="flex flex-wrap gap-1">
+                  {/* 8 Compliances in Up-Down Vertical Columns (4 per column: AUDIT, GST, TDS, ITR | VAT, E-INVOICE, RCM, 86B) */}
+                  <td className="p-3.5 min-w-[185px]">
+                    <div className="grid grid-rows-4 grid-flow-col gap-1 w-fit">
                       {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                         const isApp = appMap[item.key];
                         return (
@@ -271,13 +271,13 @@ export const ClientMasterTable: React.FC = () => {
                             type="button"
                             onClick={() => handleToggleClientCompliance(client, item.key)}
                             title={item.fullTitle}
-                            className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 hover:border-slate-400 transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                            className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 hover:border-slate-400 transition-all flex items-center justify-between gap-2 cursor-pointer min-w-[82px]"
                           >
                             <span className="font-mono font-bold text-[9px] uppercase text-slate-800 dark:text-slate-200">
                               {item.label}
                             </span>
                             <span
-                              className={`w-6 h-3.5 rounded-full p-0.5 flex items-center transition-colors duration-200 ${
+                              className={`w-6 h-3.5 rounded-full p-0.5 flex items-center shrink-0 transition-colors duration-200 ${
                                 isApp ? 'bg-emerald-500 justify-end' : 'bg-red-500 justify-start'
                               }`}
                             >
