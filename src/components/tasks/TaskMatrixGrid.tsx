@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { useAuth } from '../../context/AuthContext';
-import { TaskItem, TaskStatus, Client } from '../../types';
+import { TaskItem, TaskStatus, Client, ComplianceApplicabilityKey } from '../../types';
 import { GoogleDriveService } from '../../services/googleDriveService';
+import { COMPLIANCE_APPLICABILITY_ITEMS, resolveClientApplicability } from '../../utils/complianceApplicability';
 import { 
   CalendarCheck2, 
   Copy, 
@@ -44,6 +45,7 @@ export const TaskMatrixGrid: React.FC<{
   const { 
     tasks, 
     clients, 
+    updateClient,
     addTask, 
     updateTaskStatus, 
     bulkUpdateTasks, 
@@ -632,6 +634,41 @@ export const TaskMatrixGrid: React.FC<{
                         <p className="text-[11px] text-slate-500 font-medium">
                           {client.legalName} • <span className="font-semibold text-slate-700 dark:text-slate-300">{client.category}</span> • Assigned: <span className="text-amber-700 dark:text-amber-400 font-bold">{client.assignedTeamName || 'General Staff'}</span>
                         </p>
+
+                        {/* 7 Applicable Tax Compliances Buttons (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
+                        <div className="flex flex-wrap items-center gap-1.5 mt-2" onClick={(e) => e.stopPropagation()}>
+                          {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
+                            const appMap = resolveClientApplicability(client);
+                            const isApp = appMap[item.key];
+                            return (
+                              <button
+                                key={item.key}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (client.id && !client.id.startsWith('cli-temp')) {
+                                    updateClient(client.id, {
+                                      complianceApplicability: {
+                                        ...appMap,
+                                        [item.key]: !isApp,
+                                      },
+                                    });
+                                  }
+                                }}
+                                title={`${item.fullTitle}: ${isApp ? 'APPLICABLE (ACTIVE)' : 'NOT APPLICABLE (INACTIVE)'} — Click to toggle`}
+                                className={`px-2 py-0.5 rounded-md font-mono font-black text-[9px] uppercase tracking-wider transition-all active:scale-95 flex items-center gap-1 shadow-sm border ${
+                                  isApp
+                                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500'
+                                    : 'bg-red-600 hover:bg-red-500 text-white border-red-500'
+                                }`}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                                <span>{item.label}</span>
+                                <span className="text-[8px] opacity-90">({isApp ? 'ACTIVE' : 'N/A'})</span>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
 

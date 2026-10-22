@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { useAuth } from '../../context/AuthContext';
-import { Client } from '../../types';
+import { Client, ComplianceApplicabilityKey } from '../../types';
 import { ExcelService } from '../../services/excelService';
 import { PDFService } from '../../services/pdfService';
+import { COMPLIANCE_APPLICABILITY_ITEMS, resolveClientApplicability } from '../../utils/complianceApplicability';
 import { 
   Building, 
   Plus, 
@@ -22,9 +23,18 @@ import { ClientImportModal } from './ClientImportModal';
 import { VoiceSearchBar } from '../common/VoiceSearchBar';
 
 export const ClientMasterTable: React.FC = () => {
-  const { clients, tasks, addClient, deleteClient, settings } = useTasks();
+  const { clients, tasks, addClient, updateClient, deleteClient, settings } = useTasks();
   const { currentRole, currentUser } = useAuth();
   const canEditClients = currentRole === 'ADMIN' || (currentRole === 'GUEST' && !currentUser?.trialInfo?.isExpired);
+
+  const handleToggleClientCompliance = (client: Client, key: ComplianceApplicabilityKey) => {
+    const currentApp = resolveClientApplicability(client);
+    const updatedApp = {
+      ...currentApp,
+      [key]: !currentApp[key],
+    };
+    updateClient(client.id, { complianceApplicability: updatedApp });
+  };
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -174,6 +184,7 @@ export const ClientMasterTable: React.FC = () => {
               <tr className="bg-slate-100/90 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider">
                 <th className="p-3.5">Client & Legal Name</th>
                 <th className="p-3.5">Statutory IDs (PAN / GST / TAN / VAT)</th>
+                <th className="p-3.5">Applicable Compliances (Green = Active / Red = N/A)</th>
                 <th className="p-3.5">Entity Status / Type</th>
                 <th className="p-3.5">Contact Person</th>
                 <th className="p-3.5">Client Employee (Sub-Login)</th>
@@ -183,7 +194,9 @@ export const ClientMasterTable: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-              {filteredClients.map(client => (
+              {filteredClients.map(client => {
+                const appMap = resolveClientApplicability(client);
+                return (
                 <tr key={client.id} className="hover:bg-amber-50/40 dark:hover:bg-slate-800/30 transition-colors group">
                   
                   {/* Client & Legal Name */}
@@ -244,6 +257,32 @@ export const ClientMasterTable: React.FC = () => {
                           </span>
                         )}
                       </div>
+                    </div>
+                  </td>
+
+                  {/* 7 Applicable Tax Compliances Buttons (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
+                  <td className="p-3.5 min-w-[230px]">
+                    <div className="flex flex-wrap gap-1.5">
+                      {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
+                        const isApp = appMap[item.key];
+                        return (
+                          <button
+                            key={item.key}
+                            type="button"
+                            onClick={() => handleToggleClientCompliance(client, item.key)}
+                            title={`${item.fullTitle}: ${isApp ? 'APPLICABLE (ACTIVE)' : 'NOT APPLICABLE (INACTIVE)'} — Click to toggle`}
+                            className={`px-2 py-1 rounded-lg font-mono font-black text-[9px] uppercase tracking-wider transition-all active:scale-95 flex items-center gap-1 shadow-sm border ${
+                              isApp
+                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-emerald-600/20'
+                                : 'bg-red-600 hover:bg-red-500 text-white border-red-500 shadow-red-600/20'
+                            }`}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                            <span>{item.label}</span>
+                            <span className="text-[8px] opacity-90">({isApp ? 'ACTIVE' : 'N/A'})</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </td>
 
@@ -332,7 +371,8 @@ export const ClientMasterTable: React.FC = () => {
                   </td>
 
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

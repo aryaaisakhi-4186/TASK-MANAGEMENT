@@ -62,6 +62,18 @@ export interface ClientRepoDoc {
   uploadedAt: string;
 }
 
+export type ComplianceApplicabilityKey = 'AUDIT' | 'GST' | 'TDS' | 'VAT' | 'E_INVOICE' | 'RCM' | 'RULE_86B';
+
+export interface ClientComplianceApplicability {
+  AUDIT: boolean;
+  GST: boolean;
+  TDS: boolean;
+  VAT: boolean;
+  E_INVOICE: boolean;
+  RCM: boolean;
+  RULE_86B: boolean;
+}
+
 export interface Client {
   id: string;
   tradeName: string;
@@ -87,6 +99,7 @@ export interface Client {
   googleDriveFolderUrl?: string;  // Direct URL to client's Drive folder
   customFields?: CustomField[];
   repositoryDocs?: ClientRepoDoc[]; // Ultra-light KYC & Statutory Document Repository
+  complianceApplicability?: ClientComplianceApplicability; // AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B (Applicable / Not Applicable)
   createdAt: string;
 }
 

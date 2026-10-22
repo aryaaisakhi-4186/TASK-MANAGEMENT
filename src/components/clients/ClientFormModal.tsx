@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Client, ClientCategory, CustomField, ClientRepoDoc, ClientRepoDocType } from '../../types';
+import { Client, ClientCategory, CustomField, ClientRepoDoc, ClientRepoDocType, ClientComplianceApplicability, ComplianceApplicabilityKey } from '../../types';
 import { useTasks } from '../../context/TaskContext';
 import { 
   X, 
@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { detectEntityCategoryFromPANAndGSTIN } from '../../utils/masterImportExport';
+import { COMPLIANCE_APPLICABILITY_ITEMS, resolveClientApplicability } from '../../utils/complianceApplicability';
 
 interface Props {
   isOpen: boolean;
@@ -122,6 +123,9 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
   const [googleDriveFolderUrl, setGoogleDriveFolderUrl] = useState('');
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [repositoryDocs, setRepositoryDocs] = useState<ClientRepoDoc[]>([]);
+  const [complianceApplicability, setComplianceApplicability] = useState<ClientComplianceApplicability>(() =>
+    resolveClientApplicability(client)
+  );
 
   // Repository Upload Form State
   const [selectedDocType, setSelectedDocType] = useState<ClientRepoDocType>('GST_REG');
@@ -160,6 +164,7 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
       setGoogleDriveFolderUrl(client.googleDriveFolderUrl || '');
       setCustomFields(client.customFields && Array.isArray(client.customFields) ? [...client.customFields] : []);
       setRepositoryDocs(client.repositoryDocs && Array.isArray(client.repositoryDocs) ? [...client.repositoryDocs] : []);
+      setComplianceApplicability(resolveClientApplicability(client));
     } else {
       setTradeName('');
       setLegalName('');
@@ -183,8 +188,16 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
       setGoogleDriveFolderUrl('');
       setCustomFields([]);
       setRepositoryDocs([]);
+      setComplianceApplicability(resolveClientApplicability(null));
     }
   }, [client, team, isOpen]);
+
+  const handleToggleApplicability = (key: ComplianceApplicabilityKey, forcedVal?: boolean) => {
+    setComplianceApplicability(prev => ({
+      ...prev,
+      [key]: forcedVal !== undefined ? forcedVal : !prev[key]
+    }));
+  };
 
   // Auto-populate document number when switching docType
   useEffect(() => {
@@ -414,6 +427,7 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
       googleDriveFolderUrl: googleDriveFolderUrl.trim(),
       customFields: validCustomFields,
       repositoryDocs,
+      complianceApplicability,
     };
 
     if (isEditing && client) {
@@ -689,6 +703,63 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
                   <p className="text-[10px] text-slate-400 mt-1">
                     Vault uploads & camera scans for this client will be automatically routed to this Google Drive folder.
                   </p>
+                </div>
+
+                {/* Applicable Tax Compliances (AUDIT, GST, TDS, VAT, E-INVOICE, RCM, 86B) */}
+                <div className="pt-3 border-t border-slate-200 dark:border-slate-800/80 space-y-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <label className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <ShieldCheck size={14} className="text-emerald-500" />
+                      <span>Applicable Tax Compliances (Click Button or Select Applicable / Not Applicable)</span>
+                    </label>
+                    <div className="flex items-center gap-2 text-[10px] font-bold">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-600 text-white">● ACTIVE / APPLICABLE</span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-600 text-white">● INACTIVE / NOT APPLICABLE</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
+                    {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
+                      const isApp = complianceApplicability[item.key];
+                      return (
+                        <div
+                          key={item.key}
+                          className={`p-2 rounded-xl border transition-all flex flex-col gap-1.5 ${
+                            isApp
+                              ? 'bg-emerald-500/10 border-emerald-500/50 dark:bg-emerald-950/30'
+                              : 'bg-red-500/10 border-red-500/50 dark:bg-red-950/30'
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleToggleApplicability(item.key)}
+                            title={`${item.fullTitle} — Click to toggle ACTIVE (Green) / INACTIVE (Red)`}
+                            className={`w-full py-1.5 px-2 rounded-lg font-black text-[10px] uppercase tracking-wider shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1 ${
+                              isApp
+                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
+                                : 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/20'
+                            }`}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                            <span>{item.label}</span>
+                          </button>
+
+                          <select
+                            value={isApp ? 'APPLICABLE' : 'NOT_APPLICABLE'}
+                            onChange={(e) => handleToggleApplicability(item.key, e.target.value === 'APPLICABLE')}
+                            className={`w-full px-1 py-1 rounded-md text-[9px] font-black uppercase border focus:outline-none cursor-pointer ${
+                              isApp
+                                ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-400/50'
+                                : 'bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-400/50'
+                            }`}
+                          >
+                            <option value="APPLICABLE">🟢 APPLICABLE</option>
+                            <option value="NOT_APPLICABLE">🔴 NOT APPLICABLE</option>
+                          </select>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
