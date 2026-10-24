@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useTasks } from '../../context/TaskContext';
+import { StorageService } from '../../services/storage';
 import { 
   Scale, 
   ShieldCheck, 
