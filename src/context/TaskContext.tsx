@@ -143,8 +143,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           StorageService.saveGuestLeads(onlineData.guestLeads);
         }
         if (onlineData.settings) {
-          setSettings(onlineData.settings);
-          StorageService.saveSettings(onlineData.settings);
+          const cleanSettings = { ...onlineData.settings };
+          if (!cleanSettings.firmName || cleanSettings.firmName.includes('VAANI') || cleanSettings.firmName.includes('Vaani')) {
+            cleanSettings.firmName = 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+          }
+          setSettings(cleanSettings);
+          StorageService.saveSettings(cleanSettings);
         }
       }
 
@@ -157,7 +161,13 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (Array.isArray(liveSnap.extraWork)) setExtraWork(liveSnap.extraWork);
           if (Array.isArray(liveSnap.documents)) setDocuments(liveSnap.documents);
           if (Array.isArray(liveSnap.attendanceRecords)) setAttendanceRecords(liveSnap.attendanceRecords);
-          if (liveSnap.settings) setSettings(liveSnap.settings);
+          if (liveSnap.settings) {
+            const cleanSettings = { ...liveSnap.settings };
+            if (!cleanSettings.firmName || cleanSettings.firmName.includes('VAANI') || cleanSettings.firmName.includes('Vaani')) {
+              cleanSettings.firmName = 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+            }
+            setSettings(cleanSettings);
+          }
         })
       );
 

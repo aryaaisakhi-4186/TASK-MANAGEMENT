@@ -16,7 +16,7 @@ export const ShareModal: React.FC<Props> = ({ isOpen, document, onClose }) => {
   if (!isOpen || !document) return null;
 
   const shareText = encodeURIComponent(
-    `*TASK-VAANI Compliance Document Share*\n\n📄 Document: ${document.title}\n🏢 Client: ${document.clientName}\n🏷️ Category: ${document.category}\n📅 Date: ${document.uploadedAt}\n\nProtected & Verified by M/S VAANI & ASSOCIATES, CHARTERED ACCOUNTANTS.`
+    `*TASK-VAANI Compliance Document Share*\n\n📄 Document: ${document.title}\n🏢 Client: ${document.clientName}\n🏷️ Category: ${document.category}\n📅 Date: ${document.uploadedAt}\n\nProtected & Verified by M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION.`
   );
 
   const whatsappUrl = `https://wa.me/?text=${shareText}`;

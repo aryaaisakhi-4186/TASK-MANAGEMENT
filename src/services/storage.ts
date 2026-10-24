@@ -126,11 +126,45 @@ export const StorageService = {
   saveClientReminders: (reminders: any[]) => safeSet(KEYS.CLIENT_REMINDERS, reminders),
 
   // Settings
-  getSettings: (): SystemSettings => safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS),
+  getSettings: (): SystemSettings => {
+    const settings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
+    if (!settings.firmName || settings.firmName.includes('VAANI') || settings.firmName.includes('Vaani')) {
+      settings.firmName = 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+      if (!settings.firmEmail || settings.firmEmail.includes('vaaniassociates')) {
+        settings.firmEmail = 'arya.taskmanagement@gmail.com';
+      }
+      if (!settings.cloudStorageEmail || settings.cloudStorageEmail.includes('vaaniassociates')) {
+        settings.cloudStorageEmail = 'arya.taskmanagement@gmail.com';
+      }
+      safeSet(KEYS.SETTINGS, settings);
+    }
+    return settings;
+  },
   saveSettings: (settings: SystemSettings) => safeSet(KEYS.SETTINGS, settings),
 
   // Auth Session
-  getAuthSession: (): UserProfile | null => safeGet<UserProfile | null>(KEYS.AUTH_SESSION, null),
+  getAuthSession: (): UserProfile | null => {
+    const session = safeGet<UserProfile | null>(KEYS.AUTH_SESSION, null);
+    if (session && session.role === 'ADMIN') {
+      let changed = false;
+      if (!session.name || session.name.includes('VAANI') || session.name.includes('Vaani') || session.name === 'Managing Partner (Admin)') {
+        session.name = 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION (Admin)';
+        changed = true;
+      }
+      if (!session.email || session.email.includes('vaaniassociates')) {
+        session.email = 'arya.taskmanagement@gmail.com';
+        changed = true;
+      }
+      if (!session.phone) {
+        session.phone = '+91-8982147763';
+        changed = true;
+      }
+      if (changed) {
+        safeSet(KEYS.AUTH_SESSION, session);
+      }
+    }
+    return session;
+  },
   saveAuthSession: (user: UserProfile | null) => safeSet(KEYS.AUTH_SESSION, user),
 
   // Guest Leads & 15-Day Trial Records

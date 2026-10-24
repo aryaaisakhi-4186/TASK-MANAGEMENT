@@ -11,6 +11,7 @@ interface AuthContextType {
   loginAsGuest: () => void;
   loginAsGuestWithMobile: (mobile: string, password: string, name: string, firmName?: string, city?: string, email?: string) => { success: boolean; error?: string };
   updateGuestDemoSetup: (firmName: string, city: string, email?: string) => void;
+  refreshAdminSession: () => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -24,10 +25,11 @@ const GUEST_USER: UserProfile = {
 
 const ADMIN_USER: UserProfile = {
   id: 'admin',
-  name: 'Managing Partner (Admin)',
+  name: 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION (Admin)',
   role: 'ADMIN',
   designation: 'Principal Partner',
-  email: 'admin@vaaniassociates.in',
+  email: 'arya.taskmanagement@gmail.com',
+  phone: '+91-8982147763',
   avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=250',
 };
 
@@ -39,6 +41,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const currentRole: UserRole = currentUser ? currentUser.role : 'GUEST';
+
+  const refreshAdminSession = () => {
+    const settings = StorageService.getSettings();
+    setCurrentUser(prev => {
+      if (prev && prev.role === 'ADMIN') {
+        const updated: UserProfile = {
+          ...prev,
+          name: settings.firmName ? `${settings.firmName} (Admin)` : 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION (Admin)',
+          email: settings.firmEmail || settings.cloudStorageEmail || 'arya.taskmanagement@gmail.com',
+          phone: settings.firmPhone || '+91-8982147763'
+        };
+        StorageService.saveAuthSession(updated);
+        return updated;
+      }
+      return prev;
+    });
+  };
+
+  useEffect(() => {
+    refreshAdminSession();
+  }, []);
 
   const loginAsAdmin = (password: string): boolean => {
     const settings = StorageService.getSettings();
@@ -262,6 +285,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loginAsGuest,
       loginAsGuestWithMobile,
       updateGuestDemoSetup,
+      refreshAdminSession,
       logout,
       isAuthenticated: !!currentUser
     }}>

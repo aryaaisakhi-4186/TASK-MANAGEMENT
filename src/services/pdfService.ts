@@ -8,7 +8,7 @@ export const PDFService = {
   generateAndEmailReport: async (
     client: Client,
     tasks: TaskItem[],
-    firmName = 'M/S VAANI & ASSOCIATES, CHARTERED ACCOUNTANTS',
+    firmName = 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION',
     targetEmail = 'arya.taskmanagement@gmail.com'
   ): Promise<{ success: boolean; message: string }> => {
     const doc = new jsPDF();
@@ -121,7 +121,7 @@ export const PDFService = {
   },
 
   // Fallback direct download if user explicitly wants local copy
-  downloadLocalPDF: (client: Client, tasks: TaskItem[], firmName = 'M/S VAANI & ASSOCIATES, CHARTERED ACCOUNTANTS') => {
+  downloadLocalPDF: (client: Client, tasks: TaskItem[], firmName = 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION') => {
     const doc = new jsPDF();
     doc.setFillColor(11, 25, 44);
     doc.rect(0, 0, 210, 38, 'F');

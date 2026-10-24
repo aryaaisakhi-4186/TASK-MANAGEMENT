@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useTasks } from '../../context/TaskContext';
+import { useAuth } from '../../context/AuthContext';
 import { FirebaseService } from '../../services/firebaseService';
 import { getSavedFirebaseConfig, saveFirebaseConfig, removeFirebaseConfig, initFirebase } from '../../firebase/config';
 import { StorageService } from '../../services/storage';
+import { OnlineDataService } from '../../services/onlineDataService';
 import { Settings, Flame, Shield, Bell, Save, Check, Mail, Cloud, Eye, EyeOff, RefreshCw, Trash2, AlertTriangle, AlertCircle, Users, Rocket } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { GuestLeadsModal } from './GuestLeadsModal';
 import { OnlineUpdateModal } from '../common/OnlineUpdateModal';
 
 export const FirmSettingsModal: React.FC = () => {
-  const { settings, updateSettings, resetAllData, fullAppReset } = useTasks();
+  const { settings, updateSettings, resetAllData, fullAppReset, clients, tasks, team, extraWork, documents, attendanceRecords } = useTasks();
+  const { refreshAdminSession } = useAuth();
   const [isGuestLeadsOpen, setIsGuestLeadsOpen] = useState(false);
   const [isOnlineUpdateOpen, setIsOnlineUpdateOpen] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
-  const [firmName, setFirmName] = useState(settings.firmName || '');
-  const [firmEmail, setFirmEmail] = useState(settings.firmEmail || '');
-  const [firmPhone, setFirmPhone] = useState(settings.firmPhone || '');
+  const [firmName, setFirmName] = useState(settings.firmName || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION');
+  const [firmEmail, setFirmEmail] = useState(settings.firmEmail || 'arya.taskmanagement@gmail.com');
+  const [firmPhone, setFirmPhone] = useState(settings.firmPhone || '+91-8982147763');
   const [alarmTime, setAlarmTime] = useState(settings.morningAlarmTime || '10:30');
   const [enableSound, setEnableSound] = useState(settings.enableSoundChime ?? true);
   const [adminPassword, setAdminPassword] = useState(settings.adminPasswordHash || 'admin123');
@@ -34,9 +38,9 @@ export const FirmSettingsModal: React.FC = () => {
   const [fbStatusMsg, setFbStatusMsg] = useState<string | null>(null);
   const isFirebaseActive = FirebaseService.isConfigured();
 
-  // Sync internal form state whenever settings are updated or loaded from Cloud
+  // Sync internal form state whenever settings are updated from Cloud, but ONLY if user hasn't typed modifications
   useEffect(() => {
-    if (settings) {
+    if (settings && !isDirty) {
       if (settings.firmName) setFirmName(settings.firmName);
       if (settings.firmEmail) setFirmEmail(settings.firmEmail);
       if (settings.firmPhone) setFirmPhone(settings.firmPhone);
@@ -46,18 +50,23 @@ export const FirmSettingsModal: React.FC = () => {
       if (settings.cloudStorageEmail) setCloudStorageEmail(settings.cloudStorageEmail);
       if (typeof settings.googleDriveSyncEnabled === 'boolean') setGoogleDriveSync(settings.googleDriveSyncEnabled);
     }
-  }, [settings]);
+  }, [settings, isDirty]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanFirmName = firmName.trim() || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+    const cleanFirmEmail = firmEmail.trim() || 'arya.taskmanagement@gmail.com';
+    const cleanFirmPhone = firmPhone.trim() || '+91-8982147763';
+    const cleanCloudEmail = cloudStorageEmail.trim() || 'arya.taskmanagement@gmail.com';
+
     const updatedPayload = {
-      firmName: firmName.trim(),
-      firmEmail: firmEmail.trim(),
-      firmPhone: firmPhone.trim(),
+      firmName: cleanFirmName,
+      firmEmail: cleanFirmEmail,
+      firmPhone: cleanFirmPhone,
       morningAlarmTime: alarmTime,
       enableSoundChime: enableSound,
       adminPasswordHash: adminPassword,
-      cloudStorageEmail: cloudStorageEmail.trim(),
+      cloudStorageEmail: cleanCloudEmail,
       googleDriveSyncEnabled: googleDriveSync,
       lastCloudSyncTimestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
     };
@@ -71,7 +80,23 @@ export const FirmSettingsModal: React.FC = () => {
       ...updatedPayload
     });
 
-    // 3. Sync to Firebase Firestore online cloud if configured
+    // 3. Immediately refresh admin session so navbar and header reflect new firm details
+    refreshAdminSession();
+    setIsDirty(false);
+
+    // 4. Immediately trigger auto sync to online DB
+    OnlineDataService.scheduleAutoOnlineSync({
+      clients,
+      tasks,
+      team,
+      extraWork,
+      documents,
+      attendanceRecords,
+      settings: { ...settings, ...updatedPayload },
+      guestLeads: StorageService.getGuestLeads()
+    });
+
+    // 5. Sync to Firebase Firestore online cloud if configured
     try {
       if (FirebaseService.isConfigured()) {
         await FirebaseService.upsertDoc('system', 'settings', updatedPayload);
@@ -119,7 +144,7 @@ export const FirmSettingsModal: React.FC = () => {
               type="email"
               required
               value={cloudStorageEmail}
-              onChange={(e) => setCloudStorageEmail(e.target.value)}
+              onChange={(e) => { setCloudStorageEmail(e.target.value); setIsDirty(true); }}
               placeholder="arya.taskmanagement@gmail.com"
               className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono font-bold focus:border-amber-500 focus:outline-none shadow-sm"
             />
@@ -133,7 +158,7 @@ export const FirmSettingsModal: React.FC = () => {
               type="checkbox"
               id="googleDriveSync"
               checked={googleDriveSync}
-              onChange={(e) => setGoogleDriveSync(e.target.checked)}
+              onChange={(e) => { setGoogleDriveSync(e.target.checked); setIsDirty(true); }}
               className="rounded border-slate-300 text-amber-500 focus:ring-amber-400"
             />
             <label htmlFor="googleDriveSync" className="text-xs text-slate-700 dark:text-slate-300 font-medium">
@@ -146,7 +171,8 @@ export const FirmSettingsModal: React.FC = () => {
             <input
               type="text"
               value={firmName}
-              onChange={(e) => setFirmName(e.target.value)}
+              onChange={(e) => { setFirmName(e.target.value); setIsDirty(true); }}
+              placeholder="M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION"
               className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs"
             />
           </div>
@@ -157,7 +183,8 @@ export const FirmSettingsModal: React.FC = () => {
               <input
                 type="email"
                 value={firmEmail}
-                onChange={(e) => setFirmEmail(e.target.value)}
+                onChange={(e) => { setFirmEmail(e.target.value); setIsDirty(true); }}
+                placeholder="arya.taskmanagement@gmail.com"
                 className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs"
               />
             </div>
@@ -166,7 +193,8 @@ export const FirmSettingsModal: React.FC = () => {
               <input
                 type="text"
                 value={firmPhone}
-                onChange={(e) => setFirmPhone(e.target.value)}
+                onChange={(e) => { setFirmPhone(e.target.value); setIsDirty(true); }}
+                placeholder="+91-8982147763"
                 className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs"
               />
             </div>

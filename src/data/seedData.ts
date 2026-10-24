@@ -2,7 +2,7 @@ import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, S
 
 export const INITIAL_SYSTEM_SETTINGS: SystemSettings = {
   adminPasswordHash: 'admin123',
-  firmName: 'M/S VAANI & ASSOCIATES, CHARTERED ACCOUNTANTS',
+  firmName: 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION',
   firmEmail: 'arya.taskmanagement@gmail.com',
   firmPhone: '+91-8982147763',
   firmAddress: 'Suite 401, Nariman Point Commercial Complex, Mumbai - 400021',
