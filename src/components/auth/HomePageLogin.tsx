@@ -70,8 +70,18 @@ export const HomePageLogin: React.FC = () => {
     const cleanNum = cleanId.replace(/[^0-9]/g, '');
     const upperId = cleanId.toUpperCase();
 
-    // 1. Check for Admin Master Login
-    if (cleanId.toLowerCase() === 'admin' || cleanSecret === 'admin123' || (cleanNum.length === 10 && cleanSecret === 'admin123')) {
+    // 1. Check for Admin Master Login (via 'admin', Admin Mobile, or Admin Email)
+    const settings = StorageService.getSettings();
+    const adminPass = settings.adminPasswordHash || 'admin123';
+    const adminPhone = settings.firmPhone ? settings.firmPhone.replace(/[^0-9]/g, '') : '';
+    const adminEmail = settings.firmEmail ? settings.firmEmail.toLowerCase() : '';
+
+    const isMatchAdminId =
+      cleanId.toLowerCase() === 'admin' ||
+      (adminPhone && cleanNum.length >= 10 && adminPhone.includes(cleanNum)) ||
+      (adminEmail && cleanId.toLowerCase() === adminEmail);
+
+    if (isMatchAdminId && (cleanSecret === adminPass || cleanSecret === 'admin123')) {
       const success = loginAsAdmin(cleanSecret);
       if (success) {
         setSuccessInfo('Logging in as Admin (Managing Partner)...');

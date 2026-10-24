@@ -42,12 +42,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginAsAdmin = (password: string): boolean => {
     const settings = StorageService.getSettings();
-    if (password === settings.adminPasswordHash || password === 'admin123') {
-      setCurrentUser(ADMIN_USER);
-      StorageService.saveAuthSession(ADMIN_USER);
+    const validPassword = settings.adminPasswordHash || 'admin123';
+    if (password === validPassword || password === 'admin123') {
+      const adminUser: UserProfile = {
+        ...ADMIN_USER,
+        name: settings.firmName ? `${settings.firmName} (Admin)` : ADMIN_USER.name,
+        email: settings.firmEmail || settings.cloudStorageEmail || ADMIN_USER.email,
+        phone: settings.firmPhone || '+91-8982147763'
+      };
+      setCurrentUser(adminUser);
+      StorageService.saveAuthSession(adminUser);
       StorageService.addAuditLog({
         actorId: 'admin',
-        actorName: 'Managing Partner',
+        actorName: adminUser.name,
         role: 'ADMIN',
         action: 'LOGIN_ADMIN',
         category: 'AUTH',
