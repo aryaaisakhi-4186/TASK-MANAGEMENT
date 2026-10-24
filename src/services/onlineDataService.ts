@@ -17,8 +17,11 @@ export interface OnlineDatabaseSnapshot {
 }
 
 let syncTimeout: ReturnType<typeof setTimeout> | null = null;
+let lastSyncedTimestamp: string = '';
 
 export const OnlineDataService = {
+  getLastSyncedTimestamp: () => lastSyncedTimestamp,
+
   // 1. Fetch Live Online Database on Startup (Works on both GitHub Pages & Local Network)
   pullLiveOnlineData: async (): Promise<Partial<OnlineDatabaseSnapshot> | null> => {
     let snapshot: Partial<OnlineDatabaseSnapshot> | null = null;
@@ -46,6 +49,10 @@ export const OnlineDataService = {
       } catch {}
     }
 
+    if (snapshot?.updatedAt) {
+      lastSyncedTimestamp = snapshot.updatedAt;
+    }
+
     // B. If snapshot includes Firebase credentials, auto-configure Firebase on this device!
     if (snapshot?.firebaseConfig && snapshot.firebaseConfig.projectId && snapshot.firebaseConfig.apiKey) {
       const existingCfg = getSavedFirebaseConfig();
@@ -59,7 +66,7 @@ export const OnlineDataService = {
     if (FirebaseService.isConfigured()) {
       try {
         const cloudData = await FirebaseService.pullAllFromCloud();
-        if (cloudData.clients.length > 0 || cloudData.tasks.length > 0) {
+        if (cloudData.clients.length > 0 || cloudData.tasks.length > 0 || cloudData.team.length > 0) {
           return {
             clients: cloudData.clients.length > 0 ? cloudData.clients : snapshot?.clients,
             tasks: cloudData.tasks.length > 0 ? cloudData.tasks : snapshot?.tasks,
@@ -68,7 +75,9 @@ export const OnlineDataService = {
             documents: cloudData.documents.length > 0 ? cloudData.documents : snapshot?.documents,
             attendanceRecords: cloudData.attendanceRecords.length > 0 ? cloudData.attendanceRecords : snapshot?.attendanceRecords,
             guestLeads: cloudData.guestLeads.length > 0 ? cloudData.guestLeads : snapshot?.guestLeads,
-            settings: cloudData.settings || snapshot?.settings
+            settings: cloudData.settings || snapshot?.settings,
+            updatedAt: snapshot?.updatedAt,
+            updatedAtIST: snapshot?.updatedAtIST
           };
         }
       } catch (cloudErr) {
@@ -79,21 +88,25 @@ export const OnlineDataService = {
     return snapshot;
   },
 
-  // 2. Auto-Push Live Changes to Online DB (Debounced so UI stays super fast)
+  // 2. Auto-Push Live Changes to Online DB + Firebase Cloud (Debounced so UI stays super fast)
   scheduleAutoOnlineSync: (data: OnlineDatabaseSnapshot) => {
     if (syncTimeout) {
       clearTimeout(syncTimeout);
     }
 
     syncTimeout = setTimeout(async () => {
+      const nowIso = new Date().toISOString();
+      const nowIst = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+      lastSyncedTimestamp = nowIso;
+
       const payload: OnlineDatabaseSnapshot = {
         ...data,
         firebaseConfig: getSavedFirebaseConfig(),
-        updatedAt: new Date().toISOString(),
-        updatedAtIST: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+        updatedAt: nowIso,
+        updatedAtIST: nowIst
       };
 
-      // A. Save to live server online-db.json if connected to Admin server
+      // A. Save to live server online-db.json (persists directly to public/online-db.json on disk)
       try {
         await fetch('/api/online-db', {
           method: 'POST',
@@ -101,6 +114,34 @@ export const OnlineDataService = {
           body: JSON.stringify(payload)
         });
       } catch {}
-    }, 500);
+
+      // B. Also push to Firebase Cloud Firestore if configured
+      if (FirebaseService.isConfigured()) {
+        try {
+          await FirebaseService.syncAllToCloud(payload);
+        } catch (err) {
+          console.warn('Auto Firebase sync note:', err);
+        }
+      }
+    }, 400);
+  },
+
+  // 3. Subscribe to Real-Time Online Database Updates across tabs & network devices
+  subscribeToLiveServerUpdates: (onSnapshotUpdate: (snapshot: Partial<OnlineDatabaseSnapshot>) => void) => {
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/online-db?t=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json && !json.empty && json.updatedAt && json.updatedAt !== lastSyncedTimestamp) {
+          if (!lastSyncedTimestamp || new Date(json.updatedAt).getTime() > new Date(lastSyncedTimestamp).getTime()) {
+            lastSyncedTimestamp = json.updatedAt;
+            onSnapshotUpdate(json);
+          }
+        }
+      } catch {}
+    }, 4000);
+
+    return () => clearInterval(interval);
   }
 };

@@ -39,7 +39,7 @@ export const OnlineUpdateModal: React.FC<OnlineUpdateModalProps> = ({ isOpen, on
 
   if (!isOpen) return null;
 
-  const LIVE_APP_URL = 'https://aryaaisakhi-4186.github.io/task-vaani/';
+  const LIVE_APP_URL = 'https://aryaaisakhi-4186.github.io/TASK-MANAGEMENT/';
 
   const handleOneClickOnlineUpdate = async () => {
     setIsUpdating(true);

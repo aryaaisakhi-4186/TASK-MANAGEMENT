@@ -148,6 +148,19 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
+      // Attach Real-Time Live Server Listener (/api/online-db across tabs & office devices)
+      unsubscribers.push(
+        OnlineDataService.subscribeToLiveServerUpdates((liveSnap) => {
+          if (Array.isArray(liveSnap.clients)) setClients(liveSnap.clients);
+          if (Array.isArray(liveSnap.tasks)) setTasks(liveSnap.tasks);
+          if (Array.isArray(liveSnap.team)) setTeam(liveSnap.team);
+          if (Array.isArray(liveSnap.extraWork)) setExtraWork(liveSnap.extraWork);
+          if (Array.isArray(liveSnap.documents)) setDocuments(liveSnap.documents);
+          if (Array.isArray(liveSnap.attendanceRecords)) setAttendanceRecords(liveSnap.attendanceRecords);
+          if (liveSnap.settings) setSettings(liveSnap.settings);
+        })
+      );
+
       // Attach Real-Time Firebase Listeners if Firebase is configured
       if (FirebaseService.isConfigured()) {
         unsubscribers.push(

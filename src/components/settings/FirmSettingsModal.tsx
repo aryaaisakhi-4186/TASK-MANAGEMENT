@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { FirebaseService } from '../../services/firebaseService';
+import { getSavedFirebaseConfig, saveFirebaseConfig, removeFirebaseConfig, initFirebase } from '../../firebase/config';
 import { StorageService } from '../../services/storage';
 import { Settings, Flame, Shield, Bell, Save, Check, Mail, Cloud, Eye, EyeOff, RefreshCw, Trash2, AlertTriangle, AlertCircle, Users, Rocket } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
@@ -22,6 +23,16 @@ export const FirmSettingsModal: React.FC = () => {
   const [cloudStorageEmail, setCloudStorageEmail] = useState(settings.cloudStorageEmail || 'arya.taskmanagement@gmail.com');
   const [googleDriveSync, setGoogleDriveSync] = useState(settings.googleDriveSyncEnabled ?? true);
   const [saved, setSaved] = useState(false);
+
+  // Firebase Real-Time Cloud Config State
+  const existingFb = getSavedFirebaseConfig();
+  const [showFirebaseSetup, setShowFirebaseSetup] = useState(false);
+  const [fbApiKey, setFbApiKey] = useState(existingFb?.apiKey || '');
+  const [fbProjectId, setFbProjectId] = useState(existingFb?.projectId || '');
+  const [fbAppId, setFbAppId] = useState(existingFb?.appId || '');
+  const [fbAuthDomain, setFbAuthDomain] = useState(existingFb?.authDomain || '');
+  const [fbStatusMsg, setFbStatusMsg] = useState<string | null>(null);
+  const isFirebaseActive = FirebaseService.isConfigured();
 
   // Sync internal form state whenever settings are updated or loaded from Cloud
   useEffect(() => {
@@ -218,30 +229,134 @@ export const FirmSettingsModal: React.FC = () => {
         </form>
       </GlassCard>
 
-      {/* 1-Click Online App Updater Card */}
-      <GlassCard className="p-6 max-w-2xl mx-auto border-emerald-500/30" variant="elevated">
+      {/* 1-Click Online App Updater & Real-Time Cloud Sync Card */}
+      <GlassCard className="p-6 max-w-2xl mx-auto border-emerald-500/30 space-y-4" variant="elevated">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold shrink-0">
               <Rocket size={20} />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 dark:text-white text-sm">🚀 1-Click Online App Update & Publish</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Publish app changes directly to GitHub Pages & sync cloud data without running terminal commands.
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-slate-900 dark:text-white text-sm">🚀 Real-Time Online Database & GitHub Publisher</h3>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">
+                  ● Auto-Sync ON
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Har naya Client, Task aur Compliance change real-time me save hota hai. Live GitHub Pages par publish karne ke liye button dabayein.
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsOnlineUpdateOpen(true)}
-            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 shrink-0"
-          >
-            <Rocket size={14} />
-            <span>Update App Online</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowFirebaseSetup(!showFirebaseSetup)}
+              className="px-3 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 transition-all"
+            >
+              <Flame size={14} className="text-amber-500" />
+              <span>{isFirebaseActive ? 'Firebase Connected' : 'Setup Firebase'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsOnlineUpdateOpen(true)}
+              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 shrink-0"
+            >
+              <Rocket size={14} />
+              <span>Update App Online</span>
+            </button>
+          </div>
         </div>
+
+        {showFirebaseSetup && (
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-amber-500/30 space-y-3 text-xs">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <Flame size={15} className="text-amber-500" />
+                <span>Firebase Firestore Real-Time Cloud Sync (Optional Cross-City Cloud DB)</span>
+              </h4>
+              {isFirebaseActive && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    removeFirebaseConfig();
+                    setFbApiKey('');
+                    setFbProjectId('');
+                    setFbAppId('');
+                    setFbAuthDomain('');
+                    setFbStatusMsg('Firebase configuration removed. Using Server & GitHub Online DB.');
+                  }}
+                  className="text-[10px] text-red-500 hover:underline font-bold"
+                >
+                  Disconnect Firebase
+                </button>
+              )}
+            </div>
+            <p className="text-[11px] text-slate-500">
+              Aapka data pehle se <strong>Local Server (`public/online-db.json`)</strong> aur <strong>GitHub Pages</strong> par save hota hai. Agar aap 24x7 Firebase Firestore bhi jodna chahein, to apना Firebase Project ID aur API Key yahan save karein:
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <input
+                type="text"
+                value={fbProjectId}
+                onChange={(e) => setFbProjectId(e.target.value)}
+                placeholder="Firebase Project ID (e.g. task-vaani-db)"
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono"
+              />
+              <input
+                type="text"
+                value={fbApiKey}
+                onChange={(e) => setFbApiKey(e.target.value)}
+                placeholder="Firebase Web API Key (AIzaSy...)"
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono"
+              />
+              <input
+                type="text"
+                value={fbAppId}
+                onChange={(e) => setFbAppId(e.target.value)}
+                placeholder="Firebase App ID (1:123456:web:...)"
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono"
+              />
+              <input
+                type="text"
+                value={fbAuthDomain}
+                onChange={(e) => setFbAuthDomain(e.target.value)}
+                placeholder="Auth Domain (optional: project.firebaseapp.com)"
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono"
+              />
+            </div>
+            {fbStatusMsg && (
+              <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">{fbStatusMsg}</p>
+            )}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!fbProjectId.trim() || !fbApiKey.trim()) {
+                    alert('Kripya Firebase Project ID aur API Key enter karein.');
+                    return;
+                  }
+                  const cfg = {
+                    projectId: fbProjectId.trim(),
+                    apiKey: fbApiKey.trim(),
+                    appId: fbAppId.trim() || '1:000000:web:000000',
+                    authDomain: fbAuthDomain.trim() || `${fbProjectId.trim()}.firebaseapp.com`,
+                    storageBucket: `${fbProjectId.trim()}.appspot.com`,
+                    messagingSenderId: '0000000000'
+                  };
+                  saveFirebaseConfig(cfg);
+                  initFirebase(cfg);
+                  setFbStatusMsg('✅ Firebase Real-Time Cloud Connected! All changes will now sync live to Firestore.');
+                }}
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-sm"
+              >
+                Save & Connect Firebase
+              </button>
+            </div>
+          </div>
+        )}
       </GlassCard>
 
       {/* Guest Demo Leads & Trial Tracking Card */}
