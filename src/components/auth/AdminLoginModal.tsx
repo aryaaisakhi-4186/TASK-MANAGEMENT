@@ -61,7 +61,7 @@ export const AdminLoginModal: React.FC<Props> = ({ isOpen, onClose, onBack }) =>
               required
               value={password}
               onChange={(e) => { setPassword(e.target.value); setError(false); }}
-              placeholder="Admin Password (Default: admin123)"
+              placeholder="Admin Master Password"
               className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs text-center font-mono focus:border-amber-500 focus:outline-none"
             />
             <button
@@ -72,7 +72,7 @@ export const AdminLoginModal: React.FC<Props> = ({ isOpen, onClose, onBack }) =>
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
-            {error && <p className="text-[10px] text-red-500 text-center mt-1">Incorrect password. Default is: admin123</p>}
+            {error && <p className="text-[10px] text-red-500 text-center mt-1">Incorrect admin password. Please try again.</p>}
           </div>
 
           <button

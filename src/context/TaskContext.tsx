@@ -143,9 +143,22 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           StorageService.saveGuestLeads(onlineData.guestLeads);
         }
         if (onlineData.settings) {
+          const currentSavedSettings = StorageService.getSettings();
+          const savedAdminPass = StorageService.getAdminPassword();
           const cleanSettings = { ...onlineData.settings };
+
+          // Never revert a user-customized password back to default 'admin123' from static snapshot
+          if (savedAdminPass && savedAdminPass !== 'admin123') {
+            cleanSettings.adminPasswordHash = savedAdminPass;
+          } else if (currentSavedSettings.adminPasswordHash && currentSavedSettings.adminPasswordHash !== 'admin123') {
+            cleanSettings.adminPasswordHash = currentSavedSettings.adminPasswordHash;
+          }
+
           if (!cleanSettings.firmName || cleanSettings.firmName.includes('VAANI') || cleanSettings.firmName.includes('Vaani')) {
-            cleanSettings.firmName = 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+            cleanSettings.firmName = currentSavedSettings.firmName || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+          }
+          if (currentSavedSettings.selectedTaxYear) {
+            cleanSettings.selectedTaxYear = currentSavedSettings.selectedTaxYear;
           }
           setSettings(cleanSettings);
           StorageService.saveSettings(cleanSettings);
@@ -162,9 +175,21 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (Array.isArray(liveSnap.documents)) setDocuments(liveSnap.documents);
           if (Array.isArray(liveSnap.attendanceRecords)) setAttendanceRecords(liveSnap.attendanceRecords);
           if (liveSnap.settings) {
+            const currentSavedSettings = StorageService.getSettings();
+            const savedAdminPass = StorageService.getAdminPassword();
             const cleanSettings = { ...liveSnap.settings };
+
+            if (savedAdminPass && savedAdminPass !== 'admin123') {
+              cleanSettings.adminPasswordHash = savedAdminPass;
+            } else if (currentSavedSettings.adminPasswordHash && currentSavedSettings.adminPasswordHash !== 'admin123') {
+              cleanSettings.adminPasswordHash = currentSavedSettings.adminPasswordHash;
+            }
+
             if (!cleanSettings.firmName || cleanSettings.firmName.includes('VAANI') || cleanSettings.firmName.includes('Vaani')) {
-              cleanSettings.firmName = 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+              cleanSettings.firmName = currentSavedSettings.firmName || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+            }
+            if (currentSavedSettings.selectedTaxYear) {
+              cleanSettings.selectedTaxYear = currentSavedSettings.selectedTaxYear;
             }
             setSettings(cleanSettings);
           }

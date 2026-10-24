@@ -15,6 +15,7 @@ const KEYS = {
   CLIENT_REMINDERS: 'taskvaani_client_reminders_v1',
   AI_LEARNED_MEMORY: 'taskvaani_ai_learned_memory_v1',
   GUEST_LEADS: 'taskvaani_guest_leads_v1',
+  ADMIN_PASSWORD: 'taskvaani_admin_master_password_v1',
 };
 
 // Safe JSON parser
@@ -126,8 +127,24 @@ export const StorageService = {
   saveClientReminders: (reminders: any[]) => safeSet(KEYS.CLIENT_REMINDERS, reminders),
 
   // Settings
+  getAdminPassword: (): string => {
+    const direct = safeGet<string>(KEYS.ADMIN_PASSWORD, '');
+    if (direct) return direct;
+    const settings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
+    return settings.adminPasswordHash || 'admin123';
+  },
+  saveAdminPassword: (password: string): void => {
+    safeSet(KEYS.ADMIN_PASSWORD, password);
+    const settings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
+    settings.adminPasswordHash = password;
+    safeSet(KEYS.SETTINGS, settings);
+  },
   getSettings: (): SystemSettings => {
     const settings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
+    const customPassword = safeGet<string>(KEYS.ADMIN_PASSWORD, '');
+    if (customPassword) {
+      settings.adminPasswordHash = customPassword;
+    }
     if (!settings.firmName || settings.firmName.includes('VAANI') || settings.firmName.includes('Vaani')) {
       settings.firmName = 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
       if (!settings.firmEmail || settings.firmEmail.includes('vaaniassociates')) {
@@ -144,7 +161,12 @@ export const StorageService = {
     }
     return settings;
   },
-  saveSettings: (settings: SystemSettings) => safeSet(KEYS.SETTINGS, settings),
+  saveSettings: (settings: SystemSettings) => {
+    if (settings.adminPasswordHash) {
+      safeSet(KEYS.ADMIN_PASSWORD, settings.adminPasswordHash);
+    }
+    safeSet(KEYS.SETTINGS, settings);
+  },
 
   // Auth Session
   getAuthSession: (): UserProfile | null => {

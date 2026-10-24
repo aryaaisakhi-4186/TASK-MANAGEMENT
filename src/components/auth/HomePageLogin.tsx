@@ -73,7 +73,7 @@ export const HomePageLogin: React.FC = () => {
 
     // 1. Check for Admin Master Login (via 'admin', Admin Mobile, or Admin Email)
     const settings = StorageService.getSettings();
-    const adminPass = settings.adminPasswordHash || 'admin123';
+    const adminPass = StorageService.getAdminPassword() || settings.adminPasswordHash || 'admin123';
     const adminPhone = settings.firmPhone ? settings.firmPhone.replace(/[^0-9]/g, '') : '';
     const adminEmail = settings.firmEmail ? settings.firmEmail.toLowerCase() : '';
 
@@ -82,7 +82,9 @@ export const HomePageLogin: React.FC = () => {
       (adminPhone && cleanNum.length >= 10 && adminPhone.includes(cleanNum)) ||
       (adminEmail && cleanId.toLowerCase() === adminEmail);
 
-    if (isMatchAdminId && (cleanSecret === adminPass || cleanSecret === 'admin123')) {
+    const isPassCorrect = cleanSecret === adminPass || (adminPass === 'admin123' && cleanSecret === 'admin123');
+
+    if (isMatchAdminId && isPassCorrect) {
       const success = loginAsAdmin(cleanSecret);
       if (success) {
         setSuccessInfo('Logging in as Admin (Managing Partner)...');

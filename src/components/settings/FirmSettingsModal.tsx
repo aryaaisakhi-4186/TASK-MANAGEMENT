@@ -22,7 +22,7 @@ export const FirmSettingsModal: React.FC = () => {
   const [firmPhone, setFirmPhone] = useState(settings.firmPhone || '+91-8982147763');
   const [alarmTime, setAlarmTime] = useState(settings.morningAlarmTime || '10:30');
   const [enableSound, setEnableSound] = useState(settings.enableSoundChime ?? true);
-  const [adminPassword, setAdminPassword] = useState(settings.adminPasswordHash || 'admin123');
+  const [adminPassword, setAdminPassword] = useState(() => StorageService.getAdminPassword() || settings.adminPasswordHash || 'admin123');
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [cloudStorageEmail, setCloudStorageEmail] = useState(settings.cloudStorageEmail || 'arya.taskmanagement@gmail.com');
   const [googleDriveSync, setGoogleDriveSync] = useState(settings.googleDriveSyncEnabled ?? true);
@@ -46,7 +46,8 @@ export const FirmSettingsModal: React.FC = () => {
       if (settings.firmPhone) setFirmPhone(settings.firmPhone);
       if (settings.morningAlarmTime) setAlarmTime(settings.morningAlarmTime);
       if (typeof settings.enableSoundChime === 'boolean') setEnableSound(settings.enableSoundChime);
-      if (settings.adminPasswordHash) setAdminPassword(settings.adminPasswordHash);
+      const savedPass = StorageService.getAdminPassword();
+      setAdminPassword(savedPass || settings.adminPasswordHash || 'admin123');
       if (settings.cloudStorageEmail) setCloudStorageEmail(settings.cloudStorageEmail);
       if (typeof settings.googleDriveSyncEnabled === 'boolean') setGoogleDriveSync(settings.googleDriveSyncEnabled);
     }
@@ -58,6 +59,10 @@ export const FirmSettingsModal: React.FC = () => {
     const cleanFirmEmail = firmEmail.trim() || 'arya.taskmanagement@gmail.com';
     const cleanFirmPhone = firmPhone.trim() || '+91-8982147763';
     const cleanCloudEmail = cloudStorageEmail.trim() || 'arya.taskmanagement@gmail.com';
+    const cleanPassword = adminPassword.trim() || 'admin123';
+
+    // Save master admin password immediately into dedicated permanent local key
+    StorageService.saveAdminPassword(cleanPassword);
 
     const updatedPayload = {
       firmName: cleanFirmName,
@@ -65,7 +70,7 @@ export const FirmSettingsModal: React.FC = () => {
       firmPhone: cleanFirmPhone,
       morningAlarmTime: alarmTime,
       enableSoundChime: enableSound,
-      adminPasswordHash: adminPassword,
+      adminPasswordHash: cleanPassword,
       cloudStorageEmail: cleanCloudEmail,
       googleDriveSyncEnabled: googleDriveSync,
       lastCloudSyncTimestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
@@ -217,8 +222,9 @@ export const FirmSettingsModal: React.FC = () => {
                 <input
                   type={showAdminPassword ? 'text' : 'password'}
                   value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  className="w-full pl-3.5 pr-10 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs"
+                  onChange={(e) => { setAdminPassword(e.target.value); setIsDirty(true); }}
+                  placeholder="Enter Admin Master Password"
+                  className="w-full pl-3.5 pr-10 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono"
                 />
                 <button
                   type="button"

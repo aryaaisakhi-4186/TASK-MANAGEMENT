@@ -65,8 +65,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginAsAdmin = (password: string): boolean => {
     const settings = StorageService.getSettings();
-    const validPassword = settings.adminPasswordHash || 'admin123';
-    if (password === validPassword || password === 'admin123') {
+    const validPassword = StorageService.getAdminPassword() || settings.adminPasswordHash || 'admin123';
+    const isMatched = password === validPassword || (validPassword === 'admin123' && password === 'admin123');
+    if (isMatched) {
       const adminUser: UserProfile = {
         ...ADMIN_USER,
         name: settings.firmName ? `${settings.firmName} (Admin)` : ADMIN_USER.name,
