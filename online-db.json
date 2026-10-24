@@ -22,7 +22,7 @@
   "attendanceRecords": [],
   "settings": {
     "adminPasswordHash": "admin123",
-    "firmName": "M/S VAANI & ASSOCIATES, CHARTERED ACCOUNTANTS",
+    "firmName": "M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION",
     "firmEmail": "arya.taskmanagement@gmail.com",
     "firmPhone": "+91-8982147763",
     "firmAddress": "Suite 401, Nariman Point Commercial Complex, Mumbai - 400021",
@@ -34,10 +34,10 @@
     "googleSheetName": "TASK-VAANI Statutory Compliance Master FY 2025-26",
     "masterGoogleSheetUrl": "https://docs.google.com/spreadsheets/d/1GcG1ekpVnewJo034_yttoP92qIYEeO_2uBacAgpwCqU/edit?pli=1&gid=0#gid=0",
     "masterGoogleSheetId": "1GcG1ekpVnewJo034_yttoP92qIYEeO_2uBacAgpwCqU",
-    "lastCloudSyncTimestamp": "24/10/2026, 11:26:08 am"
+    "lastCloudSyncTimestamp": "24/10/2026, 09:10:00 pm"
   },
   "guestLeads": [],
   "firebaseConfig": null,
-  "updatedAt": "2026-10-24T05:56:09.500Z",
-  "updatedAtIST": "24/10/2026, 11:26:09 am"
+  "updatedAt": "2026-10-24T15:40:00.000Z",
+  "updatedAtIST": "24/10/2026, 09:10:00 pm"
 }
