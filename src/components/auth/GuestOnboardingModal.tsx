@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTasks } from '../../context/TaskContext';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { 
   Sparkles, 
   Building2, 
@@ -9,7 +10,9 @@ import {
   CheckCircle2, 
   Calendar, 
   ArrowRight, 
-  ShieldCheck
+  ShieldCheck,
+  X,
+  LogOut
 } from 'lucide-react';
 
 interface Props {
@@ -18,7 +21,7 @@ interface Props {
 }
 
 export const GuestOnboardingModal: React.FC<Props> = ({ isOpen, onClose }) => {
-  const { currentUser, updateGuestDemoSetup } = useAuth();
+  const { currentUser, updateGuestDemoSetup, logout } = useAuth();
   const { resetToBlankForGuestDemo, loadSampleForGuestDemo } = useTasks();
 
   const [firmName, setFirmName] = useState(currentUser?.trialInfo?.firmName || '');
@@ -26,6 +29,19 @@ export const GuestOnboardingModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState(currentUser?.email || '');
   const [demoMode, setDemoMode] = useState<'BLANK' | 'SAMPLE'>('BLANK');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleExitGuestMode = () => {
+    logout();
+    onClose();
+  };
+
+  const handleDismissModal = () => {
+    // Dismiss setup modal and allow user to continue in guest workspace without trapping them
+    updateGuestDemoSetup(firmName.trim() || 'My CA Practice', city.trim() || 'India', email.trim());
+    onClose();
+  };
+
+  useEscapeKey(handleDismissModal, isOpen);
 
   if (!isOpen || !currentUser || currentUser.role !== 'GUEST') return null;
 
@@ -47,9 +63,27 @@ export const GuestOnboardingModal: React.FC<Props> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4 animate-in fade-in">
-      <div className="w-full max-w-lg rounded-3xl bg-slate-900 border-2 border-amber-500/50 p-6 sm:p-8 shadow-2xl shadow-amber-500/20 text-slate-100 relative">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4 animate-in fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleDismissModal();
+      }}
+    >
+      <div 
+        className="w-full max-w-lg rounded-3xl bg-slate-900 border-2 border-amber-500/50 p-6 sm:p-8 shadow-2xl shadow-amber-500/20 text-slate-100 relative"
+        onClick={(e) => e.stopPropagation()}
+      >
         
+        {/* Top-Right Close Button (X) */}
+        <button
+          type="button"
+          onClick={handleDismissModal}
+          title="Dismiss / Close Window"
+          className="absolute top-4 right-4 p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+        >
+          <X size={18} />
+        </button>
+
         {/* Header */}
         <div className="text-center mb-6">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-amber-500/30">
@@ -173,15 +207,26 @@ export const GuestOnboardingModal: React.FC<Props> = ({ isOpen, onClose }) => {
             </ul>
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 active:scale-95 transition-all mt-3"
-          >
-            <span>Start 15-Days Free Demo Workspace</span>
-            <ArrowRight size={16} />
-          </button>
+          {/* Action Buttons: Cancel/Exit Guest vs Start Demo */}
+          <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-2">
+            <button
+              type="button"
+              onClick={handleExitGuestMode}
+              className="w-full sm:w-auto px-4 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 order-2 sm:order-1"
+            >
+              <LogOut size={14} />
+              <span>Cancel & Exit Guest (Wapas Login Par Jayein)</span>
+            </button>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/25 active:scale-95 transition-all order-1 sm:order-2"
+            >
+              <span>Start 15-Days Free Demo</span>
+              <ArrowRight size={15} />
+            </button>
+          </div>
 
         </form>
 
