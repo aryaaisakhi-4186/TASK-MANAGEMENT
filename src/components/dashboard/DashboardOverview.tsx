@@ -19,17 +19,41 @@ export const DashboardOverview: React.FC<{
   const [now, setNow] = useState(new Date());
   const [selectedReportType, setSelectedReportType] = useState<MetricReportType | null>(null);
 
+  const normalizeTaxYear = (val?: string | null): string => {
+    if (!val) return 'Tax Year 2026-27';
+    if (val.includes('2027-28')) return 'Tax Year 2027-28';
+    if (val.includes('2026-27')) return 'Tax Year 2026-27';
+    if (val.includes('2025-26')) return 'Tax Year 2025-26';
+    if (val.includes('2024-25')) return 'Tax Year 2024-25';
+    if (val.includes('2023-24')) return 'Tax Year 2023-24';
+    if (val.includes('2022-23')) return 'Tax Year 2022-23';
+    if (val.includes('2021-22')) return 'Tax Year 2021-22';
+    if (val.includes('2020-21')) return 'Tax Year 2020-21';
+    return val.startsWith('Tax Year') ? val : `Tax Year ${val}`;
+  };
+
   const [selectedTaxYear, setSelectedTaxYear] = useState(() => {
-    return settings.selectedTaxYear || localStorage.getItem('taskvaani_selected_tax_year') || 'AY 2026-27 / FY 2025-26';
+    const raw = settings.selectedTaxYear || localStorage.getItem('taskvaani_selected_tax_year');
+    return normalizeTaxYear(raw);
   });
 
   const handleTaxYearChange = (newYear: string) => {
-    setSelectedTaxYear(newYear);
-    updateSettings({ selectedTaxYear: newYear });
+    const normalized = normalizeTaxYear(newYear);
+    setSelectedTaxYear(normalized);
+    updateSettings({ selectedTaxYear: normalized });
     try {
-      localStorage.setItem('taskvaani_selected_tax_year', newYear);
+      localStorage.setItem('taskvaani_selected_tax_year', normalized);
     } catch {}
   };
+
+  useEffect(() => {
+    if (settings.selectedTaxYear) {
+      const normalized = normalizeTaxYear(settings.selectedTaxYear);
+      if (normalized !== selectedTaxYear) {
+        setSelectedTaxYear(normalized);
+      }
+    }
+  }, [settings.selectedTaxYear]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -99,13 +123,14 @@ export const DashboardOverview: React.FC<{
                 onChange={(e) => handleTaxYearChange(e.target.value)}
                 className="w-full max-w-[210px] px-2.5 py-1 rounded-xl bg-amber-500/15 dark:bg-slate-900 border border-amber-500/40 text-slate-900 dark:text-amber-300 font-bold text-[11px] cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm transition-all"
               >
-                <option value="AY 2027-28 / FY 2026-27">AY 2027-28 / FY 2026-27</option>
-                <option value="AY 2026-27 / FY 2025-26">AY 2026-27 / FY 2025-26</option>
-                <option value="AY 2025-26 / FY 2024-25">AY 2025-26 / FY 2024-25</option>
-                <option value="AY 2024-25 / FY 2023-24">AY 2024-25 / FY 2023-24</option>
-                <option value="AY 2023-24 / FY 2022-23">AY 2023-24 / FY 2022-23</option>
-                <option value="AY 2022-23 / FY 2021-22">AY 2022-23 / FY 2021-22</option>
-                <option value="AY 2021-22 / FY 2020-21">AY 2021-22 / FY 2020-21</option>
+                <option value="Tax Year 2027-28">Tax Year 2027-28</option>
+                <option value="Tax Year 2026-27">Tax Year 2026-27</option>
+                <option value="Tax Year 2025-26">Tax Year 2025-26</option>
+                <option value="Tax Year 2024-25">Tax Year 2024-25</option>
+                <option value="Tax Year 2023-24">Tax Year 2023-24</option>
+                <option value="Tax Year 2022-23">Tax Year 2022-23</option>
+                <option value="Tax Year 2021-22">Tax Year 2021-22</option>
+                <option value="Tax Year 2020-21">Tax Year 2020-21</option>
               </select>
             </div>
 

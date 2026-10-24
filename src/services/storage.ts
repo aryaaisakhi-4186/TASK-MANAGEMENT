@@ -138,6 +138,10 @@ export const StorageService = {
       }
       safeSet(KEYS.SETTINGS, settings);
     }
+    if (!settings.selectedTaxYear || settings.selectedTaxYear.includes('AY') || settings.selectedTaxYear.includes('/')) {
+      settings.selectedTaxYear = 'Tax Year 2026-27';
+      safeSet(KEYS.SETTINGS, settings);
+    }
     return settings;
   },
   saveSettings: (settings: SystemSettings) => safeSet(KEYS.SETTINGS, settings),

@@ -10,6 +10,7 @@ export const INITIAL_SYSTEM_SETTINGS: SystemSettings = {
   enableMorningAlarm: true,
   enableSoundChime: true,
   cloudStorageEmail: 'arya.taskmanagement@gmail.com',
+  selectedTaxYear: 'Tax Year 2026-27',
   googleDriveSyncEnabled: true,
   googleSheetName: 'TASK-VAANI Statutory Compliance Master FY 2025-26',
   masterGoogleSheetUrl: 'https://docs.google.com/spreadsheets/d/1GcG1ekpVnewJo034_yttoP92qIYEeO_2uBacAgpwCqU/edit?pli=1&gid=0#gid=0',
