@@ -2,6 +2,8 @@ import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, S
 
 export const INITIAL_SYSTEM_SETTINGS: SystemSettings = {
   adminPasswordHash: 'admin123',
+  adminName: 'RAVI KATARA',
+  adminDesignation: 'Senior Partner (Tax & Audit)',
   firmName: 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION',
   firmEmail: 'arya.taskmanagement@gmail.com',
   firmPhone: '+91-8982147763',

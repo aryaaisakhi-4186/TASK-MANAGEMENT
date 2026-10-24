@@ -173,16 +173,27 @@ export const StorageService = {
     const session = safeGet<UserProfile | null>(KEYS.AUTH_SESSION, null);
     if (session && session.role === 'ADMIN') {
       let changed = false;
-      if (!session.name || session.name.includes('VAANI') || session.name.includes('Vaani') || session.name === 'Managing Partner (Admin)') {
-        session.name = 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION (Admin)';
+      const settings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
+      const team = safeGet<UserProfile[]>(KEYS.TEAM, []);
+      const memberName = settings.adminName || (team.length > 0 ? team[0].name : 'RAVI KATARA');
+      const memberPost = settings.adminDesignation || (team.length > 0 ? team[0].designation : 'Senior Partner (Tax & Audit)');
+
+      // If session name was incorrectly set to firm name or placeholder, set to member name & post
+      if (!session.name || session.name.includes('VAANI') || session.name.includes('Vaani') || session.name.includes('ARYA ASSOCIATES') || session.name === 'Managing Partner (Admin)') {
+        session.name = memberName;
+        session.designation = memberPost;
+        changed = true;
+      }
+      if (!session.designation) {
+        session.designation = memberPost;
         changed = true;
       }
       if (!session.email || session.email.includes('vaaniassociates')) {
-        session.email = 'arya.taskmanagement@gmail.com';
+        session.email = settings.firmEmail || 'arya.taskmanagement@gmail.com';
         changed = true;
       }
       if (!session.phone) {
-        session.phone = '+91-8982147763';
+        session.phone = settings.firmPhone || '+91-8815052555';
         changed = true;
       }
       if (changed) {

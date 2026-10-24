@@ -83,7 +83,7 @@ export const DashboardOverview: React.FC<{
           
           {/* Left Greeting */}
           <div className="flex-1 w-full">
-            <IndianGreeting userName={currentUser?.name} />
+            <IndianGreeting userName={currentUser?.name && !currentUser.name.includes('ARYA ASSOCIATES') ? currentUser.name : (settings.adminName || 'RAVI KATARA')} />
           </div>
 
           {/* Right Unified Clock & Live Date-Time Card */}

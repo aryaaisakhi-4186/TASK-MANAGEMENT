@@ -23,7 +23,8 @@ export const Navbar: React.FC<{
     loginOffice, 
     logoffOffice, 
     startLunchBreak, 
-    endLunchBreak 
+    endLunchBreak,
+    settings
   } = useTasks();
 
   const getRoleBadge = () => {
@@ -214,12 +215,20 @@ export const Navbar: React.FC<{
               {currentUser?.avatar ? (
                 <img src={currentUser.avatar} alt="User" className="w-full h-full rounded-full object-cover" />
               ) : (
-                currentUser?.name.charAt(0) || 'U'
+                (currentUser?.name && !currentUser.name.includes('ARYA ASSOCIATES') ? currentUser.name : (settings.adminName || 'RAVI KATARA')).charAt(0) || 'U'
               )}
             </div>
             <div className="hidden md:block text-left">
-              <p className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">{currentUser?.name}</p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">{currentUser?.designation || currentRole}</p>
+              <p className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">
+                {currentUser?.name && !currentUser.name.includes('ARYA ASSOCIATES') && !currentUser.name.includes('VAANI') 
+                  ? currentUser.name 
+                  : (settings.adminName || 'RAVI KATARA')}
+              </p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                {currentUser?.designation && currentUser.designation !== 'Principal Partner'
+                  ? currentUser.designation
+                  : (settings.adminDesignation || currentUser?.designation || currentRole)}
+              </p>
             </div>
             <button
               onClick={logout}

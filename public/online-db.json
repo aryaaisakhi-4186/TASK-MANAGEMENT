@@ -22,6 +22,8 @@
   "attendanceRecords": [],
   "settings": {
     "adminPasswordHash": "admin123",
+    "adminName": "RAVI KATARA",
+    "adminDesignation": "Senior Partner (Tax & Audit)",
     "firmName": "M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION",
     "firmEmail": "arya.taskmanagement@gmail.com",
     "firmPhone": "+91-8982147763",

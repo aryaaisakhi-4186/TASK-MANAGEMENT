@@ -18,6 +18,8 @@ export const FirmSettingsModal: React.FC = () => {
   const [isDirty, setIsDirty] = useState(false);
 
   const [firmName, setFirmName] = useState(settings.firmName || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION');
+  const [adminName, setAdminName] = useState(settings.adminName || 'RAVI KATARA');
+  const [adminDesignation, setAdminDesignation] = useState(settings.adminDesignation || 'Senior Partner (Tax & Audit)');
   const [firmEmail, setFirmEmail] = useState(settings.firmEmail || 'arya.taskmanagement@gmail.com');
   const [firmPhone, setFirmPhone] = useState(settings.firmPhone || '+91-8982147763');
   const [alarmTime, setAlarmTime] = useState(settings.morningAlarmTime || '10:30');
@@ -42,6 +44,8 @@ export const FirmSettingsModal: React.FC = () => {
   useEffect(() => {
     if (settings && !isDirty) {
       if (settings.firmName) setFirmName(settings.firmName);
+      if (settings.adminName) setAdminName(settings.adminName);
+      if (settings.adminDesignation) setAdminDesignation(settings.adminDesignation);
       if (settings.firmEmail) setFirmEmail(settings.firmEmail);
       if (settings.firmPhone) setFirmPhone(settings.firmPhone);
       if (settings.morningAlarmTime) setAlarmTime(settings.morningAlarmTime);
@@ -56,6 +60,8 @@ export const FirmSettingsModal: React.FC = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanFirmName = firmName.trim() || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+    const cleanAdminName = adminName.trim() || 'RAVI KATARA';
+    const cleanAdminDesignation = adminDesignation.trim() || 'Senior Partner (Tax & Audit)';
     const cleanFirmEmail = firmEmail.trim() || 'arya.taskmanagement@gmail.com';
     const cleanFirmPhone = firmPhone.trim() || '+91-8982147763';
     const cleanCloudEmail = cloudStorageEmail.trim() || 'arya.taskmanagement@gmail.com';
@@ -66,6 +72,8 @@ export const FirmSettingsModal: React.FC = () => {
 
     const updatedPayload = {
       firmName: cleanFirmName,
+      adminName: cleanAdminName,
+      adminDesignation: cleanAdminDesignation,
       firmEmail: cleanFirmEmail,
       firmPhone: cleanFirmPhone,
       morningAlarmTime: alarmTime,
@@ -180,6 +188,30 @@ export const FirmSettingsModal: React.FC = () => {
               placeholder="M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION"
               className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs"
             />
+          </div>
+
+          {/* Admin Member Profile Section */}
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Logged-in Admin Member Name</label>
+              <input
+                type="text"
+                value={adminName}
+                onChange={(e) => { setAdminName(e.target.value); setIsDirty(true); }}
+                placeholder="RAVI KATARA"
+                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Admin Member Post / Designation</label>
+              <input
+                type="text"
+                value={adminDesignation}
+                onChange={(e) => { setAdminDesignation(e.target.value); setIsDirty(true); }}
+                placeholder="Senior Partner (Tax & Audit)"
+                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">

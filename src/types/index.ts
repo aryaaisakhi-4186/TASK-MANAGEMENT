@@ -212,6 +212,8 @@ export interface AuditLog {
 
 export interface SystemSettings {
   adminPasswordHash: string;
+  adminName?: string;
+  adminDesignation?: string;
   firmName: string;
   firmEmail: string;
   firmPhone: string;

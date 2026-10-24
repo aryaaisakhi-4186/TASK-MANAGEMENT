@@ -25,11 +25,11 @@ const GUEST_USER: UserProfile = {
 
 const ADMIN_USER: UserProfile = {
   id: 'admin',
-  name: 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION (Admin)',
+  name: 'RAVI KATARA',
   role: 'ADMIN',
-  designation: 'Principal Partner',
+  designation: 'Senior Partner (Tax & Audit)',
   email: 'arya.taskmanagement@gmail.com',
-  phone: '+91-8982147763',
+  phone: '+91-8815052555',
   avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=250',
 };
 
@@ -44,13 +44,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshAdminSession = () => {
     const settings = StorageService.getSettings();
+    const team = StorageService.getTeam();
+    const memberName = settings.adminName || (team.length > 0 ? team[0].name : 'RAVI KATARA');
+    const memberPost = settings.adminDesignation || (team.length > 0 ? team[0].designation : 'Senior Partner (Tax & Audit)');
+
     setCurrentUser(prev => {
       if (prev && prev.role === 'ADMIN') {
         const updated: UserProfile = {
           ...prev,
-          name: settings.firmName ? `${settings.firmName} (Admin)` : 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION (Admin)',
+          name: memberName,
+          designation: memberPost,
           email: settings.firmEmail || settings.cloudStorageEmail || 'arya.taskmanagement@gmail.com',
-          phone: settings.firmPhone || '+91-8982147763'
+          phone: settings.firmPhone || '+91-8815052555'
         };
         StorageService.saveAuthSession(updated);
         return updated;
@@ -68,11 +73,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const validPassword = StorageService.getAdminPassword() || settings.adminPasswordHash || 'admin123';
     const isMatched = password === validPassword || (validPassword === 'admin123' && password === 'admin123');
     if (isMatched) {
+      const team = StorageService.getTeam();
+      const memberName = settings.adminName || (team.length > 0 ? team[0].name : 'RAVI KATARA');
+      const memberPost = settings.adminDesignation || (team.length > 0 ? team[0].designation : 'Senior Partner (Tax & Audit)');
+
       const adminUser: UserProfile = {
         ...ADMIN_USER,
-        name: settings.firmName ? `${settings.firmName} (Admin)` : ADMIN_USER.name,
+        name: memberName,
+        designation: memberPost,
         email: settings.firmEmail || settings.cloudStorageEmail || ADMIN_USER.email,
-        phone: settings.firmPhone || '+91-8982147763'
+        phone: settings.firmPhone || '+91-8815052555'
       };
       setCurrentUser(adminUser);
       StorageService.saveAuthSession(adminUser);
