@@ -218,6 +218,8 @@ export const StorageService = {
         firmName: leadData.firmName || existing.firmName,
         city: leadData.city || existing.city,
         notes: leadData.notes || existing.notes,
+        remark: leadData.remark !== undefined ? leadData.remark : existing.remark,
+        approvalStatus: leadData.approvalStatus || existing.approvalStatus || 'ACCEPTED',
         isDemoSetup: leadData.isDemoSetup !== undefined ? leadData.isDemoSetup : existing.isDemoSetup,
         trialStatus: leadData.trialStatus || existing.trialStatus,
       };
@@ -236,6 +238,8 @@ export const StorageService = {
         trialStartDate: now.toISOString(),
         trialEndDate: expiry.toISOString(),
         trialStatus: 'ACTIVE_DEMO',
+        approvalStatus: 'ACCEPTED',
+        remark: '',
         isDemoSetup: leadData.isDemoSetup || false,
         notes: leadData.notes || 'Registered via Home Page Guest Demo.'
       };
@@ -254,6 +258,38 @@ export const StorageService = {
       leads[index].trialEndDate = newExpiry.toISOString();
       leads[index].trialStatus = 'ACTIVE_DEMO';
       StorageService.saveGuestLeads(leads);
+      return true;
+    }
+    return false;
+  },
+  updateGuestLeadApproval: (leadId: string, status: 'ACCEPTED' | 'REJECTED' | 'PENDING', remark?: string): boolean => {
+    const leads = StorageService.getGuestLeads();
+    const index = leads.findIndex(l => l.id === leadId);
+    if (index >= 0) {
+      leads[index].approvalStatus = status;
+      if (remark !== undefined) {
+        leads[index].remark = remark;
+      }
+      StorageService.saveGuestLeads(leads);
+      return true;
+    }
+    return false;
+  },
+  updateGuestLeadRemark: (leadId: string, remark: string): boolean => {
+    const leads = StorageService.getGuestLeads();
+    const index = leads.findIndex(l => l.id === leadId);
+    if (index >= 0) {
+      leads[index].remark = remark;
+      StorageService.saveGuestLeads(leads);
+      return true;
+    }
+    return false;
+  },
+  deleteGuestLead: (leadId: string): boolean => {
+    const leads = StorageService.getGuestLeads();
+    const filtered = leads.filter(l => l.id !== leadId);
+    if (filtered.length !== leads.length) {
+      StorageService.saveGuestLeads(filtered);
       return true;
     }
     return false;

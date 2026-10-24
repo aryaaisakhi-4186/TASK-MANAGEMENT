@@ -36,6 +36,8 @@ export interface GuestLead {
   trialStartDate: string;
   trialEndDate: string;
   trialStatus: 'ACTIVE_DEMO' | 'EXPIRED' | 'CONVERTED';
+  approvalStatus?: 'ACCEPTED' | 'REJECTED' | 'PENDING';
+  remark?: string;
   isDemoSetup: boolean;
   notes?: string;
 }

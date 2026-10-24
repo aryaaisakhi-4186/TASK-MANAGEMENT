@@ -188,6 +188,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email: email || ''
     });
 
+    if (lead.approvalStatus === 'REJECTED') {
+      return { 
+        success: false, 
+        error: `Aapka Guest Demo Admin dwara Reject / Deactivate kar diya gaya hai.${lead.remark ? ` Reason/Remark: "${lead.remark}"` : ''} Kripya Admin se sampark karein.` 
+      };
+    }
+
     // Calculate trial days remaining
     const expiryMs = new Date(lead.trialEndDate).getTime();
     const nowMs = Date.now();
