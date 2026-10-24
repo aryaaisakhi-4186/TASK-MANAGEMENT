@@ -15,9 +15,21 @@ export const DashboardOverview: React.FC<{
   setActiveTab: (tab: string) => void;
 }> = ({ onOpenTaskModal, setActiveTab }) => {
   const { currentUser } = useAuth();
-  const { tasks } = useTasks();
+  const { tasks, settings, updateSettings } = useTasks();
   const [now, setNow] = useState(new Date());
   const [selectedReportType, setSelectedReportType] = useState<MetricReportType | null>(null);
+
+  const [selectedTaxYear, setSelectedTaxYear] = useState(() => {
+    return settings.selectedTaxYear || localStorage.getItem('taskvaani_selected_tax_year') || 'AY 2026-27 / FY 2025-26';
+  });
+
+  const handleTaxYearChange = (newYear: string) => {
+    setSelectedTaxYear(newYear);
+    updateSettings({ selectedTaxYear: newYear });
+    try {
+      localStorage.setItem('taskvaani_selected_tax_year', newYear);
+    } catch {}
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -76,10 +88,25 @@ export const DashboardOverview: React.FC<{
               </span>
             </div>
 
-            {/* Statutory Period Row */}
-            <div className="flex items-center justify-center pt-1.5 border-t border-slate-100 dark:border-slate-800/60 text-[11px] text-amber-900 dark:text-amber-300 font-semibold gap-1">
-              <Shield size={12} className="text-amber-600" />
-              <span>Period: AY 2026-27 / FY 2025-26</span>
+            {/* Statutory Tax Year Selector Row */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/60 text-[11px] text-amber-900 dark:text-amber-300 font-semibold gap-2">
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Shield size={13} className="text-amber-600 shrink-0" />
+                <span className="font-bold whitespace-nowrap">Tax Year:</span>
+              </div>
+              <select
+                value={selectedTaxYear}
+                onChange={(e) => handleTaxYearChange(e.target.value)}
+                className="w-full max-w-[210px] px-2.5 py-1 rounded-xl bg-amber-500/15 dark:bg-slate-900 border border-amber-500/40 text-slate-900 dark:text-amber-300 font-bold text-[11px] cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500 shadow-sm transition-all"
+              >
+                <option value="AY 2027-28 / FY 2026-27">AY 2027-28 / FY 2026-27</option>
+                <option value="AY 2026-27 / FY 2025-26">AY 2026-27 / FY 2025-26</option>
+                <option value="AY 2025-26 / FY 2024-25">AY 2025-26 / FY 2024-25</option>
+                <option value="AY 2024-25 / FY 2023-24">AY 2024-25 / FY 2023-24</option>
+                <option value="AY 2023-24 / FY 2022-23">AY 2023-24 / FY 2022-23</option>
+                <option value="AY 2022-23 / FY 2021-22">AY 2022-23 / FY 2021-22</option>
+                <option value="AY 2021-22 / FY 2020-21">AY 2021-22 / FY 2020-21</option>
+              </select>
             </div>
 
           </div>

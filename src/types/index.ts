@@ -224,6 +224,7 @@ export interface SystemSettings {
   masterGoogleSheetId?: string;
   googleWebhookUrl?: string;
   lastCloudSyncTimestamp?: string;
+  selectedTaxYear?: string;
 }
 
 export type AIMemoryCategory = 'PREFERENCE' | 'CLIENT_RULE' | 'STAFF_RULE' | 'FEE_RULE' | 'GENERAL_NOTE';
