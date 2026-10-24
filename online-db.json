@@ -1,0 +1,43 @@
+{
+  "clients": [],
+  "tasks": [],
+  "team": [
+    {
+      "id": "team-1",
+      "name": "RAVI KATARA",
+      "role": "TEAM",
+      "email": "arya4186@gmail.com",
+      "phone": "+91-8815052555",
+      "pin": "1517",
+      "designation": "Senior Partner (Tax & Audit)",
+      "assignedClientIds": [
+        "cli-1",
+        "cli-2",
+        "cli-5"
+      ]
+    }
+  ],
+  "extraWork": [],
+  "documents": [],
+  "attendanceRecords": [],
+  "settings": {
+    "adminPasswordHash": "admin123",
+    "firmName": "M/S VAANI & ASSOCIATES, CHARTERED ACCOUNTANTS",
+    "firmEmail": "arya.taskmanagement@gmail.com",
+    "firmPhone": "+91-8982147763",
+    "firmAddress": "Suite 401, Nariman Point Commercial Complex, Mumbai - 400021",
+    "morningAlarmTime": "10:30",
+    "enableMorningAlarm": true,
+    "enableSoundChime": true,
+    "cloudStorageEmail": "arya.taskmanagement@gmail.com",
+    "googleDriveSyncEnabled": true,
+    "googleSheetName": "TASK-VAANI Statutory Compliance Master FY 2025-26",
+    "masterGoogleSheetUrl": "https://docs.google.com/spreadsheets/d/1GcG1ekpVnewJo034_yttoP92qIYEeO_2uBacAgpwCqU/edit?pli=1&gid=0#gid=0",
+    "masterGoogleSheetId": "1GcG1ekpVnewJo034_yttoP92qIYEeO_2uBacAgpwCqU",
+    "lastCloudSyncTimestamp": "24/10/2026, 11:26:08 am"
+  },
+  "guestLeads": [],
+  "firebaseConfig": null,
+  "updatedAt": "2026-10-24T05:56:09.500Z",
+  "updatedAtIST": "24/10/2026, 11:26:09 am"
+}
