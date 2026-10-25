@@ -267,12 +267,12 @@ export const DocumentVault: React.FC = () => {
   };
 
   // Delete Folder and its Sub-Folders
-  const handleDeleteFolder = (folderId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDeleteFolder = (folderId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     const folder = folders.find(f => f.id === folderId);
     if (!folder) return;
 
-    if (window.confirm(`Delete folder "${folder.name}" and all sub-folders inside it? Documents will remain safely stored.`)) {
+    if (window.confirm(`Kya aap folder "${folder.name}" aur iske sabhi sub-folders ko delete karna chahte hain? Documents safely store rahenge.`)) {
       const idsToDelete = getDescendantFolderIds(folderId);
       const updated = folders.filter(f => !idsToDelete.includes(f.id));
       saveFolders(updated);
@@ -894,14 +894,23 @@ export const DocumentVault: React.FC = () => {
 
         {/* Current Folder Action */}
         <div className="flex items-center gap-2">
-          {currentFolder && (
-            <button
-              onClick={(e) => handleOpenEditFolderModal(currentFolder, e)}
-              className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-500/20 text-slate-700 dark:text-slate-300 hover:text-amber-600 text-[11px] font-bold border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-all"
-              title="Rename current folder"
-            >
-              <Edit3 size={12} className="text-amber-500" /> Rename Folder
-            </button>
+          {currentFolder && (currentRole !== 'GUEST' || !currentUser?.trialInfo?.isExpired) && (
+            <>
+              <button
+                onClick={(e) => handleOpenEditFolderModal(currentFolder, e)}
+                className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-500/20 text-slate-700 dark:text-slate-300 hover:text-amber-600 text-[11px] font-bold border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-all"
+                title="Rename current folder"
+              >
+                <Edit3 size={12} className="text-amber-500" /> Rename Folder
+              </button>
+              <button
+                onClick={(e) => handleDeleteFolder(currentFolder.id, e)}
+                className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500 hover:text-white dark:bg-slate-800 text-red-600 dark:text-red-400 text-[11px] font-bold border border-red-500/30 flex items-center gap-1 transition-all"
+                title="Delete current folder"
+              >
+                <Trash2 size={12} /> Delete Folder
+              </button>
+            </>
           )}
 
           {(currentRole !== 'GUEST' || !currentUser?.trialInfo?.isExpired) && (
@@ -942,26 +951,28 @@ export const DocumentVault: React.FC = () => {
                       <Folder size={20} />
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                       {/* Rename / Edit Folder Button */}
                       {(currentRole !== 'GUEST' || !currentUser?.trialInfo?.isExpired) && (
                         <button
+                          type="button"
                           onClick={(e) => handleOpenEditFolderModal(folder, e)}
-                          title="Rename folder"
-                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-amber-500/20 text-slate-400 hover:text-amber-600 transition-all"
+                          title="Rename / Move folder"
+                          className="p-1 rounded-lg bg-slate-100 hover:bg-amber-500/20 dark:bg-slate-800 text-slate-500 hover:text-amber-600 transition-all shadow-sm"
                         >
-                          <Edit3 size={13} />
+                          <Edit3 size={12} />
                         </button>
                       )}
 
-                      {/* Delete button for custom folders */}
-                      {!folder.isBuiltIn && currentRole === 'ADMIN' && (
+                      {/* Delete button for folders */}
+                      {(currentRole !== 'GUEST' || !currentUser?.trialInfo?.isExpired) && (
                         <button
+                          type="button"
                           onClick={(e) => handleDeleteFolder(folder.id, e)}
-                          title="Delete folder and sub-folders"
-                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500 hover:text-white text-slate-400 transition-all"
+                          title={`Delete folder "${folder.name}"`}
+                          className="p-1 rounded-lg bg-slate-100 hover:bg-red-500 hover:text-white dark:bg-slate-800 text-slate-500 hover:text-white transition-all shadow-sm"
                         >
-                          <Trash2 size={13} />
+                          <Trash2 size={12} />
                         </button>
                       )}
                     </div>
@@ -1274,20 +1285,36 @@ export const DocumentVault: React.FC = () => {
               </div>
 
               {/* Modal Action Buttons */}
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
                 <button
                   type="button"
-                  onClick={() => { setIsEditFolderModalOpen(false); setEditingFolder(null); }}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold"
+                  onClick={(e) => {
+                    if (editingFolder) {
+                      handleDeleteFolder(editingFolder.id, e);
+                      setIsEditFolderModalOpen(false);
+                      setEditingFolder(null);
+                    }
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-red-500/15 hover:bg-red-600 text-red-700 dark:text-red-400 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 border border-red-500/30"
                 >
-                  Cancel
+                  <Trash2 size={13} /> Delete Folder
                 </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 active:scale-95 transition-all flex items-center gap-1.5"
-                >
-                  <Check size={14} /> Update Folder Name
-                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setIsEditFolderModalOpen(false); setEditingFolder(null); }}
+                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 active:scale-95 transition-all flex items-center gap-1.5"
+                  >
+                    <Check size={14} /> Update Folder Name
+                  </button>
+                </div>
               </div>
 
             </form>
