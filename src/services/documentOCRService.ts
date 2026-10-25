@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Client, ClientCategory } from '../types';
 import { getStoredGeminiKey } from './clientAIService';
 
-// Load PDF.js dynamically from CDN if not already present
+// Load PDF.js dynamically from CDN if not already present with timeout guard
 let pdfjsLoadingPromise: Promise<any> | null = null;
 export const loadPdfJsFromCdn = async (): Promise<any> => {
   if (typeof window === 'undefined') return null;
@@ -11,26 +11,43 @@ export const loadPdfJsFromCdn = async (): Promise<any> => {
   if (pdfjsLoadingPromise) return pdfjsLoadingPromise;
 
   pdfjsLoadingPromise = new Promise((resolve) => {
+    let settled = false;
+    const safeResolve = (val: any) => {
+      if (!settled) {
+        settled = true;
+        resolve(val);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      safeResolve(null);
+    }, 3500);
+
     try {
       const script = document.createElement('script');
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
       script.async = true;
       script.onload = () => {
+        clearTimeout(timer);
         const lib = (window as any).pdfjsLib;
         if (lib) {
-          lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-          resolve(lib);
+          try {
+            lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          } catch {}
+          safeResolve(lib);
         } else {
-          resolve(null);
+          safeResolve(null);
         }
       };
       script.onerror = () => {
+        clearTimeout(timer);
         console.warn('PDF.js CDN load error, fallback to binary scanner');
-        resolve(null);
+        safeResolve(null);
       };
       document.head.appendChild(script);
     } catch {
-      resolve(null);
+      clearTimeout(timer);
+      safeResolve(null);
     }
   });
 
