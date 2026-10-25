@@ -5,7 +5,7 @@ import { FirebaseService } from '../services/firebaseService';
 import { OnlineDataService } from '../services/onlineDataService';
 import { AudioService } from '../services/audioService';
 import { GoogleDriveService } from '../services/googleDriveService';
-import { detectEntityCategoryFromPANAndGSTIN } from '../utils/masterImportExport';
+import { detectEntityCategoryFromPANAndGSTIN, ParsedClientRow } from '../utils/masterImportExport';
 import { useAuth } from './AuthContext';
 import { SEED_CLIENTS, SEED_TASKS, SEED_EXTRA_WORK, SEED_DOCUMENTS } from '../data/seedData';
 
@@ -22,6 +22,7 @@ interface TaskContextType {
 
   // Client actions
   addClient: (client: Omit<Client, 'id' | 'createdAt'>) => Client;
+  bulkImportClients: (rows: ParsedClientRow[]) => { createdCount: number; updatedCount: number; totalCount: number };
   updateClient: (id: string, updates: Partial<Client>) => void;
   deleteClient: (id: string) => void;
 
@@ -461,7 +462,168 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       details: `Created new client: ${newClient.tradeName} (PAN: ${newClient.pan})`
     });
     setAuditLogs(StorageService.getAuditLogs());
+    StorageService.saveClients(updated);
     return newClient;
+  };
+
+  const bulkImportClients = (
+    rows: ParsedClientRow[]
+  ): { createdCount: number; updatedCount: number; totalCount: number } => {
+    if (!checkGuestWriteAllowed()) {
+      return { createdCount: 0, updatedCount: 0, totalCount: clients.length };
+    }
+
+    const currentClients = StorageService.getClients();
+    const updatedClientList: Client[] = [...currentClients];
+    let createdCount = 0;
+    let updatedCount = 0;
+    const newTasksToCreate: TaskItem[] = [];
+    const nowIso = new Date().toISOString().split('T')[0];
+
+    rows.forEach((row, idx) => {
+      const normPan = row.pan?.trim().toUpperCase();
+      const normGst = row.gstin?.trim().toUpperCase();
+      const normName = row.tradeName?.trim().toLowerCase();
+
+      // Check if client already exists (by PAN, GSTIN, or exact Trade Name)
+      const existingIndex = updatedClientList.findIndex(c => {
+        if (normPan && normPan !== 'PAN-PENDING' && c.pan?.trim().toUpperCase() === normPan) return true;
+        if (normGst && c.gstin?.trim().toUpperCase() === normGst) return true;
+        if (normName && c.tradeName?.trim().toLowerCase() === normName) return true;
+        return false;
+      });
+
+      const categoryToUse = row.category || detectEntityCategoryFromPANAndGSTIN(normPan, normGst, row.tradeName, row.legalName);
+
+      if (existingIndex !== -1) {
+        // MERGE & UPDATE EXISTING CLIENT (ZERO DUPLICATES!)
+        const existing = updatedClientList[existingIndex];
+        const merged: Client = {
+          ...existing,
+          tradeName: row.tradeName || existing.tradeName,
+          legalName: row.legalName || existing.legalName || row.tradeName || existing.tradeName,
+          pan: (normPan && normPan !== 'PAN-PENDING') ? normPan : existing.pan,
+          gstin: normGst || existing.gstin,
+          tan: row.tan || existing.tan,
+          category: categoryToUse || existing.category,
+          contactPerson: row.contactPerson || existing.contactPerson,
+          phone: row.phone || existing.phone,
+          email: row.email || existing.email,
+          formationDate: row.formationDate || existing.formationDate,
+          employeeName: row.employeeName || existing.employeeName,
+          employeePhone: row.employeePhone || existing.employeePhone,
+          googleDriveFolderId: row.googleDriveFolderId || existing.googleDriveFolderId,
+          googleDriveFolderUrl: row.googleDriveFolderUrl || existing.googleDriveFolderUrl
+        };
+        updatedClientList[existingIndex] = merged;
+        updatedCount++;
+      } else {
+        // CREATE NEW CLIENT RECORD
+        const clientId = 'cli-' + Date.now() + '-' + idx + '-' + Math.floor(Math.random() * 1000);
+        const newClient: Client = {
+          id: clientId,
+          createdAt: nowIso,
+          tradeName: row.tradeName,
+          legalName: row.legalName || row.tradeName,
+          pan: normPan || 'PAN-PENDING',
+          gstin: normGst,
+          tan: row.tan,
+          vatNumber: row.vatNumber,
+          category: categoryToUse,
+          status: 'ACTIVE',
+          contactPerson: row.contactPerson || '',
+          phone: row.phone || '',
+          email: row.email || '',
+          employeeName: row.employeeName,
+          employeePhone: row.employeePhone,
+          aadharNumber: row.aadharNumber,
+          dob: row.dob,
+          formationDate: row.formationDate,
+          assignedTeamId: '',
+          assignedTeamName: row.assignedTeamName || 'Assigned Staff',
+          portalPassword: 'client' + (row.phone ? row.phone.slice(-4) : '123'),
+          googleDriveFolderId: row.googleDriveFolderId || '',
+          googleDriveFolderUrl: row.googleDriveFolderUrl || '',
+          customFields: []
+        };
+        updatedClientList.push(newClient);
+        createdCount++;
+
+        // Add standard statutory compliance tasks for new client
+        const tsk1: TaskItem = {
+          id: 'tsk-' + Date.now() + '-' + idx + '-1',
+          clientId: newClient.id,
+          clientName: newClient.tradeName,
+          title: 'Monthly TDS Payment (Challan 281)',
+          category: 'TDS',
+          frequency: 'MONTHLY',
+          dueDayOrDate: '7',
+          dueDate: '2026-09-07',
+          status: 'PENDING',
+          assignedTeamId: newClient.assignedTeamId || '',
+          assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
+          priority: 'HIGH',
+          financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
+        };
+        const tsk2: TaskItem = {
+          id: 'tsk-' + Date.now() + '-' + idx + '-2',
+          clientId: newClient.id,
+          clientName: newClient.tradeName,
+          title: 'GSTR-1 Monthly Outward Return',
+          category: 'GST',
+          frequency: 'MONTHLY',
+          dueDayOrDate: '11',
+          dueDate: '2026-09-11',
+          status: 'PENDING',
+          assignedTeamId: newClient.assignedTeamId || '',
+          assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
+          priority: 'CRITICAL',
+          financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
+        };
+        newTasksToCreate.push(tsk1, tsk2);
+      }
+    });
+
+    // 1. Immediately write updated clients to state and LocalStorage
+    setClients(updatedClientList);
+    StorageService.saveClients(updatedClientList);
+
+    // 2. Save tasks if any new clients added
+    let currentTasks = StorageService.getTasks();
+    if (newTasksToCreate.length > 0) {
+      currentTasks = [...newTasksToCreate, ...currentTasks];
+      setTasks(currentTasks);
+      StorageService.saveTasks(currentTasks);
+    }
+
+    // 3. Immediately trigger background auto-sync to online server & Firebase
+    OnlineDataService.scheduleAutoOnlineSync({
+      clients: updatedClientList,
+      tasks: currentTasks,
+      team: StorageService.getTeam(),
+      extraWork: StorageService.getExtraWork(),
+      documents: StorageService.getDocuments(),
+      attendanceRecords: StorageService.getAttendance(),
+      settings: StorageService.getSettings(),
+      guestLeads: StorageService.getGuestLeads()
+    });
+
+    if (FirebaseService.isConfigured()) {
+      updatedClientList.forEach(c => FirebaseService.upsertDoc('clients', c.id, c));
+      newTasksToCreate.forEach(t => FirebaseService.upsertDoc('tasks', t.id, t));
+    }
+
+    StorageService.addAuditLog({
+      actorId: 'admin',
+      actorName: 'Admin',
+      role: 'ADMIN',
+      action: 'BULK_IMPORT_CLIENTS',
+      category: 'CLIENT',
+      details: `Bulk imported clients: ${createdCount} new created, ${updatedCount} existing updated (Zero Duplicates). Total in directory: ${updatedClientList.length}`
+    });
+    setAuditLogs(StorageService.getAuditLogs());
+
+    return { createdCount, updatedCount, totalCount: updatedClientList.length };
   };
 
   const updateClient = (id: string, updates: Partial<Client>) => {
@@ -1076,6 +1238,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       attendanceRecords,
       settings,
       addClient,
+      bulkImportClients,
       updateClient,
       deleteClient,
       addTask,

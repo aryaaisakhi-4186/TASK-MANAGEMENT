@@ -73,7 +73,17 @@
       "googleDriveFolderUrl": "",
       "customFields": [],
       "id": "cli-1792925526886-383",
-      "createdAt": "2026-10-25"
+      "createdAt": "2026-10-25",
+      "complianceApplicability": {
+        "AUDIT": true,
+        "GST": true,
+        "TDS": true,
+        "ITR": true,
+        "VAT": false,
+        "E_INVOICE": false,
+        "RCM": true,
+        "RULE_86B": false
+      }
     },
     {
       "tradeName": "SYED INFOCOM",
@@ -12646,6 +12656,6 @@
   },
   "guestLeads": [],
   "firebaseConfig": null,
-  "updatedAt": "2026-10-25T10:57:58.757Z",
-  "updatedAtIST": "25/10/2026, 4:27:58 pm"
+  "updatedAt": "2026-10-25T11:01:24.278Z",
+  "updatedAtIST": "25/10/2026, 4:31:24 pm"
 }

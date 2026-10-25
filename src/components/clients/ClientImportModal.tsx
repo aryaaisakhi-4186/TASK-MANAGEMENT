@@ -41,7 +41,7 @@ interface Props {
 const DEFAULT_MASTER_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1GcG1ekpVnewJo034_yttoP92qIYEeO_2uBacAgpwCqU/edit?pli=1&gid=0#gid=0';
 
 export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
-  const { clients, addClient, updateClient, settings, updateSettings, team } = useTasks();
+  const { clients, addClient, updateClient, bulkImportClients, settings, updateSettings, team } = useTasks();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEscapeKey(onClose, isOpen);
@@ -290,67 +290,14 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
     const validRows = rowsToProcess.filter(r => r.isValid);
     if (validRows.length === 0) return;
 
-    let updatedCount = 0;
-    let createdCount = 0;
-
-    validRows.forEach(row => {
-      const normPan = row.pan?.trim().toUpperCase();
-      const normGst = row.gstin?.trim().toUpperCase();
-      const normName = row.tradeName?.trim().toLowerCase();
-
-      const existingMatch = clients.find(c => {
-        if (normPan && normPan !== 'PAN-PENDING' && c.pan?.trim().toUpperCase() === normPan) return true;
-        if (normGst && c.gstin?.trim().toUpperCase() === normGst) return true;
-        if (normName && c.tradeName?.trim().toLowerCase() === normName) return true;
-        return false;
-      });
-
-      if (existingMatch) {
-        updateClient(existingMatch.id, {
-          tradeName: row.tradeName || existingMatch.tradeName,
-          legalName: row.legalName || existingMatch.legalName || row.tradeName,
-          pan: (normPan && normPan !== 'PAN-PENDING') ? normPan : existingMatch.pan,
-          gstin: row.gstin || existingMatch.gstin,
-          tan: row.tan || existingMatch.tan,
-          category: row.category || existingMatch.category,
-          contactPerson: row.contactPerson || existingMatch.contactPerson,
-          phone: row.phone || existingMatch.phone,
-          email: row.email || existingMatch.email,
-          formationDate: row.formationDate || existingMatch.formationDate
-        });
-        updatedCount++;
-      } else {
-        addClient({
-          tradeName: row.tradeName,
-          legalName: row.legalName || row.tradeName,
-          pan: row.pan,
-          gstin: row.gstin,
-          tan: row.tan,
-          vatNumber: row.vatNumber,
-          category: row.category,
-          status: 'ACTIVE',
-          contactPerson: row.contactPerson || '',
-          phone: row.phone || '',
-          email: row.email || '',
-          employeeName: row.employeeName,
-          employeePhone: row.employeePhone,
-          aadharNumber: row.aadharNumber,
-          dob: row.dob,
-          formationDate: row.formationDate,
-          assignedTeamId: '',
-          assignedTeamName: row.assignedTeamName || 'Assigned Staff',
-          portalPassword: 'client' + (row.phone ? row.phone.slice(-4) : '123'),
-          googleDriveFolderId: row.googleDriveFolderId || '',
-          googleDriveFolderUrl: row.googleDriveFolderUrl || '',
-          customFields: []
-        });
-        createdCount++;
-      }
-    });
+    // Use guaranteed atomic bulk import (zero duplicates, updates existing, adds new, saves instantly)
+    const { createdCount, updatedCount, totalCount } = bulkImportClients(validRows);
 
     setImportSuccessCount(validRows.length);
-    setImportSuccessSummary(`✨ ${createdCount} New Clients created, 🔄 ${updatedCount} Existing Profiles updated (0 Duplicate Records).`);
+    setImportSuccessSummary(`✨ ${createdCount} New Clients added, 🔄 ${updatedCount} Existing Profiles updated (Total ${totalCount} Clients in Directory).`);
     setParsedRows([]);
+    setEditingIndex(null);
+    setEditFormData(null);
   };
 
   const validCount = parsedRows.filter(r => r.isValid).length;
@@ -423,19 +370,36 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
         {/* Success Alert */}
         {importSuccessCount !== null && (
-          <div className="mb-4 p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Check size={18} className="text-emerald-500 font-bold" />
-              <span>
-                <strong>{importSuccessCount} Clients</strong> successfully imported/updated into Master Directory without any duplicates!
-              </span>
+          <div className="mb-4 p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+            <div className="flex items-start gap-2.5">
+              <Check size={18} className="text-emerald-500 font-bold shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-slate-900 dark:text-white">
+                  {importSuccessCount} Clients successfully processed into Master Directory!
+                </p>
+                {importSuccessSummary && (
+                  <p className="text-[11px] text-emerald-700 dark:text-emerald-300 mt-0.5">
+                    {importSuccessSummary}
+                  </p>
+                )}
+              </div>
             </div>
-            <button
-              onClick={() => setImportSuccessCount(null)}
-              className="font-bold underline ml-2"
-            >
-              Import More
-            </button>
+            <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all"
+              >
+                View Client Directory
+              </button>
+              <button
+                type="button"
+                onClick={() => { setImportSuccessCount(null); setImportSuccessSummary(null); }}
+                className="px-2.5 py-1.5 font-bold underline text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900"
+              >
+                Import More
+              </button>
+            </div>
           </div>
         )}
 
