@@ -154,11 +154,5 @@ export default defineConfig({
   server: {
     host: true, // Listens on 0.0.0.0 so phone can access via local Wi-Fi IP
     port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      },
-    },
   },
 });

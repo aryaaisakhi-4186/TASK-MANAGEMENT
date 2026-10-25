@@ -5,7 +5,7 @@ import { FirebaseService } from '../../services/firebaseService';
 import { getSavedFirebaseConfig, saveFirebaseConfig, removeFirebaseConfig, initFirebase } from '../../firebase/config';
 import { StorageService } from '../../services/storage';
 import { OnlineDataService } from '../../services/onlineDataService';
-import { Settings, Flame, Shield, Bell, Save, Check, Mail, Cloud, Eye, EyeOff, RefreshCw, Trash2, AlertTriangle, AlertCircle, Users, Rocket } from 'lucide-react';
+import { Settings, Flame, Shield, Bell, Save, Check, Mail, Cloud, Eye, EyeOff, RefreshCw, Trash2, AlertTriangle, AlertCircle, Users, Rocket, Download } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { GuestLeadsModal } from './GuestLeadsModal';
 import { OnlineUpdateModal } from '../common/OnlineUpdateModal';
@@ -120,6 +120,39 @@ export const FirmSettingsModal: React.FC = () => {
 
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  };
+
+  const handleExportBackup = () => {
+    try {
+      const backupData = {
+        firmName,
+        adminName,
+        adminDesignation,
+        clients: StorageService.getClients(),
+        tasks: StorageService.getTasks(),
+        team: StorageService.getTeam(),
+        extraWork: StorageService.getExtraWork(),
+        documents: StorageService.getDocuments(),
+        attendanceRecords: StorageService.getAttendance(),
+        settings: StorageService.getSettings(),
+        guestLeads: StorageService.getGuestLeads(),
+        backupDate: new Date().toISOString()
+      };
+      const jsonStr = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const dateStr = new Date().toISOString().slice(0, 10);
+      a.download = `Arya_Associates_Practice_Backup_${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Backup export failed:', err);
+      alert('Backup export karne me error aayi.');
+    }
   };
 
   return (
@@ -473,28 +506,23 @@ export const FirmSettingsModal: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           
-          {/* Card 1: App Reset (Seed Data) */}
-          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col justify-between gap-3">
+          {/* Card 1: Backup Practice Data (Export JSON) */}
+          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col justify-between gap-3">
             <div>
-              <div className="flex items-center gap-2 font-bold text-xs text-amber-900 dark:text-amber-300">
-                <RefreshCw size={15} className="text-amber-600" />
-                <span>🔄 App Reset (Seed Data)</span>
+              <div className="flex items-center gap-2 font-bold text-xs text-emerald-900 dark:text-emerald-300">
+                <Download size={15} className="text-emerald-600 dark:text-emerald-400" />
+                <span>📥 Backup Practice Data (JSON)</span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
-                Resets clients, compliance tasks, and team staff back to the standard CA seed demo templates.
+                Download a complete offline JSON snapshot of your clients, tasks, compliance records, and firm settings.
               </p>
             </div>
             <button
               type="button"
-              onClick={() => {
-                if (window.confirm('Are you sure you want to restore default seed demo data? Any custom tasks added will be replaced.')) {
-                  resetAllData();
-                  alert('App data successfully reset to default seed records!');
-                }
-              }}
-              className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-1.5"
+              onClick={handleExportBackup}
+              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-1.5"
             >
-              <RefreshCw size={13} /> Reset to Demo Data
+              <Download size={13} /> Export Practice Backup
             </button>
           </div>
 
@@ -503,24 +531,24 @@ export const FirmSettingsModal: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 font-bold text-xs text-red-900 dark:text-red-300">
                 <Trash2 size={15} className="text-red-600" />
-                <span>💥 Full App Reset (0 Data)</span>
+                <span>💥 Full App Reset (0 Clean Data)</span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
-                Completely purges all clients, tasks, extra work, and chat history. Sets database to 0 for a 100% fresh practice start.
+                Clears all clients, tasks, extra work & documents to 0 for a 100% clean start. <strong>Your Admin Password & Firm Settings will NOT be deleted.</strong>
               </p>
             </div>
             <button
               type="button"
               onClick={() => {
-                const conf = window.prompt('⚠️ WARNING: This will permanently delete ALL clients, tasks, extra billing & attendance (0 data).\n\nTo confirm, type "RESET" in the box below:');
+                const conf = window.prompt('⚠️ WARNING: This will permanently delete ALL clients, tasks, extra billing & documents (0 data).\n\nAapka Admin Password aur Firm Settings SURAKSHIT rahenge.\n\nTo confirm, type "RESET" in the box below:');
                 if (conf === 'RESET' || conf === 'reset') {
                   fullAppReset();
-                  alert('💥 Full App Reset Complete! All records have been cleared to zero for a clean start.');
+                  alert('💥 Full App Reset Complete! All records have been cleared to 0. Aapka Admin Password aur Firm Settings safe hain.');
                 }
               }}
               className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/30 transition-all flex items-center justify-center gap-1.5"
             >
-              <Trash2 size={13} /> Full App Reset (Zero Wipe)
+              <Trash2 size={13} /> Full App Reset (0 Clean Data)
             </button>
           </div>
 

@@ -115,11 +115,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     OnlineDataService.pullLiveOnlineData().then(onlineData => {
       if (onlineData) {
-        if (Array.isArray(onlineData.clients) && onlineData.clients.length > 0) {
+        if (Array.isArray(onlineData.clients)) {
           setClients(onlineData.clients);
           StorageService.saveClients(onlineData.clients);
         }
-        if (Array.isArray(onlineData.tasks) && onlineData.tasks.length > 0) {
+        if (Array.isArray(onlineData.tasks)) {
           setTasks(onlineData.tasks);
           StorageService.saveTasks(onlineData.tasks);
         }
@@ -127,19 +127,19 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setTeam(onlineData.team);
           StorageService.saveTeam(onlineData.team);
         }
-        if (Array.isArray(onlineData.extraWork) && onlineData.extraWork.length > 0) {
+        if (Array.isArray(onlineData.extraWork)) {
           setExtraWork(onlineData.extraWork);
           StorageService.saveExtraWork(onlineData.extraWork);
         }
-        if (Array.isArray(onlineData.documents) && onlineData.documents.length > 0) {
+        if (Array.isArray(onlineData.documents)) {
           setDocuments(onlineData.documents);
           StorageService.saveDocuments(onlineData.documents);
         }
-        if (Array.isArray(onlineData.attendanceRecords) && onlineData.attendanceRecords.length > 0) {
+        if (Array.isArray(onlineData.attendanceRecords)) {
           setAttendanceRecords(onlineData.attendanceRecords);
           StorageService.saveAttendance(onlineData.attendanceRecords);
         }
-        if (Array.isArray(onlineData.guestLeads) && onlineData.guestLeads.length > 0) {
+        if (Array.isArray(onlineData.guestLeads)) {
           StorageService.saveGuestLeads(onlineData.guestLeads);
         }
         if (onlineData.settings) {
@@ -156,6 +156,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (!cleanSettings.firmName || cleanSettings.firmName.includes('VAANI') || cleanSettings.firmName.includes('Vaani')) {
             cleanSettings.firmName = currentSavedSettings.firmName || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+          }
+          if (currentSavedSettings.adminName) {
+            cleanSettings.adminName = currentSavedSettings.adminName;
+          }
+          if (currentSavedSettings.adminDesignation) {
+            cleanSettings.adminDesignation = currentSavedSettings.adminDesignation;
           }
           if (currentSavedSettings.selectedTaxYear) {
             cleanSettings.selectedTaxYear = currentSavedSettings.selectedTaxYear;
@@ -187,6 +193,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (!cleanSettings.firmName || cleanSettings.firmName.includes('VAANI') || cleanSettings.firmName.includes('Vaani')) {
               cleanSettings.firmName = currentSavedSettings.firmName || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+            }
+            if (currentSavedSettings.adminName) {
+              cleanSettings.adminName = currentSavedSettings.adminName;
+            }
+            if (currentSavedSettings.adminDesignation) {
+              cleanSettings.adminDesignation = currentSavedSettings.adminDesignation;
             }
             if (currentSavedSettings.selectedTaxYear) {
               cleanSettings.selectedTaxYear = currentSavedSettings.selectedTaxYear;
@@ -1009,12 +1021,26 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     StorageService.fullCleanWipe();
     setClients([]);
     setTasks([]);
-    setTeam(StorageService.getTeam());
+    const cleanTeam = StorageService.getTeam();
+    setTeam(cleanTeam);
     setExtraWork([]);
     setDocuments([]);
     setAuditLogs([]);
     setAttendanceRecords([]);
-    setSettings(StorageService.getSettings());
+    const preservedSettings = StorageService.getSettings();
+    setSettings(preservedSettings);
+
+    // Immediately trigger auto-sync of this 0-data state to server / Firebase
+    OnlineDataService.scheduleAutoOnlineSync({
+      clients: [],
+      tasks: [],
+      team: cleanTeam,
+      extraWork: [],
+      documents: [],
+      attendanceRecords: [],
+      settings: preservedSettings,
+      guestLeads: StorageService.getGuestLeads()
+    });
   };
 
   const resetToBlankForGuestDemo = () => {

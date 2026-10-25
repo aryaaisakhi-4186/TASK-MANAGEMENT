@@ -14,7 +14,7 @@ export const INITIAL_SYSTEM_SETTINGS: SystemSettings = {
   cloudStorageEmail: 'arya.taskmanagement@gmail.com',
   selectedTaxYear: 'Tax Year 2026-27',
   googleDriveSyncEnabled: true,
-  googleSheetName: 'TASK-VAANI Statutory Compliance Master FY 2025-26',
+  googleSheetName: 'M/S. ARYA ASSOCIATES Statutory Compliance Master Tax Year 2026-27',
   masterGoogleSheetUrl: 'https://docs.google.com/spreadsheets/d/1GcG1ekpVnewJo034_yttoP92qIYEeO_2uBacAgpwCqU/edit?pli=1&gid=0#gid=0',
   masterGoogleSheetId: '1GcG1ekpVnewJo034_yttoP92qIYEeO_2uBacAgpwCqU',
   lastCloudSyncTimestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
@@ -23,14 +23,14 @@ export const INITIAL_SYSTEM_SETTINGS: SystemSettings = {
 export const SEED_TEAM_MEMBERS: UserProfile[] = [
   {
     id: 'team-1',
-    name: 'CA Rajesh Sharma',
+    name: 'RAVI KATARA',
     role: 'TEAM',
-    email: 'rajesh@vaaniassociates.in',
-    phone: '+91 98111 22334',
-    pin: '1234',
+    email: 'arya4186@gmail.com',
+    phone: '+91-8815052555',
+    pin: '1517',
     designation: 'Senior Partner (Tax & Audit)',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
-    assignedClientIds: ['cli-1', 'cli-2', 'cli-5'],
+    assignedClientIds: [],
   },
   {
     id: 'team-2',

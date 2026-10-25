@@ -59,52 +59,63 @@ function getScopedKey(baseKey: string): { key: string; isGuestWorkspace: boolean
 }
 
 export const StorageService = {
-  // Clients (Isolated blank workspace for Guest Demo users, Seed/Master data for Admin/Team)
+  // Clients (Defaults to 0 for Clean Production Practice Start)
   getClients: (): Client[] => {
-    const { key, isGuestWorkspace } = getScopedKey(KEYS.CLIENTS);
-    return safeGet<Client[]>(key, isGuestWorkspace ? [] : SEED_CLIENTS);
+    const { key } = getScopedKey(KEYS.CLIENTS);
+    return safeGet<Client[]>(key, []);
   },
   saveClients: (clients: Client[]) => {
     const { key } = getScopedKey(KEYS.CLIENTS);
     safeSet(key, clients);
   },
 
-  // Tasks (Isolated blank workspace for Guest Demo users, Seed/Master data for Admin/Team)
+  // Tasks (Defaults to 0 for Clean Production Practice Start)
   getTasks: (): TaskItem[] => {
-    const { key, isGuestWorkspace } = getScopedKey(KEYS.TASKS);
-    return safeGet<TaskItem[]>(key, isGuestWorkspace ? [] : SEED_TASKS);
+    const { key } = getScopedKey(KEYS.TASKS);
+    return safeGet<TaskItem[]>(key, []);
   },
   saveTasks: (tasks: TaskItem[]) => {
     const { key } = getScopedKey(KEYS.TASKS);
     safeSet(key, tasks);
   },
 
-  // Team
-  getTeam: (): UserProfile[] => safeGet<UserProfile[]>(KEYS.TEAM, SEED_TEAM_MEMBERS),
+  // Team (Defaults to Partner Ravi Katara)
+  getTeam: (): UserProfile[] => safeGet<UserProfile[]>(KEYS.TEAM, [
+    {
+      id: 'team-1',
+      name: 'RAVI KATARA',
+      role: 'TEAM',
+      email: 'arya4186@gmail.com',
+      phone: '+91-8815052555',
+      pin: '1517',
+      designation: 'Senior Partner (Tax & Audit)',
+      assignedClientIds: []
+    }
+  ]),
   saveTeam: (team: UserProfile[]) => safeSet(KEYS.TEAM, team),
 
-  // Extra Work
+  // Extra Work (Defaults to 0)
   getExtraWork: (): ExtraWorkItem[] => {
-    const { key, isGuestWorkspace } = getScopedKey(KEYS.EXTRA_WORK);
-    return safeGet<ExtraWorkItem[]>(key, isGuestWorkspace ? [] : SEED_EXTRA_WORK);
+    const { key } = getScopedKey(KEYS.EXTRA_WORK);
+    return safeGet<ExtraWorkItem[]>(key, []);
   },
   saveExtraWork: (work: ExtraWorkItem[]) => {
     const { key } = getScopedKey(KEYS.EXTRA_WORK);
     safeSet(key, work);
   },
 
-  // Documents
+  // Documents (Defaults to 0)
   getDocuments: (): DocumentItem[] => {
-    const { key, isGuestWorkspace } = getScopedKey(KEYS.DOCUMENTS);
-    return safeGet<DocumentItem[]>(key, isGuestWorkspace ? [] : SEED_DOCUMENTS);
+    const { key } = getScopedKey(KEYS.DOCUMENTS);
+    return safeGet<DocumentItem[]>(key, []);
   },
   saveDocuments: (docs: DocumentItem[]) => {
     const { key } = getScopedKey(KEYS.DOCUMENTS);
     safeSet(key, docs);
   },
 
-  // Audit Logs
-  getAuditLogs: (): AuditLog[] => safeGet<AuditLog[]>(KEYS.AUDIT_LOGS, SEED_AUDIT_LOGS),
+  // Audit Logs (Defaults to 0)
+  getAuditLogs: (): AuditLog[] => safeGet<AuditLog[]>(KEYS.AUDIT_LOGS, []),
   saveAuditLogs: (logs: AuditLog[]) => safeSet(KEYS.AUDIT_LOGS, logs),
   addAuditLog: (log: Omit<AuditLog, 'id' | 'timestamp'>) => {
     const current = StorageService.getAuditLogs();
@@ -128,20 +139,32 @@ export const StorageService = {
 
   // Settings
   getAdminPassword: (): string => {
-    const direct = safeGet<string>(KEYS.ADMIN_PASSWORD, '');
-    if (direct) return direct;
+    try {
+      const raw = localStorage.getItem(KEYS.ADMIN_PASSWORD);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (typeof parsed === 'string' && parsed.trim()) return parsed.trim();
+        } catch {
+          if (raw.trim()) return raw.trim();
+        }
+      }
+    } catch {}
     const settings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
     return settings.adminPasswordHash || 'admin123';
   },
   saveAdminPassword: (password: string): void => {
-    safeSet(KEYS.ADMIN_PASSWORD, password);
+    const clean = password.trim() || 'admin123';
+    try {
+      localStorage.setItem(KEYS.ADMIN_PASSWORD, JSON.stringify(clean));
+    } catch {}
     const settings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
-    settings.adminPasswordHash = password;
+    settings.adminPasswordHash = clean;
     safeSet(KEYS.SETTINGS, settings);
   },
   getSettings: (): SystemSettings => {
     const settings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
-    const customPassword = safeGet<string>(KEYS.ADMIN_PASSWORD, '');
+    const customPassword = StorageService.getAdminPassword();
     if (customPassword) {
       settings.adminPasswordHash = customPassword;
     }
@@ -362,13 +385,36 @@ export const StorageService = {
   fullCleanWipe: () => {
     safeSet(KEYS.CLIENTS, []);
     safeSet(KEYS.TASKS, []);
-    safeSet(KEYS.TEAM, [SEED_TEAM_MEMBERS[0]]);
     safeSet(KEYS.EXTRA_WORK, []);
     safeSet(KEYS.DOCUMENTS, []);
     safeSet(KEYS.AUDIT_LOGS, []);
     safeSet(KEYS.ATTENDANCE, []);
     safeSet(KEYS.CLIENT_REMINDERS, []);
-    safeSet(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
+    
+    // PRESERVE active Team member (Partner Ravi Katara)
+    const currentTeam = StorageService.getTeam();
+    safeSet(KEYS.TEAM, currentTeam.length > 0 ? currentTeam : [
+      {
+        id: 'team-1',
+        name: 'RAVI KATARA',
+        role: 'TEAM',
+        email: 'arya4186@gmail.com',
+        phone: '+91-8815052555',
+        pin: '1517',
+        designation: 'Senior Partner (Tax & Audit)',
+        assignedClientIds: []
+      }
+    ]);
+
+    // STRICTLY PRESERVE firm settings & custom admin password!
+    const currentSettings = StorageService.getSettings();
+    const currentAdminPass = StorageService.getAdminPassword();
+    currentSettings.adminPasswordHash = currentAdminPass;
+    safeSet(KEYS.SETTINGS, currentSettings);
+    try {
+      localStorage.setItem(KEYS.ADMIN_PASSWORD, JSON.stringify(currentAdminPass));
+    } catch {}
+
     try {
       localStorage.removeItem('taskvaani_agentic_ai_chat_history');
     } catch {}

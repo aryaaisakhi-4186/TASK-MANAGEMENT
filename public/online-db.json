@@ -10,11 +10,7 @@
       "phone": "+91-8815052555",
       "pin": "1517",
       "designation": "Senior Partner (Tax & Audit)",
-      "assignedClientIds": [
-        "cli-1",
-        "cli-2",
-        "cli-5"
-      ]
+      "assignedClientIds": []
     }
   ],
   "extraWork": [],
