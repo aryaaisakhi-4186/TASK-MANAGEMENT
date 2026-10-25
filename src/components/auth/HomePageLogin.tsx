@@ -23,17 +23,20 @@ import {
   Square,
   Phone,
   Mail,
-  MessageCircle
+  MessageCircle,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 export const HomePageLogin: React.FC = () => {
   const { loginAsAdmin, loginAsTeam, loginAsClient, loginAsGuestWithMobile } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { team, clients } = useTasks();
+  const { team, clients, settings } = useTasks();
 
   // Unified Smart Login State
-  const [identifier, setIdentifier] = useState('');
+  const [identifier, setIdentifier] = useState('admin');
   const [secret, setSecret] = useState('');
+  const [showSecret, setShowSecret] = useState(false);
   const [guestName, setGuestName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [successInfo, setSuccessInfo] = useState('');
@@ -172,8 +175,9 @@ export const HomePageLogin: React.FC = () => {
     setErrorMsg('');
     setSuccessInfo('');
     if (type === 'ADMIN') {
+      const currentPass = StorageService.getAdminPassword() || 'admin123';
       setIdentifier('admin');
-      setSecret('admin123');
+      setSecret(currentPass);
       setGuestName('');
     } else if (type === 'STAFF') {
       const firstStaff = team[0];
@@ -197,9 +201,9 @@ export const HomePageLogin: React.FC = () => {
             <Scale size={22} className="text-slate-950 font-black" />
           </div>
           <div>
-            <h1 className="text-lg font-black tracking-wider text-white font-serif flex items-center gap-2">
-              <span>TASK-VAANI</span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold border border-amber-500/30">
+            <h1 className="text-sm sm:text-base font-black tracking-wider text-white font-serif flex items-center gap-2">
+              <span className="truncate max-w-[260px] sm:max-w-md">{settings.firmName || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION'}</span>
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-mono font-bold border border-amber-500/30 shrink-0">
                 v2.0
               </span>
             </h1>
@@ -231,15 +235,15 @@ export const HomePageLogin: React.FC = () => {
         <div className="w-full max-w-md">
           <div className="rounded-3xl bg-slate-900/90 border-2 border-amber-500/40 p-6 sm:p-8 shadow-2xl shadow-amber-500/10 backdrop-blur-xl relative">
             
-            {/* Logo and TASK-VAANI Title */}
+            {/* Logo and Firm Title */}
             <div className="text-center mb-6">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 text-slate-950 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-amber-500/30 border border-amber-300">
                 <Scale size={28} className="text-slate-950 font-black" />
               </div>
-              <h2 className="text-2xl font-black text-white font-serif tracking-wide">
-                TASK-VAANI
+              <h2 className="text-lg sm:text-xl font-black text-white font-serif tracking-wide leading-tight px-1">
+                {settings.firmName || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION'}
               </h2>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-slate-400 mt-1.5 font-medium">
                 Statutory Compliance & Practice Management
               </p>
             </div>
@@ -291,13 +295,23 @@ export const HomePageLogin: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <input
-                  type="password"
-                  value={secret}
-                  onChange={(e) => setSecret(e.target.value)}
-                  placeholder="Enter Password / PIN (e.g. last 4 digits)"
-                  className="w-full px-4 py-3 rounded-2xl bg-slate-950 border border-slate-800 font-mono text-white text-sm placeholder:text-slate-600 focus:border-amber-500 focus:outline-none transition-all shadow-inner"
-                />
+                <div className="relative">
+                  <input
+                    type={showSecret ? 'text' : 'password'}
+                    value={secret}
+                    onChange={(e) => setSecret(e.target.value)}
+                    placeholder="Enter Password / PIN (e.g. admin password or 4-digit PIN)"
+                    className="w-full pl-4 pr-11 py-3 rounded-2xl bg-slate-950 border border-slate-800 font-mono text-white text-sm placeholder:text-slate-600 focus:border-amber-500 focus:outline-none transition-all shadow-inner"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSecret(!showSecret)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-amber-400 transition-colors p-1"
+                    title={showSecret ? 'Hide Password' : 'Show Password'}
+                  >
+                    {showSecret ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
 
               {/* Status Message */}
@@ -319,7 +333,7 @@ export const HomePageLogin: React.FC = () => {
                 type="submit"
                 className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 active:scale-95 transition-all mt-2"
               >
-                <span>Sign In to TASK-VAANI</span>
+                <span>Sign In to Practice Portal</span>
                 <ArrowRight size={16} />
               </button>
 
