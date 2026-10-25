@@ -115,6 +115,55 @@ export const deduplicateTasks = (taskList: TaskItem[], currentClients?: Client[]
   return Array.from(uniqueMap.values());
 };
 
+/**
+ * Merge two client lists safely without dropping any clients.
+ * Updates matching clients (by PAN, GSTIN, or Trade Name) and appends non-existing ones.
+ */
+export const mergeClients = (localClients: Client[], incomingClients: Client[]): Client[] => {
+  if (!Array.isArray(incomingClients) || incomingClients.length === 0) return localClients || [];
+  if (!Array.isArray(localClients) || localClients.length === 0) return incomingClients || [];
+
+  const mergedList: Client[] = [...localClients];
+
+  for (const inc of incomingClients) {
+    if (!inc || !inc.tradeName) continue;
+    const normPan = (inc.pan || '').trim().toUpperCase();
+    const normGst = (inc.gstin || '').trim().toUpperCase();
+    const normName = (inc.tradeName || '').trim().toLowerCase();
+
+    const existingIdx = mergedList.findIndex(c => {
+      if (normPan && normPan !== 'PAN-PENDING' && (c.pan || '').trim().toUpperCase() === normPan) return true;
+      if (normGst && (c.gstin || '').trim().toUpperCase() === normGst) return true;
+      if (normName && (c.tradeName || '').trim().toLowerCase() === normName) return true;
+      return false;
+    });
+
+    if (existingIdx !== -1) {
+      const existing = mergedList[existingIdx];
+      mergedList[existingIdx] = {
+        ...existing,
+        ...inc,
+        tradeName: existing.tradeName || inc.tradeName,
+        legalName: existing.legalName || inc.legalName || inc.tradeName,
+        pan: (existing.pan && existing.pan !== 'PAN-PENDING') ? existing.pan : inc.pan,
+        gstin: existing.gstin || inc.gstin,
+        phone: existing.phone || inc.phone,
+        email: existing.email || inc.email,
+        contactPerson: existing.contactPerson || inc.contactPerson,
+        employeeName: existing.employeeName || inc.employeeName,
+        googleDriveFolderId: existing.googleDriveFolderId || inc.googleDriveFolderId,
+        complianceApplicability: inc.complianceApplicability
+          ? { ...(existing.complianceApplicability || {}), ...inc.complianceApplicability } as any
+          : existing.complianceApplicability
+      };
+    } else {
+      mergedList.push(inc);
+    }
+  }
+
+  return mergedList;
+};
+
 export const StorageService = {
   // Clients (Defaults to 0 for Clean Production Practice Start)
   getClients: (): Client[] => {

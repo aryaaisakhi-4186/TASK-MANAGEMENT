@@ -105,7 +105,7 @@ export const ClientMasterTable: React.FC = () => {
             <Building className="text-amber-500" /> Client Master Directory
           </h2>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-medium">
-            Manage client identities, statutory registrations (PAN, GSTIN, TAN, VAT), employee sub-logins & KYC records
+            Manage client identities, statutory registrations (PAN, GSTIN, TAN, VAT), employee sub-logins & KYC records ({clients.length} Registered Clients • {filteredClients.length} Showing)
           </p>
         </div>
 

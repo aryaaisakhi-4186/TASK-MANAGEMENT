@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord, TaskStatus, ClientReminder } from '../types';
-import { StorageService, deduplicateTasks } from '../services/storage';
+import { StorageService, deduplicateTasks, mergeClients } from '../services/storage';
 import { FirebaseService } from '../services/firebaseService';
 import { OnlineDataService } from '../services/onlineDataService';
 import { AudioService } from '../services/audioService';
@@ -77,10 +77,65 @@ interface TaskContextType {
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
+// Helper to ensure every client referenced in tasks exists in the master client directory
+export const syncMissingClientsFromTasks = (currentClients: Client[], currentTasks: TaskItem[]): Client[] => {
+  const existingMap = new Map<string, Client>();
+  currentClients.forEach(c => {
+    if (c.tradeName) existingMap.set(c.tradeName.trim().toLowerCase(), c);
+  });
+
+  const added: Client[] = [];
+  currentTasks.forEach(t => {
+    if (!t.clientName) return;
+    const norm = t.clientName.trim().toLowerCase();
+    if (!existingMap.has(norm)) {
+      const cat = detectEntityCategoryFromPANAndGSTIN('', '', t.clientName, t.clientName);
+      const synthClient: Client = {
+        id: t.clientId || ('cli-' + Date.now() + '-' + Math.floor(Math.random() * 10000)),
+        tradeName: t.clientName,
+        legalName: t.clientName,
+        pan: 'PAN-PENDING',
+        category: cat,
+        status: 'ACTIVE',
+        contactPerson: '',
+        phone: '',
+        email: '',
+        assignedTeamId: t.assignedTeamId || '',
+        assignedTeamName: t.assignedTeamName || 'Assigned Staff',
+        portalPassword: 'client123',
+        createdAt: '2026-10-25',
+        complianceApplicability: {
+          GST: true,
+          TDS: true,
+          ITR: true,
+          AUDIT: cat === 'PVT_LTD' || cat === 'LLP',
+          VAT: false,
+          E_INVOICE: false,
+          RCM: false,
+          RULE_86B: false
+        }
+      };
+      existingMap.set(norm, synthClient);
+      added.push(synthClient);
+    }
+  });
+
+  if (added.length > 0) {
+    const all = [...currentClients, ...added];
+    StorageService.saveClients(all);
+    return all;
+  }
+  return currentClients;
+};
+
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { currentUser } = useAuth();
-  const [clients, setClients] = useState<Client[]>(() => StorageService.getClients());
   const [tasks, setTasks] = useState<TaskItem[]>(() => StorageService.getTasks());
+  const [clients, setClients] = useState<Client[]>(() => {
+    const rawClients = StorageService.getClients();
+    const rawTasks = StorageService.getTasks();
+    return syncMissingClientsFromTasks(rawClients, rawTasks);
+  });
   const [team, setTeam] = useState<UserProfile[]>(() => StorageService.getTeam());
   const [extraWork, setExtraWork] = useState<ExtraWorkItem[]>(() => StorageService.getExtraWork());
   const [documents, setDocuments] = useState<DocumentItem[]>(() => StorageService.getDocuments());
@@ -117,9 +172,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     OnlineDataService.pullLiveOnlineData().then(onlineData => {
       if (onlineData) {
-        if (Array.isArray(onlineData.clients)) {
-          setClients(onlineData.clients);
-          StorageService.saveClients(onlineData.clients);
+        if (Array.isArray(onlineData.clients) && onlineData.clients.length > 0) {
+          const currentLocal = StorageService.getClients();
+          const merged = mergeClients(currentLocal, onlineData.clients);
+          const complete = syncMissingClientsFromTasks(merged, onlineData.tasks || StorageService.getTasks());
+          setClients(complete);
+          StorageService.saveClients(complete);
         }
         if (Array.isArray(onlineData.tasks)) {
           const cleanTasks = deduplicateTasks(onlineData.tasks, onlineData.clients || StorageService.getClients());
@@ -177,7 +235,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Attach Real-Time Live Server Listener (/api/online-db across tabs & office devices)
       unsubscribers.push(
         OnlineDataService.subscribeToLiveServerUpdates((liveSnap) => {
-          if (Array.isArray(liveSnap.clients)) setClients(liveSnap.clients);
+          if (Array.isArray(liveSnap.clients) && liveSnap.clients.length > 0) {
+            setClients(prev => {
+              const currentLocal = StorageService.getClients();
+              const merged = mergeClients(currentLocal, liveSnap.clients || []);
+              StorageService.saveClients(merged);
+              return merged;
+            });
+          }
           if (Array.isArray(liveSnap.tasks)) {
             const clean = deduplicateTasks(liveSnap.tasks, liveSnap.clients || StorageService.getClients());
             setTasks(clean);
@@ -219,7 +284,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (FirebaseService.isConfigured()) {
         unsubscribers.push(
           FirebaseService.subscribeToCollection<Client>('clients', (items) => {
-            if (items.length > 0) setClients(items);
+            if (items.length > 0) {
+              setClients(prev => {
+                const currentLocal = StorageService.getClients();
+                const merged = mergeClients(currentLocal, items);
+                StorageService.saveClients(merged);
+                return merged;
+              });
+            }
           }),
           FirebaseService.subscribeToCollection<TaskItem>('tasks', (items) => {
             if (items.length > 0) {
