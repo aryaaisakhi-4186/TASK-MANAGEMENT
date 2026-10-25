@@ -49,6 +49,7 @@ export const TaskMatrixGrid: React.FC<{
     addTask, 
     updateTaskStatus, 
     bulkUpdateTasks, 
+    cleanDuplicateTasks,
     settings, 
     recordPunchIn, 
     recordPunchOut, 
@@ -56,6 +57,16 @@ export const TaskMatrixGrid: React.FC<{
   } = useTasks();
   
   const { currentRole, currentUser } = useAuth();
+
+  const handleCleanDuplicates = () => {
+    const removed = cleanDuplicateTasks();
+    if (removed > 0) {
+      setActionNotice(`🧹 Safely removed ${removed} duplicate compliance tasks! All tasks are now unique.`);
+    } else {
+      setActionNotice('✨ Perfect! Zero duplicate tasks found.');
+    }
+    setTimeout(() => setActionNotice(null), 4000);
+  };
 
   const handleDuplicateTask = (task: TaskItem) => {
     addTask({
@@ -149,10 +160,23 @@ export const TaskMatrixGrid: React.FC<{
       map.set(c.id, { client: c, tasks: [] });
     });
 
+    // Helper to prevent any identical duplicate task from appearing inside a client group
+    const pushTaskCleanly = (targetList: TaskItem[], candidate: TaskItem) => {
+      const normTitle = (candidate.title || '').trim().toLowerCase();
+      const normDate = (candidate.dueDate || candidate.dueDayOrDate || candidate.financialYear || '').trim().toLowerCase();
+      const isDup = targetList.some(
+        t => (t.title || '').trim().toLowerCase() === normTitle &&
+             (t.dueDate || t.dueDayOrDate || t.financialYear || '').trim().toLowerCase() === normDate
+      );
+      if (!isDup) {
+        targetList.push(candidate);
+      }
+    };
+
     // Assign tasks to their client group
     filteredTasks.forEach(task => {
       if (task.clientId && map.has(task.clientId)) {
-        map.get(task.clientId)!.tasks.push(task);
+        pushTaskCleanly(map.get(task.clientId)!.tasks, task);
       } else {
         // Find by name match or create temporary group
         const existingByName = Array.from(map.values()).find(
@@ -160,7 +184,7 @@ export const TaskMatrixGrid: React.FC<{
         );
 
         if (existingByName) {
-          existingByName.tasks.push(task);
+          pushTaskCleanly(existingByName.tasks, task);
         } else {
           const tempId = 'cli-temp-' + (task.clientName || 'unknown').replace(/\s+/g, '-');
           if (!map.has(tempId)) {
@@ -176,7 +200,7 @@ export const TaskMatrixGrid: React.FC<{
               tasks: []
             });
           }
-          map.get(tempId)!.tasks.push(task);
+          pushTaskCleanly(map.get(tempId)!.tasks, task);
         }
       }
     });
@@ -432,6 +456,15 @@ export const TaskMatrixGrid: React.FC<{
               <Plus size={16} /> New Task
             </button>
           )}
+
+          {/* One-Click Clean Duplicate Tasks Button */}
+          <button
+            onClick={handleCleanDuplicates}
+            title="Scan and remove any duplicate compliance tasks across clients"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 shadow-sm transition-all active:scale-95"
+          >
+            <span>🧹 Clean Duplicates</span>
+          </button>
 
           {/* Sync to Google Sheets Button */}
           <button

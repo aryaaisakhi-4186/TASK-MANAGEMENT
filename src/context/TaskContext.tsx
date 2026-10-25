@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord, TaskStatus, ClientReminder } from '../types';
-import { StorageService } from '../services/storage';
+import { StorageService, deduplicateTasks } from '../services/storage';
 import { FirebaseService } from '../services/firebaseService';
 import { OnlineDataService } from '../services/onlineDataService';
 import { AudioService } from '../services/audioService';
@@ -32,6 +32,7 @@ interface TaskContextType {
   updateTask: (id: string, updates: Partial<TaskItem>) => void;
   deleteTask: (id: string) => void;
   bulkUpdateTasks: (taskIds: string[], status: TaskStatus) => void;
+  cleanDuplicateTasks: () => number;
 
   // Team actions
   addTeamMember: (member: Omit<UserProfile, 'id' | 'role'> & { role?: 'ADMIN' | 'TEAM' }) => UserProfile;
@@ -121,8 +122,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           StorageService.saveClients(onlineData.clients);
         }
         if (Array.isArray(onlineData.tasks)) {
-          setTasks(onlineData.tasks);
-          StorageService.saveTasks(onlineData.tasks);
+          const cleanTasks = deduplicateTasks(onlineData.tasks, onlineData.clients || StorageService.getClients());
+          setTasks(cleanTasks);
+          StorageService.saveTasks(cleanTasks);
         }
         if (Array.isArray(onlineData.team) && onlineData.team.length > 0) {
           setTeam(onlineData.team);
@@ -176,7 +178,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       unsubscribers.push(
         OnlineDataService.subscribeToLiveServerUpdates((liveSnap) => {
           if (Array.isArray(liveSnap.clients)) setClients(liveSnap.clients);
-          if (Array.isArray(liveSnap.tasks)) setTasks(liveSnap.tasks);
+          if (Array.isArray(liveSnap.tasks)) {
+            const clean = deduplicateTasks(liveSnap.tasks, liveSnap.clients || StorageService.getClients());
+            setTasks(clean);
+            StorageService.saveTasks(clean);
+          }
           if (Array.isArray(liveSnap.team)) setTeam(liveSnap.team);
           if (Array.isArray(liveSnap.extraWork)) setExtraWork(liveSnap.extraWork);
           if (Array.isArray(liveSnap.documents)) setDocuments(liveSnap.documents);
@@ -216,7 +222,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (items.length > 0) setClients(items);
           }),
           FirebaseService.subscribeToCollection<TaskItem>('tasks', (items) => {
-            if (items.length > 0) setTasks(items);
+            if (items.length > 0) {
+              const clean = deduplicateTasks(items, StorageService.getClients());
+              setTasks(clean);
+              StorageService.saveTasks(clean);
+            }
           }),
           FirebaseService.subscribeToCollection<UserProfile>('team', (items) => {
             if (items.length > 0) setTeam(items);
@@ -397,7 +407,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updated = [newClient, ...clients];
     setClients(updated);
     
-    // Auto generate standard recurring tasks for new client
+    // Auto generate standard recurring tasks for new client ONLY if not already existing
     const sampleTasks: TaskItem[] = [
       {
         id: 'tsk-' + Date.now() + '-1',
@@ -412,7 +422,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         assignedTeamId: newClient.assignedTeamId,
         assignedTeamName: newClient.assignedTeamName,
         priority: 'HIGH',
-        financialYear: '2026-2027',
+        financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
       },
       {
         id: 'tsk-' + Date.now() + '-2',
@@ -427,7 +437,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         assignedTeamId: newClient.assignedTeamId,
         assignedTeamName: newClient.assignedTeamName,
         priority: 'CRITICAL',
-        financialYear: '2026-2027',
+        financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
       },
       {
         id: 'tsk-' + Date.now() + '-3',
@@ -442,15 +452,31 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         assignedTeamId: newClient.assignedTeamId,
         assignedTeamName: newClient.assignedTeamName,
         priority: 'CRITICAL',
-        financialYear: '2026-2027',
+        financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
       }
     ];
-    setTasks(prev => [...sampleTasks, ...prev]);
+
+    const normTrade = (newClient.tradeName || '').trim().toLowerCase();
+    const nonDuplicateSampleTasks = sampleTasks.filter(st => {
+      const normTitle = (st.title || '').trim().toLowerCase();
+      const normDate = (st.dueDate || st.dueDayOrDate || '').trim().toLowerCase();
+      return !tasks.some(existing =>
+        ((existing.clientId && existing.clientId === newClient.id) || (existing.clientName || '').trim().toLowerCase() === normTrade) &&
+        (existing.title || '').trim().toLowerCase() === normTitle &&
+        (existing.dueDate || existing.dueDayOrDate || '').trim().toLowerCase() === normDate
+      );
+    });
+
+    if (nonDuplicateSampleTasks.length > 0) {
+      const cleanTasks = deduplicateTasks([...nonDuplicateSampleTasks, ...tasks], updated);
+      setTasks(cleanTasks);
+      StorageService.saveTasks(cleanTasks);
+    }
 
     const isGuestDemo = currentUser?.role === 'GUEST' && !!currentUser?.phone;
-    if (!isGuestDemo && FirebaseService.isConfigured()) {
+    if (!isGuestDemo && FirebaseService.isConfigured() && nonDuplicateSampleTasks.length > 0) {
       FirebaseService.upsertDoc('clients', newClient.id, newClient);
-      sampleTasks.forEach(st => FirebaseService.upsertDoc('tasks', st.id, st));
+      nonDuplicateSampleTasks.forEach(st => FirebaseService.upsertDoc('tasks', st.id, st));
     }
 
     StorageService.addAuditLog({
@@ -474,6 +500,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const currentClients = StorageService.getClients();
+    const existingTasks: TaskItem[] = StorageService.getTasks();
     const updatedClientList: Client[] = [...currentClients];
     let createdCount = 0;
     let updatedCount = 0;
@@ -549,7 +576,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedClientList.push(newClient);
         createdCount++;
 
-        // Add standard statutory compliance tasks for new client
+        // Add standard statutory compliance tasks for new client ONLY if not already existing
         const tsk1: TaskItem = {
           id: 'tsk-' + Date.now() + '-' + idx + '-1',
           clientId: newClient.id,
@@ -580,7 +607,31 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           priority: 'CRITICAL',
           financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
         };
-        newTasksToCreate.push(tsk1, tsk2);
+
+        const taskAlreadyExists = (title: string, dueDate: string) => {
+          const normTitle = title.trim().toLowerCase();
+          const normDate = dueDate.trim().toLowerCase();
+          const normClient = (newClient.tradeName || '').trim().toLowerCase();
+          return (
+            existingTasks.some(t =>
+              ((t.clientId && t.clientId === newClient.id) || (t.clientName || '').trim().toLowerCase() === normClient) &&
+              (t.title || '').trim().toLowerCase() === normTitle &&
+              (t.dueDate || t.dueDayOrDate || '').trim().toLowerCase() === normDate
+            ) ||
+            newTasksToCreate.some(t =>
+              ((t.clientId && t.clientId === newClient.id) || (t.clientName || '').trim().toLowerCase() === normClient) &&
+              (t.title || '').trim().toLowerCase() === normTitle &&
+              (t.dueDate || t.dueDayOrDate || '').trim().toLowerCase() === normDate
+            )
+          );
+        };
+
+        if (!taskAlreadyExists('Monthly TDS Payment (Challan 281)', '2026-09-07')) {
+          newTasksToCreate.push(tsk1);
+        }
+        if (!taskAlreadyExists('GSTR-1 Monthly Outward Return', '2026-09-11')) {
+          newTasksToCreate.push(tsk2);
+        }
       }
     });
 
@@ -588,18 +639,15 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setClients(updatedClientList);
     StorageService.saveClients(updatedClientList);
 
-    // 2. Save tasks if any new clients added
-    let currentTasks = StorageService.getTasks();
-    if (newTasksToCreate.length > 0) {
-      currentTasks = [...newTasksToCreate, ...currentTasks];
-      setTasks(currentTasks);
-      StorageService.saveTasks(currentTasks);
-    }
+    // 2. Save tasks (Strictly Deduplicated)
+    const combinedTasks = deduplicateTasks([...newTasksToCreate, ...existingTasks], updatedClientList);
+    setTasks(combinedTasks);
+    StorageService.saveTasks(combinedTasks);
 
     // 3. Immediately trigger background auto-sync to online server & Firebase
     OnlineDataService.scheduleAutoOnlineSync({
       clients: updatedClientList,
-      tasks: currentTasks,
+      tasks: combinedTasks,
       team: StorageService.getTeam(),
       extraWork: StorageService.getExtraWork(),
       documents: StorageService.getDocuments(),
@@ -675,11 +723,38 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!checkGuestWriteAllowed()) {
       return tasks[0] || ({ ...taskData, id: 'blocked' } as TaskItem);
     }
+
+    const normClient = (taskData.clientName || '').trim().toLowerCase();
+    const normTitle = (taskData.title || '').trim().toLowerCase();
+    const normDate = (taskData.dueDate || taskData.dueDayOrDate || taskData.financialYear || '').trim().toLowerCase();
+    
+    // Check if an identical task already exists for this client and period
+    const existingIdx = tasks.findIndex(t =>
+      ((t.clientId && t.clientId === taskData.clientId) || (t.clientName || '').trim().toLowerCase() === normClient) &&
+      (t.title || '').trim().toLowerCase() === normTitle &&
+      (t.dueDate || t.dueDayOrDate || t.financialYear || '').trim().toLowerCase() === normDate
+    );
+
+    if (existingIdx !== -1) {
+      const updated: TaskItem = { ...tasks[existingIdx], ...taskData };
+      const nextList = [...tasks];
+      nextList[existingIdx] = updated;
+      const cleanList = deduplicateTasks(nextList, clients);
+      setTasks(cleanList);
+      StorageService.saveTasks(cleanList);
+      if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
+        FirebaseService.upsertDoc('tasks', updated.id, updated);
+      }
+      return updated;
+    }
+
     const newTask: TaskItem = {
       ...taskData,
       id: 'tsk-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
     };
-    setTasks(prev => [newTask, ...prev]);
+    const cleanList = deduplicateTasks([newTask, ...tasks], clients);
+    setTasks(cleanList);
+    StorageService.saveTasks(cleanList);
     if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
       FirebaseService.upsertDoc('tasks', newTask.id, newTask);
     }
@@ -693,6 +768,35 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     setAuditLogs(StorageService.getAuditLogs());
     return newTask;
+  };
+
+  const cleanDuplicateTasks = (): number => {
+    const current = StorageService.getTasks();
+    const currentClients = StorageService.getClients();
+    const clean = deduplicateTasks(current, currentClients);
+    const removedCount = Math.max(0, current.length - clean.length);
+    setTasks(clean);
+    StorageService.saveTasks(clean);
+    OnlineDataService.scheduleAutoOnlineSync({
+      clients: currentClients,
+      tasks: clean,
+      team: StorageService.getTeam(),
+      extraWork: StorageService.getExtraWork(),
+      documents: StorageService.getDocuments(),
+      attendanceRecords: StorageService.getAttendance(),
+      settings: StorageService.getSettings(),
+      guestLeads: StorageService.getGuestLeads()
+    });
+    StorageService.addAuditLog({
+      actorId: 'system',
+      actorName: 'System',
+      role: 'ADMIN',
+      action: 'BULK_UPDATE_TASKS',
+      category: 'TASK',
+      details: `Cleaned duplicate compliance tasks: Removed ${removedCount} duplicates. Unique remaining: ${clean.length}`
+    });
+    setAuditLogs(StorageService.getAuditLogs());
+    return removedCount;
   };
 
   const updateTaskStatus = (taskId: string, status: TaskStatus, completedBy = 'User') => {
@@ -1246,6 +1350,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateTask,
       deleteTask,
       bulkUpdateTasks,
+      cleanDuplicateTasks,
       addTeamMember,
       updateTeamMember,
       deleteTeamMember,

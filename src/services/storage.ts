@@ -58,6 +58,63 @@ function getScopedKey(baseKey: string): { key: string; isGuestWorkspace: boolean
   return { key: baseKey, isGuestWorkspace: false };
 }
 
+const normalizeTaskKey = (s?: string) => (s || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+
+/**
+ * Deduplicate compliance tasks across clients and periods.
+ * Preserves completed ('DONE') or 'IN_PROGRESS' tasks over 'PENDING' duplicates.
+ * Links tasks to actual client.id if matching by client name.
+ */
+export const deduplicateTasks = (taskList: TaskItem[], currentClients?: Client[]): TaskItem[] => {
+  if (!Array.isArray(taskList)) return [];
+
+  const nameToIdMap = new Map<string, string>();
+  if (Array.isArray(currentClients)) {
+    for (const c of currentClients) {
+      if (c.tradeName) nameToIdMap.set(normalizeTaskKey(c.tradeName), c.id);
+      if (c.legalName) nameToIdMap.set(normalizeTaskKey(c.legalName), c.id);
+    }
+  }
+
+  const uniqueMap = new Map<string, TaskItem>();
+
+  for (const t of taskList) {
+    if (!t || !t.title) continue;
+
+    const normClientName = normalizeTaskKey(t.clientName);
+    const normTitle = normalizeTaskKey(t.title);
+    const normCategory = normalizeTaskKey(t.category);
+    const normDate = normalizeTaskKey(t.dueDate || t.dueDayOrDate || t.financialYear);
+
+    // Harmonize client ID if client name matches a registered client
+    let targetClientId = t.clientId;
+    if (normClientName && nameToIdMap.has(normClientName)) {
+      targetClientId = nameToIdMap.get(normClientName)!;
+    }
+
+    const clientKey = normClientName || normalizeTaskKey(targetClientId);
+    const compositeKey = `${clientKey}::${normCategory}::${normTitle}::${normDate}`;
+
+    const taskWithHarmonizedId: TaskItem = targetClientId && targetClientId !== t.clientId
+      ? { ...t, clientId: targetClientId }
+      : t;
+
+    if (!uniqueMap.has(compositeKey)) {
+      uniqueMap.set(compositeKey, taskWithHarmonizedId);
+    } else {
+      const existing = uniqueMap.get(compositeKey)!;
+      // Prefer task with progress (DONE > IN_PROGRESS > PENDING)
+      if (taskWithHarmonizedId.status === 'DONE' && existing.status !== 'DONE') {
+        uniqueMap.set(compositeKey, taskWithHarmonizedId);
+      } else if (taskWithHarmonizedId.status === 'IN_PROGRESS' && existing.status === 'PENDING') {
+        uniqueMap.set(compositeKey, taskWithHarmonizedId);
+      }
+    }
+  }
+
+  return Array.from(uniqueMap.values());
+};
+
 export const StorageService = {
   // Clients (Defaults to 0 for Clean Production Practice Start)
   getClients: (): Client[] => {
@@ -69,14 +126,15 @@ export const StorageService = {
     safeSet(key, clients);
   },
 
-  // Tasks (Defaults to 0 for Clean Production Practice Start)
+  // Tasks (Defaults to 0 for Clean Production Practice Start, Always Deduplicated)
   getTasks: (): TaskItem[] => {
     const { key } = getScopedKey(KEYS.TASKS);
-    return safeGet<TaskItem[]>(key, []);
+    const raw = safeGet<TaskItem[]>(key, []);
+    return deduplicateTasks(raw);
   },
   saveTasks: (tasks: TaskItem[]) => {
     const { key } = getScopedKey(KEYS.TASKS);
-    safeSet(key, tasks);
+    safeSet(key, deduplicateTasks(tasks));
   },
 
   // Team (Defaults to Partner Ravi Katara)
