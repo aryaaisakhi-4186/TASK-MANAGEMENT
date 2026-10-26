@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { useAuth } from '../../context/AuthContext';
-import { TaskItem, TaskStatus, ExtraWorkItem } from '../../types';
+import { TaskItem, TaskStatus, ExtraWorkItem, Client } from '../../types';
 import { 
   X, 
   CheckCircle2, 
@@ -110,7 +110,39 @@ export const MetricReportModal: React.FC<Props> = ({
     return baseTasksForTab.filter(t => t.category === selectedCategory);
   }, [baseTasksForTab, selectedCategory]);
 
-  // Filter tasks with Search Term (Client, Title, Category, Staff, FY, Due Date)
+  // Map clients for quick lookup of statutory tax numbers
+  const clientMap = useMemo(() => {
+    const map = new Map<string, Client>();
+    clients.forEach(c => {
+      if (c.id) map.set(c.id, c);
+      if (c.tradeName) map.set(c.tradeName.toLowerCase().trim(), c);
+      if (c.legalName) map.set(c.legalName.toLowerCase().trim(), c);
+    });
+    return map;
+  }, [clients]);
+
+  const getTaskTaxInfo = (task: TaskItem) => {
+    let client: Client | undefined;
+    if (task.clientId && clientMap.has(task.clientId)) {
+      client = clientMap.get(task.clientId);
+    } else if (task.clientName && clientMap.has(task.clientName.toLowerCase().trim())) {
+      client = clientMap.get(task.clientName.toLowerCase().trim());
+    }
+
+    const pan = client?.pan && client.pan !== 'N/A' ? client.pan : null;
+    const gstin = client?.gstin && client.gstin !== 'N/A' ? client.gstin : null;
+    const tan = client?.tan && client.tan !== 'N/A' ? client.tan : null;
+
+    const cat = (task.category || '').toUpperCase();
+    const title = (task.title || '').toUpperCase();
+
+    const isGst = cat === 'GST' || title.includes('GST') || title.includes('3B');
+    const isTds = cat === 'TDS' || title.includes('TDS') || title.includes('281') || title.includes('24Q') || title.includes('26Q');
+
+    return { pan, gstin, tan, isGst, isTds };
+  };
+
+  // Filter tasks with Search Term (Client, Title, Category, Staff, FY, Due Date, Tax IDs)
   const filteredTasks = useMemo(() => {
     if (!searchTerm.trim()) return tasksAfterCategory;
     const q = searchTerm.toLowerCase().trim();
@@ -123,6 +155,12 @@ export const MetricReportModal: React.FC<Props> = ({
       const dueDayOrDate = (t.dueDayOrDate || '').toLowerCase();
       const fy = (t.financialYear || '').toLowerCase();
       const desc = (t.description || '').toLowerCase();
+
+      const tax = getTaskTaxInfo(t);
+      const pan = (tax.pan || '').toLowerCase();
+      const gstin = (tax.gstin || '').toLowerCase();
+      const tan = (tax.tan || '').toLowerCase();
+
       return (
         title.includes(q) ||
         clientName.includes(q) ||
@@ -131,10 +169,13 @@ export const MetricReportModal: React.FC<Props> = ({
         dueDate.includes(q) ||
         dueDayOrDate.includes(q) ||
         fy.includes(q) ||
-        desc.includes(q)
+        desc.includes(q) ||
+        pan.includes(q) ||
+        gstin.includes(q) ||
+        tan.includes(q)
       );
     });
-  }, [tasksAfterCategory, searchTerm]);
+  }, [tasksAfterCategory, searchTerm, clientMap]);
 
   // Filter extra work items if activeReportTab === 'EXTRA_FEES'
   const filteredExtraWork = useMemo(() => {
@@ -273,7 +314,7 @@ export const MetricReportModal: React.FC<Props> = ({
               </button>
             ) : (
               <button
-                onClick={() => exportTasksToExcel(filteredTasks, activeReportTab, selectedCategory, 'ALL', searchTerm)}
+                onClick={() => exportTasksToExcel(filteredTasks, activeReportTab, selectedCategory, 'ALL', searchTerm, clients)}
                 className="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs shadow-md flex items-center gap-1.5 transition-all active:scale-95"
                 title={`Export ${filteredTasks.length} filtered tasks to separate Excel`}
               >
@@ -456,23 +497,24 @@ export const MetricReportModal: React.FC<Props> = ({
             </table>
           ) : (
             /* Compliance Tasks Table */
-            <table className="w-full min-w-[1000px] text-left text-xs border-collapse">
+            <table className="w-full min-w-[1050px] text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold uppercase text-[11px] sticky top-0 z-10 shadow-sm">
                   <th className="p-3 w-10 text-center">#</th>
                   <th className="p-3 min-w-[160px]">Client</th>
-                  <th className="p-3 min-w-[260px]">Compliance Task</th>
-                  <th className="p-3 min-w-[100px]">Category</th>
-                  <th className="p-3 min-w-[150px]">Frequency & Due Date</th>
-                  <th className="p-3 min-w-[130px]">Assigned Staff</th>
-                  <th className="p-3 text-center min-w-[110px]">Status</th>
-                  <th className="p-3 text-right min-w-[120px]">Actions</th>
+                  <th className="p-3 min-w-[155px]">Tax ID (PAN / GST / TAN)</th>
+                  <th className="p-3 min-w-[240px]">Compliance Task</th>
+                  <th className="p-3 min-w-[90px]">Category</th>
+                  <th className="p-3 min-w-[140px]">Frequency & Due Date</th>
+                  <th className="p-3 min-w-[125px]">Assigned Staff</th>
+                  <th className="p-3 text-center min-w-[105px]">Status</th>
+                  <th className="p-3 text-right min-w-[115px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
                 {filteredTasks.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="p-8 text-center text-slate-500">
+                    <td colSpan={9} className="p-8 text-center text-slate-500">
                       No tasks found matching your search and category filter.
                     </td>
                   </tr>
@@ -488,6 +530,69 @@ export const MetricReportModal: React.FC<Props> = ({
                         </p>
                         <p className="text-[10px] text-slate-500 font-mono">{task.financialYear}</p>
                       </td>
+
+                      {/* Task-Related Tax Statutory ID (PAN / GSTIN / TAN) */}
+                      <td className="p-3 font-mono text-[11px]">
+                        {(() => {
+                          const tax = getTaskTaxInfo(task);
+                          if (tax.isGst) {
+                            return (
+                              <div className="space-y-0.5">
+                                {tax.gstin ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">GST</span>
+                                    <span className="font-bold text-amber-700 dark:text-amber-400">{tax.gstin}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 italic">No GSTIN</span>
+                                )}
+                                {tax.pan && (
+                                  <div className="text-[10px] text-slate-500">
+                                    <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          } else if (tax.isTds) {
+                            return (
+                              <div className="space-y-0.5">
+                                {tax.tan ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-blue-500/15 text-blue-800 dark:text-blue-300 border border-blue-500/30">TAN</span>
+                                    <span className="font-bold text-blue-700 dark:text-blue-400">{tax.tan}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 italic">No TAN</span>
+                                )}
+                                {tax.pan && (
+                                  <div className="text-[10px] text-slate-500">
+                                    <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <div className="space-y-0.5">
+                                {tax.pan ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">PAN</span>
+                                    <span className="font-bold text-emerald-700 dark:text-emerald-400">{tax.pan}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 italic">No PAN</span>
+                                )}
+                                {tax.gstin && (
+                                  <div className="text-[10px] text-slate-500 truncate max-w-[130px]">
+                                    <span className="font-sans font-medium text-[9px]">GST: </span>{tax.gstin}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                        })()}
+                      </td>
+
                       <td className="p-3">
                         <p className="font-semibold text-slate-800 dark:text-slate-200">{task.title}</p>
                         {task.description && (

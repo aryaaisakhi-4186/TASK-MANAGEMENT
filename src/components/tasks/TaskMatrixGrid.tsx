@@ -133,6 +133,38 @@ export const TaskMatrixGrid: React.FC<{
     ? tasks.filter(t => t.assignedTeamId === currentUser.id)
     : tasks;
 
+  // Map clients for quick lookup of statutory tax numbers
+  const clientMap = useMemo(() => {
+    const map = new Map<string, Client>();
+    clients.forEach(c => {
+      if (c.id) map.set(c.id, c);
+      if (c.tradeName) map.set(c.tradeName.toLowerCase().trim(), c);
+      if (c.legalName) map.set(c.legalName.toLowerCase().trim(), c);
+    });
+    return map;
+  }, [clients]);
+
+  const getTaskTaxInfo = (task: TaskItem) => {
+    let client: Client | undefined;
+    if (task.clientId && clientMap.has(task.clientId)) {
+      client = clientMap.get(task.clientId);
+    } else if (task.clientName && clientMap.has(task.clientName.toLowerCase().trim())) {
+      client = clientMap.get(task.clientName.toLowerCase().trim());
+    }
+
+    const pan = client?.pan && client.pan !== 'N/A' ? client.pan : null;
+    const gstin = client?.gstin && client.gstin !== 'N/A' ? client.gstin : null;
+    const tan = client?.tan && client.tan !== 'N/A' ? client.tan : null;
+
+    const cat = (task.category || '').toUpperCase();
+    const title = (task.title || '').toUpperCase();
+
+    const isGst = cat === 'GST' || title.includes('GST') || title.includes('3B');
+    const isTds = cat === 'TDS' || title.includes('TDS') || title.includes('281') || title.includes('24Q') || title.includes('26Q');
+
+    return { pan, gstin, tan, isGst, isTds };
+  };
+
   const filteredTasks = useMemo(() => {
     return visibleTasks.filter(t => {
       if (activeTab !== 'ALL' && t.frequency !== activeTab) return false;
@@ -140,16 +172,24 @@ export const TaskMatrixGrid: React.FC<{
       if (selectedStatus !== 'ALL' && t.status !== selectedStatus) return false;
       if (searchTerm) {
         const q = searchTerm.toLowerCase();
+        const tax = getTaskTaxInfo(t);
+        const pan = (tax.pan || '').toLowerCase();
+        const gstin = (tax.gstin || '').toLowerCase();
+        const tan = (tax.tan || '').toLowerCase();
+
         return (
           t.title.toLowerCase().includes(q) ||
           t.clientName.toLowerCase().includes(q) ||
           t.assignedTeamName.toLowerCase().includes(q) ||
-          t.category.toLowerCase().includes(q)
+          t.category.toLowerCase().includes(q) ||
+          pan.includes(q) ||
+          gstin.includes(q) ||
+          tan.includes(q)
         );
       }
       return true;
     });
-  }, [visibleTasks, activeTab, selectedCategory, selectedStatus, searchTerm]);
+  }, [visibleTasks, activeTab, selectedCategory, selectedStatus, searchTerm, clientMap]);
 
   // Group filtered tasks Client-Wise
   const clientWiseGroups = useMemo(() => {
@@ -415,7 +455,7 @@ export const TaskMatrixGrid: React.FC<{
 
           {/* Download Filtered Excel Button */}
           <button
-            onClick={() => exportTasksToExcel(filteredTasks, activeTab, selectedCategory, selectedStatus, searchTerm)}
+            onClick={() => exportTasksToExcel(filteredTasks, activeTab, selectedCategory, selectedStatus, searchTerm, clients)}
             title={`Download ${filteredTasks.length} tasks matching current Tab (${activeTab}) & Category as Excel (.xlsx)`}
             className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition-all active:scale-95"
           >
@@ -736,6 +776,7 @@ export const TaskMatrixGrid: React.FC<{
                           <tr className="bg-slate-100/70 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
                             <th className="p-3 w-8 text-center">#</th>
                             <th className="p-3">Compliance Task</th>
+                            <th className="p-3 min-w-[130px]">Tax ID (PAN / GST / TAN)</th>
                             <th className="p-3">Category</th>
                             <th className="p-3">Frequency & Due Date</th>
                             <th className="p-3">Assigned Staff</th>
@@ -760,6 +801,68 @@ export const TaskMatrixGrid: React.FC<{
                                   {task.description && (
                                     <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-sm">{task.description}</p>
                                   )}
+                                </td>
+
+                                {/* Related Tax ID */}
+                                <td className="p-3 font-mono text-[11px]">
+                                  {(() => {
+                                    const tax = getTaskTaxInfo(task);
+                                    if (tax.isGst) {
+                                      return (
+                                        <div className="space-y-0.5">
+                                          {tax.gstin ? (
+                                            <div className="flex items-center gap-1">
+                                              <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">GST</span>
+                                              <span className="font-bold text-amber-700 dark:text-amber-400">{tax.gstin}</span>
+                                            </div>
+                                          ) : (
+                                            <span className="text-[10px] text-slate-400 italic">No GSTIN</span>
+                                          )}
+                                          {tax.pan && (
+                                            <div className="text-[10px] text-slate-500">
+                                              <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    } else if (tax.isTds) {
+                                      return (
+                                        <div className="space-y-0.5">
+                                          {tax.tan ? (
+                                            <div className="flex items-center gap-1">
+                                              <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-blue-500/15 text-blue-800 dark:text-blue-300 border border-blue-500/30">TAN</span>
+                                              <span className="font-bold text-blue-700 dark:text-blue-400">{tax.tan}</span>
+                                            </div>
+                                          ) : (
+                                            <span className="text-[10px] text-slate-400 italic">No TAN</span>
+                                          )}
+                                          {tax.pan && (
+                                            <div className="text-[10px] text-slate-500">
+                                              <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    } else {
+                                      return (
+                                        <div className="space-y-0.5">
+                                          {tax.pan ? (
+                                            <div className="flex items-center gap-1">
+                                              <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">PAN</span>
+                                              <span className="font-bold text-emerald-700 dark:text-emerald-400">{tax.pan}</span>
+                                            </div>
+                                          ) : (
+                                            <span className="text-[10px] text-slate-400 italic">No PAN</span>
+                                          )}
+                                          {tax.gstin && (
+                                            <div className="text-[10px] text-slate-500 truncate max-w-[120px]">
+                                              <span className="font-sans font-medium text-[9px]">GST: </span>{tax.gstin}
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    }
+                                  })()}
                                 </td>
 
                                 <td className="p-3">
@@ -874,6 +977,7 @@ export const TaskMatrixGrid: React.FC<{
                     />
                   </th>
                   <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Client & Entity</th>
+                  <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Tax ID (PAN / GST / TAN)</th>
                   <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Compliance Task</th>
                   <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Category</th>
                   <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Due Rule / Date</th>
@@ -903,6 +1007,68 @@ export const TaskMatrixGrid: React.FC<{
                           {task.clientName}
                         </p>
                         <p className="text-[10px] text-slate-500 font-mono">{task.financialYear} • {task.period || 'General'}</p>
+                      </td>
+
+                      {/* Tax ID (PAN / GSTIN / TAN) */}
+                      <td className="p-3.5 font-mono text-xs">
+                        {(() => {
+                          const tax = getTaskTaxInfo(task);
+                          if (tax.isGst) {
+                            return (
+                              <div className="space-y-0.5">
+                                {tax.gstin ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">GST</span>
+                                    <span className="font-bold text-amber-700 dark:text-amber-400">{tax.gstin}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 italic">No GSTIN</span>
+                                )}
+                                {tax.pan && (
+                                  <div className="text-[10px] text-slate-500">
+                                    <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          } else if (tax.isTds) {
+                            return (
+                              <div className="space-y-0.5">
+                                {tax.tan ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-blue-500/15 text-blue-800 dark:text-blue-300 border border-blue-500/30">TAN</span>
+                                    <span className="font-bold text-blue-700 dark:text-blue-400">{tax.tan}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 italic">No TAN</span>
+                                )}
+                                {tax.pan && (
+                                  <div className="text-[10px] text-slate-500">
+                                    <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <div className="space-y-0.5">
+                                {tax.pan ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">PAN</span>
+                                    <span className="font-bold text-emerald-700 dark:text-emerald-400">{tax.pan}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 italic">No PAN</span>
+                                )}
+                                {tax.gstin && (
+                                  <div className="text-[10px] text-slate-500 truncate max-w-[120px]">
+                                    <span className="font-sans font-medium text-[9px]">GST: </span>{tax.gstin}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                        })()}
                       </td>
 
                       <td className="p-3.5">
