@@ -34,7 +34,12 @@ const MainPortal: React.FC = () => {
   const { currentRole, currentUser, logout, isAuthenticated } = useAuth();
 
   if (!isAuthenticated || !currentUser) {
-    return <HomePageLogin />;
+    return (
+      <>
+        <HomePageLogin />
+        <AlarmModal1030 />
+      </>
+    );
   }
   const [activeTab, setActiveTab] = useState<string>(() => {
     return currentRole === 'CLIENT' ? 'client-portal' : 'dashboard';

@@ -47,7 +47,10 @@ export const AlarmModal1030: React.FC = () => {
             <div key={task.id} className="p-3 rounded-xl bg-amber-50 dark:bg-slate-950 border border-amber-200 dark:border-slate-800 flex items-center justify-between text-xs">
               <div>
                 <p className="font-bold text-slate-900 dark:text-white">{task.title}</p>
-                <p className="text-[10px] text-slate-500">{task.clientName} • Due: {task.dueDayOrDate}</p>
+                <p className="text-[10px] text-slate-500">
+                  {task.clientName} • Rule: <span className="font-semibold text-amber-600 dark:text-amber-400">{task.dueDayOrDate}</span>
+                  {task.dueDate ? ` • Statutory Due: ${task.dueDate}` : ''}
+                </p>
               </div>
               <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-800 dark:text-amber-300 text-[10px] font-bold">
                 {task.category}

@@ -489,7 +489,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: 'Monthly TDS Payment (Challan 281)',
         category: 'TDS',
         frequency: 'MONTHLY',
-        dueDayOrDate: '7',
+        dueDayOrDate: '2',
         dueDate: '2026-09-07',
         status: 'PENDING',
         assignedTeamId: newClient.assignedTeamId,
@@ -504,7 +504,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: 'GSTR-1 Monthly Outward Return',
         category: 'GST',
         frequency: 'MONTHLY',
-        dueDayOrDate: '11',
+        dueDayOrDate: '6',
         dueDate: '2026-09-11',
         status: 'PENDING',
         assignedTeamId: newClient.assignedTeamId,
@@ -519,7 +519,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: 'GSTR-3B Monthly Return & Tax Settlement',
         category: 'GST',
         frequency: 'MONTHLY',
-        dueDayOrDate: '20',
+        dueDayOrDate: '15',
         dueDate: '2026-09-20',
         status: 'PENDING',
         assignedTeamId: newClient.assignedTeamId,
@@ -658,7 +658,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: 'Monthly TDS Payment (Challan 281)',
           category: 'TDS',
           frequency: 'MONTHLY',
-          dueDayOrDate: '7',
+          dueDayOrDate: '2',
           dueDate: '2026-09-07',
           status: 'PENDING',
           assignedTeamId: newClient.assignedTeamId || '',
@@ -673,7 +673,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: 'GSTR-1 Monthly Outward Return',
           category: 'GST',
           frequency: 'MONTHLY',
-          dueDayOrDate: '11',
+          dueDayOrDate: '6',
           dueDate: '2026-09-11',
           status: 'PENDING',
           assignedTeamId: newClient.assignedTeamId || '',
@@ -688,7 +688,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: 'GSTR-3B Monthly Return & Tax Settlement',
           category: 'GST',
           frequency: 'MONTHLY',
-          dueDayOrDate: '20',
+          dueDayOrDate: '15',
           dueDate: '2026-09-20',
           status: 'PENDING',
           assignedTeamId: newClient.assignedTeamId || '',
@@ -811,9 +811,24 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Tasks
-  const addTask = (taskData: Omit<TaskItem, 'id'>): TaskItem => {
+  const addTask = (rawTaskData: Omit<TaskItem, 'id'>): TaskItem => {
     if (!checkGuestWriteAllowed()) {
-      return tasks[0] || ({ ...taskData, id: 'blocked' } as TaskItem);
+      return tasks[0] || ({ ...rawTaskData, id: 'blocked' } as TaskItem);
+    }
+
+    // Auto-calculate statutory Due Rule / Day if not explicitly filled:
+    // Monthly tasks: 5 days prior to statutory due date (e.g. 7th -> 2nd, 11th -> 6th, 20th -> 15th)
+    // Daily tasks: 'Daily'
+    const taskData = { ...rawTaskData };
+    if (!taskData.dueDayOrDate || taskData.dueDayOrDate.trim() === '') {
+      if (taskData.frequency === 'DAILY') {
+        taskData.dueDayOrDate = 'Daily';
+      } else if (taskData.frequency === 'MONTHLY' && taskData.dueDate) {
+        const day = parseInt(taskData.dueDate.split('-')[2] || '0', 10);
+        if (day > 0) {
+          taskData.dueDayOrDate = Math.max(1, day - 5).toString();
+        }
+      }
     }
 
     const normClient = (taskData.clientName || '').trim().toLowerCase();

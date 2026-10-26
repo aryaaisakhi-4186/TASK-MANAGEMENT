@@ -52,8 +52,10 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
       setDescription('');
       setCategory('GST');
       setFrequency('MONTHLY');
-      setDueDayOrDate('20');
-      setDueDate(new Date().toISOString().split('T')[0]);
+      const today = new Date().toISOString().split('T')[0];
+      setDueDate(today);
+      const dayNum = parseInt(today.split('-')[2] || '20', 10);
+      setDueDayOrDate(Math.max(1, dayNum - 5).toString());
       setAssignedTeamId(team[0]?.id || '');
       setStatus('PENDING');
       setPriority('HIGH');
@@ -183,11 +185,24 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
               <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Frequency</label>
               <select
                 value={frequency}
-                onChange={(e) => setFrequency(e.target.value as TaskFrequency)}
+                onChange={(e) => {
+                  const newFreq = e.target.value as TaskFrequency;
+                  setFrequency(newFreq);
+                  if (newFreq === 'DAILY') {
+                    setDueDayOrDate('Daily');
+                  } else if (newFreq === 'MONTHLY' && dueDate) {
+                    const day = parseInt(dueDate.split('-')[2] || '0', 10);
+                    if (day > 0) {
+                      setDueDayOrDate(Math.max(1, day - 5).toString());
+                    }
+                  }
+                }}
                 className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs"
               >
+                <option value="DAILY">Daily (Daily Task)</option>
                 <option value="WEEKLY">Weekly (Days)</option>
                 <option value="MONTHLY">Monthly (Specific Date)</option>
+                <option value="QUARTERLY">Quarterly</option>
                 <option value="YEARLY">Yearly (Annual Due Date)</option>
                 <option value="ONE_TIME">One-Time Assignment</option>
               </select>
@@ -197,13 +212,18 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
           {/* Due Rule & Due Date */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Due Rule / Day</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">Due Rule / Day</label>
+                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono">
+                  {frequency === 'MONTHLY' ? '5 Days Prior' : frequency === 'DAILY' ? 'Daily' : ''}
+                </span>
+              </div>
               <input
                 type="text"
                 value={dueDayOrDate}
                 onChange={(e) => setDueDayOrDate(e.target.value)}
-                placeholder="e.g. 7th, 11th, 20th, 30-Sep"
-                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono"
+                placeholder={frequency === 'DAILY' ? 'Daily' : 'e.g. 2, 6, 15, Daily'}
+                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono font-bold"
               />
             </div>
 
@@ -212,7 +232,18 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
               <input
                 type="date"
                 value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
+                onChange={(e) => {
+                  const newDate = e.target.value;
+                  setDueDate(newDate);
+                  if (frequency === 'MONTHLY' && newDate) {
+                    const day = parseInt(newDate.split('-')[2] || '0', 10);
+                    if (day > 0) {
+                      setDueDayOrDate(Math.max(1, day - 5).toString());
+                    }
+                  } else if (frequency === 'DAILY') {
+                    setDueDayOrDate('Daily');
+                  }
+                }}
                 className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono"
               />
             </div>
