@@ -415,11 +415,11 @@ export const TaskMatrixGrid: React.FC<{
 
           {/* Download Filtered Excel Button */}
           <button
-            onClick={() => exportTasksToExcel(filteredTasks, activeTab, selectedCategory, selectedStatus)}
+            onClick={() => exportTasksToExcel(filteredTasks, activeTab, selectedCategory, selectedStatus, searchTerm)}
             title={`Download ${filteredTasks.length} tasks matching current Tab (${activeTab}) & Category as Excel (.xlsx)`}
             className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition-all active:scale-95"
           >
-            <FileSpreadsheet size={15} /> Download Excel (${filteredTasks.length})
+            <FileSpreadsheet size={15} /> Download Excel ({filteredTasks.length})
           </button>
           
           {/* View Mode Toggle: Client-Wise vs Flat Table */}

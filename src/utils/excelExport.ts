@@ -5,7 +5,8 @@ export const exportTasksToExcel = (
   tasks: TaskItem[],
   activeTab = 'ALL',
   selectedCategory = 'ALL',
-  selectedStatus = 'ALL'
+  selectedStatus = 'ALL',
+  searchTerm = ''
 ) => {
   if (!tasks || tasks.length === 0) {
     alert('No tasks to export for the selected filter.');
@@ -19,12 +20,21 @@ export const exportTasksToExcel = (
   else if (activeTab === 'MONTHLY') tabLabel = 'Monthly_Returns';
   else if (activeTab === 'QUARTERLY') tabLabel = 'Quarterly_Tasks';
   else if (activeTab === 'YEARLY') tabLabel = 'Annual_Audit';
+  else if (activeTab === 'ACTION_PENDING') tabLabel = 'Pending_Deadlines';
+  else if (activeTab === 'IN_PROGRESS') tabLabel = 'InProgress_Tasks';
+  else if (activeTab === 'COMPLIANCE_DONE') tabLabel = 'Completed_Tasks';
 
-  if (selectedCategory !== 'ALL') {
+  if (selectedCategory && selectedCategory !== 'ALL') {
     tabLabel += `_${selectedCategory}`;
   }
-  if (selectedStatus !== 'ALL') {
+  if (selectedStatus && selectedStatus !== 'ALL') {
     tabLabel += `_${selectedStatus}`;
+  }
+  if (searchTerm && searchTerm.trim()) {
+    const cleanSearch = searchTerm.trim().replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 20);
+    if (cleanSearch) {
+      tabLabel += `_Search_${cleanSearch}`;
+    }
   }
 
   const rows = tasks.map((t, idx) => ({
