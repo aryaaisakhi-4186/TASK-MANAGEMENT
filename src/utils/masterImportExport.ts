@@ -42,6 +42,44 @@ const normalizeKey = (key: string): string => {
   return key.toLowerCase().replace(/[^a-z0-9]/g, '');
 };
 
+/**
+ * Converts Excel date serial number (e.g. 25759.000115740742) or ISO date strings
+ * into clean, readable calendar date format DD-MM-YYYY.
+ */
+export const formatExcelOrStandardDate = (val?: string | number | null): string => {
+  if (!val && val !== 0) return 'N/A';
+  const str = String(val).trim();
+  if (!str || str === 'N/A' || str === '-' || str.toLowerCase() === 'undefined' || str.toLowerCase() === 'null') {
+    return 'N/A';
+  }
+
+  // 1. Check for Excel numeric date serials (e.g. 25759.000115740742 or 44561)
+  const num = parseFloat(str);
+  if (!isNaN(num) && /^\d+(\.\d+)?$/.test(str) && num > 1000 && num < 100000) {
+    try {
+      // Excel epoch: 25569 = 1970-01-01 UTC (accounts for Excel 1900 leap year bug)
+      const jsTimestamp = Math.round((num - 25569) * 86400 * 1000);
+      const dt = new Date(jsTimestamp);
+      if (!isNaN(dt.getTime())) {
+        const day = String(dt.getUTCDate()).padStart(2, '0');
+        const month = String(dt.getUTCMonth() + 1).padStart(2, '0');
+        const year = dt.getUTCFullYear();
+        return `${day}-${month}-${year}`;
+      }
+    } catch {}
+  }
+
+  // 2. Format standard ISO YYYY-MM-DD -> DD-MM-YYYY
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    const parts = str.substring(0, 10).split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+  }
+
+  return str;
+};
+
 // 1. Accurate PDF Text Extractor using Server Endpoint (pdf-parse)
 export const extractPdfTextFromServer = async (file: File): Promise<string> => {
   return new Promise((resolve) => {
@@ -178,8 +216,12 @@ export const mapRawDataToClients = (rawData: any[]): ParsedClientRow[] => {
     const employeeName = getVal(['employeeName', 'accountant', 'accountantName']);
     const employeePhone = getVal(['employeePhone', 'accountantPhone', 'accountantMobile']);
     const aadharNumber = getVal(['aadhar', 'aadharNumber', 'uidai']);
-    const dob = getVal(['dob', 'birthDate', 'dateOfBirth']);
-    const formationDate = getVal(['formationDate', 'incorporationDate', 'registrationDate']);
+    const rawDob = getVal(['dob', 'birthDate', 'dateOfBirth']);
+    const rawFormationDate = getVal(['formationDate', 'incorporationDate', 'registrationDate']);
+    const formattedDob = formatExcelOrStandardDate(rawDob);
+    const formattedFormationDate = formatExcelOrStandardDate(rawFormationDate);
+    const dob = formattedDob !== 'N/A' ? formattedDob : undefined;
+    const formationDate = formattedFormationDate !== 'N/A' ? formattedFormationDate : undefined;
     const assignedTeamName = getVal(['assignedTeamName', 'assignedPartner', 'caStaff', 'assignedStaff']);
     const googleDriveFolderId = getVal(['googleDriveFolderId', 'driveFolderId', 'driveId']);
     const googleDriveFolderUrl = getVal(['googleDriveFolderUrl', 'driveFolderUrl', 'driveUrl', 'driveLink']);

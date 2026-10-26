@@ -5,6 +5,7 @@ import { Client, ComplianceApplicabilityKey } from '../../types';
 import { ExcelService } from '../../services/excelService';
 import { PDFService } from '../../services/pdfService';
 import { COMPLIANCE_APPLICABILITY_ITEMS, resolveClientApplicability } from '../../utils/complianceApplicability';
+import { formatExcelOrStandardDate } from '../../utils/masterImportExport';
 import { 
   Building, 
   Plus, 
@@ -335,8 +336,8 @@ export const ClientMasterTable: React.FC = () => {
                   {/* Aadhar, DOB & Formation Date */}
                   <td className="px-2.5 py-2 font-mono text-[10px] text-slate-700 dark:text-slate-300">
                     <p className="text-slate-900 dark:text-white font-semibold leading-tight">Aad: {client.aadharNumber || 'N/A'}</p>
-                    <p className="text-[10px] text-slate-500 leading-tight">DOB: {client.dob || 'N/A'}</p>
-                    <p className="text-[10px] text-amber-700 dark:text-amber-400 font-bold leading-tight">Form: {client.formationDate || 'N/A'}</p>
+                    <p className="text-[10px] text-slate-500 leading-tight">DOB: {formatExcelOrStandardDate(client.dob)}</p>
+                    <p className="text-[10px] text-amber-700 dark:text-amber-400 font-bold leading-tight">Form: {formatExcelOrStandardDate(client.formationDate)}</p>
                   </td>
 
                   {/* Assigned Staff */}

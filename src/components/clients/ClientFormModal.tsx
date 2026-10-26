@@ -23,7 +23,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
-import { detectEntityCategoryFromPANAndGSTIN } from '../../utils/masterImportExport';
+import { detectEntityCategoryFromPANAndGSTIN, formatExcelOrStandardDate } from '../../utils/masterImportExport';
 import { COMPLIANCE_APPLICABILITY_ITEMS, resolveClientApplicability } from '../../utils/complianceApplicability';
 import { extractDocumentDataDirectly, cleanExtractedEntityName } from '../../services/documentOCRService';
 
@@ -195,8 +195,10 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
       setEmployeeName(client.employeeName || '');
       setEmployeePhone(client.employeePhone || '');
       setAadharNumber(client.aadharNumber || '');
-      setDob(client.dob || '');
-      setFormationDate(client.formationDate || '');
+      const formattedDob = formatExcelOrStandardDate(client.dob);
+      setDob(formattedDob !== 'N/A' ? formattedDob : (client.dob || ''));
+      const formattedForm = formatExcelOrStandardDate(client.formationDate);
+      setFormationDate(formattedForm !== 'N/A' ? formattedForm : (client.formationDate || ''));
       setAssignedTeamId(client.assignedTeamId || team[0]?.id || '');
       setPortalPassword(client.portalPassword || 'client123');
       setGoogleDriveFolderId(client.googleDriveFolderId || '');
