@@ -181,16 +181,34 @@ export const ClientMasterTable: React.FC = () => {
         <div className="overflow-x-auto max-h-[calc(100vh-230px)] overflow-y-auto relative scrollbar-thin">
           <table className="w-full text-left text-xs border-collapse">
             <thead className="sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800">
-              <tr className="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-[11px]">
-                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Client & Legal Name</th>
-                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Statutory IDs (PAN / GST / TAN / VAT)</th>
-                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Compliances</th>
-                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Entity Status / Type</th>
-                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Contact Person</th>
-                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Client Employee (Sub-Login)</th>
-                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Aadhar, DOB & Formation Date</th>
-                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Assigned CA Staff</th>
-                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm text-right whitespace-nowrap">Actions</th>
+              <tr className="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-[10px] leading-tight">
+                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[130px]">
+                  Client &<br /><span className="text-[9px] text-slate-500 font-normal">Legal Name</span>
+                </th>
+                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[140px]">
+                  Statutory IDs<br /><span className="text-[9px] text-slate-500 font-normal">(PAN / GST / TAN / VAT)</span>
+                </th>
+                <th className="px-2 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm text-center min-w-[110px]">
+                  Compliances<br /><span className="text-[9px] text-slate-500 font-normal">Applicability</span>
+                </th>
+                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[105px]">
+                  Entity Status<br /><span className="text-[9px] text-slate-500 font-normal">& Constitution</span>
+                </th>
+                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[115px]">
+                  Contact Person<br /><span className="text-[9px] text-slate-500 font-normal">& Phone / Email</span>
+                </th>
+                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[115px]">
+                  Client Employee<br /><span className="text-[9px] text-slate-500 font-normal">(Sub-Login)</span>
+                </th>
+                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[125px]">
+                  Aadhar, DOB &<br /><span className="text-[9px] text-slate-500 font-normal">Formation Date</span>
+                </th>
+                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[100px]">
+                  Assigned Staff<br /><span className="text-[9px] text-slate-500 font-normal">CA Office Team</span>
+                </th>
+                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm text-right min-w-[100px]">
+                  Actions<br /><span className="text-[9px] text-slate-500 font-normal">(Repo / Edit)</span>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -200,9 +218,9 @@ export const ClientMasterTable: React.FC = () => {
                 <tr key={client.id} className="hover:bg-amber-50/40 dark:hover:bg-slate-800/30 transition-colors group">
                   
                   {/* Client & Legal Name */}
-                  <td className="p-3.5">
-                    <p className="font-bold text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-300">{client.tradeName}</p>
-                    <p className="text-[11px] text-slate-500 font-medium">{client.legalName}</p>
+                  <td className="px-2.5 py-2">
+                    <p className="font-bold text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-300 leading-snug">{client.tradeName}</p>
+                    <p className="text-[10px] text-slate-500 font-medium leading-snug">{client.legalName}</p>
                     {client.googleDriveFolderUrl || client.googleDriveFolderId ? (
                       <a
                         href={client.googleDriveFolderUrl || `https://drive.google.com/drive/folders/${client.googleDriveFolderId}`}
@@ -219,40 +237,40 @@ export const ClientMasterTable: React.FC = () => {
                   </td>
 
                   {/* Single Unified Statutory Registrations Column */}
-                  <td className="p-3.5 font-mono text-xs">
-                    <div className="space-y-1">
+                  <td className="px-2.5 py-2 font-mono text-xs">
+                    <div className="space-y-0.5">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] font-sans font-bold px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">PAN</span>
+                        <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">PAN</span>
                         <span className="font-bold text-amber-700 dark:text-amber-400">{client.pan}</span>
                       </div>
                       
                       {client.gstin ? (
                         <div className="flex items-center gap-1.5 text-[11px]">
-                          <span className="text-[9px] font-sans font-bold px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">GST</span>
+                          <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">GST</span>
                           <span className="text-slate-700 dark:text-slate-300">{client.gstin}</span>
                         </div>
                       ) : (
-                        <span className="text-[10px] text-slate-400 italic">No GSTIN</span>
+                        <span className="text-[9px] text-slate-400 italic">No GSTIN</span>
                       )}
 
                       {client.customFields && client.customFields.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                        <div className="flex flex-wrap items-center gap-1 pt-0.5">
                           {client.customFields.map(f => (
-                            <span key={f.id} className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-800 dark:text-blue-300 border border-blue-500/20 text-[10px] font-mono">
+                            <span key={f.id} className="px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-800 dark:text-blue-300 border border-blue-500/20 text-[9px] font-mono">
                               <strong className="font-sans">{f.label}:</strong> {f.value}
                             </span>
                           ))}
                         </div>
                       )}
 
-                      <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500 pt-0.5">
+                      <div className="flex flex-wrap items-center gap-1.5 text-[9px] text-slate-500 pt-0.5">
                         {client.tan && client.tan !== 'N/A' && (
-                          <span className="bg-slate-50 dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-800">
+                          <span className="bg-slate-50 dark:bg-slate-900 px-1 py-0.2 rounded border border-slate-200 dark:border-slate-800">
                             TAN: <strong className="text-slate-800 dark:text-slate-200">{client.tan}</strong>
                           </span>
                         )}
                         {client.vatNumber && client.vatNumber !== 'N/A' && (
-                          <span className="bg-slate-50 dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-800">
+                          <span className="bg-slate-50 dark:bg-slate-900 px-1 py-0.2 rounded border border-slate-200 dark:border-slate-800">
                             VAT: <strong className="text-slate-800 dark:text-slate-200">{client.vatNumber}</strong>
                           </span>
                         )}
@@ -261,7 +279,7 @@ export const ClientMasterTable: React.FC = () => {
                   </td>
 
                   {/* 8 Compliances in Up-Down Vertical Columns (4 per column: AUDIT, GST, TDS, ITR | VAT, E-INVOICE, RCM, 86B) */}
-                  <td className="p-2.5">
+                  <td className="px-2 py-2">
                     <div className="grid grid-rows-4 grid-flow-col gap-0.5 w-fit">
                       {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                         const isApp = appMap[item.key];
@@ -277,11 +295,11 @@ export const ClientMasterTable: React.FC = () => {
                               {item.label}
                             </span>
                             <span
-                              className={`w-4 h-2.5 rounded-full p-[1px] flex items-center shrink-0 transition-colors duration-200 ${
+                              className={`w-3.5 h-2 rounded-full p-[1px] flex items-center shrink-0 transition-colors duration-200 ${
                                 isApp ? 'bg-emerald-500 justify-end' : 'bg-red-500 justify-start'
                               }`}
                             >
-                              <span className="w-2 h-2 rounded-full bg-white shadow-sm block" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-white shadow-sm block" />
                             </span>
                           </button>
                         );
@@ -290,44 +308,44 @@ export const ClientMasterTable: React.FC = () => {
                   </td>
 
                   {/* Entity Status & Type */}
-                  <td className="p-3.5">
-                    <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[10px] font-bold border border-slate-200 dark:border-slate-700 block w-fit mb-1">
+                  <td className="px-2.5 py-2">
+                    <span className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-[10px] font-bold border border-slate-200 dark:border-slate-700 block w-fit mb-1">
                       {client.category}
                     </span>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${client.status === 'ACTIVE' ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' : 'bg-red-500/15 text-red-700'}`}>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${client.status === 'ACTIVE' ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' : 'bg-red-500/15 text-red-700'}`}>
                       ● {client.status}
                     </span>
                   </td>
 
                   {/* Contact Person */}
-                  <td className="p-3.5 text-slate-700 dark:text-slate-300">
-                    <p className="font-semibold text-slate-900 dark:text-white">{client.contactPerson || 'N/A'}</p>
-                    <p className="text-[10px] text-slate-500 font-mono">{client.phone}</p>
-                    <p className="text-[10px] text-slate-500 truncate max-w-[140px]">{client.email}</p>
+                  <td className="px-2.5 py-2 text-slate-700 dark:text-slate-300">
+                    <p className="font-semibold text-slate-900 dark:text-white leading-tight">{client.contactPerson || 'N/A'}</p>
+                    <p className="text-[10px] text-slate-500 font-mono leading-tight">{client.phone}</p>
+                    <p className="text-[10px] text-slate-500 truncate max-w-[130px] leading-tight">{client.email}</p>
                   </td>
 
                   {/* Client Employee (Sub-Login) */}
-                  <td className="p-3.5">
-                    <p className="font-bold text-slate-900 dark:text-white">{client.employeeName || 'No Employee Set'}</p>
-                    <p className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-bold">
+                  <td className="px-2.5 py-2">
+                    <p className="font-bold text-slate-900 dark:text-white leading-tight">{client.employeeName || 'No Employee Set'}</p>
+                    <p className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-bold leading-tight">
                       {client.employeePhone ? `Mob: ${client.employeePhone} (PIN: ${client.employeePhone.slice(-4)})` : '-'}
                     </p>
                   </td>
 
                   {/* Aadhar, DOB & Formation Date */}
-                  <td className="p-3.5 font-mono text-[11px] text-slate-700 dark:text-slate-300">
-                    <p className="text-slate-900 dark:text-white font-semibold">Aadhar: {client.aadharNumber || 'N/A'}</p>
-                    <p className="text-[10px] text-slate-500">DOB: {client.dob || 'N/A'}</p>
-                    <p className="text-[10px] text-amber-700 dark:text-amber-400 font-bold">Formed: {client.formationDate || 'N/A'}</p>
+                  <td className="px-2.5 py-2 font-mono text-[10px] text-slate-700 dark:text-slate-300">
+                    <p className="text-slate-900 dark:text-white font-semibold leading-tight">Aad: {client.aadharNumber || 'N/A'}</p>
+                    <p className="text-[10px] text-slate-500 leading-tight">DOB: {client.dob || 'N/A'}</p>
+                    <p className="text-[10px] text-amber-700 dark:text-amber-400 font-bold leading-tight">Form: {client.formationDate || 'N/A'}</p>
                   </td>
 
                   {/* Assigned Staff */}
-                  <td className="p-3.5 text-slate-700 dark:text-slate-300 font-semibold">
+                  <td className="px-2.5 py-2 text-slate-700 dark:text-slate-300 font-semibold text-[11px]">
                     {client.assignedTeamName}
                   </td>
 
                   {/* Actions */}
-                  <td className="p-3.5 text-right">
+                  <td className="px-2.5 py-2 text-right">
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => {
