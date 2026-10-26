@@ -287,7 +287,7 @@ export const MetricReportModal: React.FC<Props> = ({
         </button>
 
         {/* Modal Top Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800 pr-10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800 pr-10 shrink-0">
           <div className="flex items-center gap-3">
             <div className={`p-2.5 rounded-2xl border ${headerInfo.bgBadge}`}>
               {headerInfo.icon}
@@ -325,54 +325,58 @@ export const MetricReportModal: React.FC<Props> = ({
         </div>
 
         {/* 1. Report Status Switcher Tabs (Action Pending | In Progress | Done | Extra Fees) */}
-        <div className="flex items-center gap-1.5 pt-3 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex flex-wrap items-center gap-2 pt-3 pb-2 shrink-0">
           <button
+            type="button"
             onClick={() => { setActiveReportTab('ACTION_PENDING'); setSelectedCategory('ALL'); }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
               activeReportTab === 'ACTION_PENDING'
-                ? 'bg-red-500 text-white border-red-600 shadow-md ring-1 ring-red-400'
-                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200'
+                ? 'bg-red-500 text-white border-red-600 shadow-md ring-2 ring-red-400/40'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
-            <AlertTriangle size={13} /> Action Pending ({pendingCount})
+            <AlertTriangle size={14} /> Action Pending ({pendingCount})
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveReportTab('IN_PROGRESS'); setSelectedCategory('ALL'); }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
               activeReportTab === 'IN_PROGRESS'
-                ? 'bg-amber-500 text-slate-950 border-amber-600 shadow-md ring-1 ring-amber-400'
-                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200'
+                ? 'bg-amber-500 text-slate-950 border-amber-600 shadow-md ring-2 ring-amber-400/40'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
-            <Clock size={13} /> In Progress ({inProgressCount})
+            <Clock size={14} /> In Progress ({inProgressCount})
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveReportTab('COMPLIANCE_DONE'); setSelectedCategory('ALL'); }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
               activeReportTab === 'COMPLIANCE_DONE'
-                ? 'bg-emerald-600 text-white border-emerald-700 shadow-md ring-1 ring-emerald-400'
-                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200'
+                ? 'bg-emerald-600 text-white border-emerald-700 shadow-md ring-2 ring-emerald-400/40'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
-            <CheckCircle2 size={13} /> Compliance Done ({doneCount})
+            <CheckCircle2 size={14} /> Compliance Done ({doneCount})
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveReportTab('EXTRA_FEES'); setSelectedCategory('ALL'); }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap border ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
               activeReportTab === 'EXTRA_FEES'
-                ? 'bg-blue-600 text-white border-blue-700 shadow-md ring-1 ring-blue-400'
-                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200'
+                ? 'bg-blue-600 text-white border-blue-700 shadow-md ring-2 ring-blue-400/40'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
-            <IndianRupee size={13} /> Extra Work & Fees ({extraFeesCount})
+            <IndianRupee size={14} /> Extra Work & Fees ({extraFeesCount})
           </button>
         </div>
 
         {/* 2. Search Bar & Category Filter Tabs */}
-        <div className="my-2.5 space-y-2.5">
+        <div className="my-2 space-y-2.5 shrink-0">
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
             {/* Search Input Box */}
             <div className="relative flex-1 max-w-xl">
@@ -410,15 +414,16 @@ export const MetricReportModal: React.FC<Props> = ({
 
           {/* Category Tabs (GST | TDS | Income Tax | Audit | ROC) */}
           {activeReportTab !== 'EXTRA_FEES' && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5 pb-1 shrink-0">
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 mr-1">
                 <Filter size={11} /> Category:
               </span>
               {categoryTabs.map(tab => (
                 <button
                   key={tab.key}
+                  type="button"
                   onClick={() => setSelectedCategory(tab.key)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap border ${
+                  className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap border shadow-sm ${
                     selectedCategory === tab.key
                       ? 'bg-amber-500 text-slate-950 border-amber-600 shadow-sm'
                       : 'bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-400'
@@ -432,7 +437,7 @@ export const MetricReportModal: React.FC<Props> = ({
         </div>
 
         {/* Scrollable Report Content */}
-        <div className="flex-1 overflow-y-auto overflow-x-auto min-h-[350px] border border-slate-200 dark:border-slate-800 rounded-2xl scrollbar-thin">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl scrollbar-thin">
           
           {activeReportTab === 'EXTRA_FEES' ? (
             /* Extra Fees Due Table */
