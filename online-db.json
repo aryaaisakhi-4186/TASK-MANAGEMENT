@@ -22,14 +22,16 @@
       "id": "cli-1792925712032-998",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "AUDIT": true,
+        "AUDIT": false,
         "GST": true,
-        "TDS": true,
+        "TDS": false,
         "ITR": true,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": true,
-        "RULE_86B": true
+        "RULE_86B": false,
+        "GSTR_9": true,
+        "GSTR_9C": false
       }
     },
     {
@@ -52,7 +54,20 @@
       "googleDriveFolderUrl": "",
       "customFields": [],
       "id": "cli-1792925576133-615",
-      "createdAt": "2026-10-25"
+      "createdAt": "2026-10-25",
+      "vatNumber": "23VAT458643",
+      "complianceApplicability": {
+        "AUDIT": false,
+        "GST": true,
+        "GSTR_9": true,
+        "GSTR_9C": false,
+        "TDS": false,
+        "ITR": true,
+        "VAT": true,
+        "E_INVOICE": false,
+        "RCM": true,
+        "RULE_86B": false
+      }
     },
     {
       "tradeName": "SYED BROTHERS, NOWGONG",
@@ -75,15 +90,18 @@
       "id": "cli-1792925526886-383",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "AUDIT": true,
+        "AUDIT": false,
         "GST": true,
-        "TDS": true,
+        "TDS": false,
         "ITR": true,
-        "VAT": false,
+        "VAT": true,
         "E_INVOICE": false,
         "RCM": true,
-        "RULE_86B": false
-      }
+        "RULE_86B": false,
+        "GSTR_9": true,
+        "GSTR_9C": false
+      },
+      "vatNumber": "23VAT178238"
     },
     {
       "tradeName": "SYED INFOCOM",
@@ -105,7 +123,19 @@
       "googleDriveFolderUrl": "",
       "customFields": [],
       "id": "cli-1792925518993-415",
-      "createdAt": "2026-10-25"
+      "createdAt": "2026-10-25",
+      "complianceApplicability": {
+        "AUDIT": false,
+        "GST": true,
+        "GSTR_9": true,
+        "GSTR_9C": false,
+        "TDS": false,
+        "ITR": true,
+        "VAT": false,
+        "E_INVOICE": false,
+        "RCM": true,
+        "RULE_86B": false
+      }
     },
     {
       "id": "cli-1792925712031-862",
@@ -122,15 +152,18 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
-        "VAT": false,
+        "VAT": true,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
-      }
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
+      },
+      "vatNumber": "23VAT859788"
     },
     {
       "id": "cli-1792925712031-455",
@@ -147,15 +180,18 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
-        "VAT": false,
+        "VAT": true,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
-      }
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
+      },
+      "vatNumber": "23VAT265034"
     },
     {
       "id": "cli-1792925712030-869",
@@ -172,14 +208,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -197,14 +235,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -222,14 +262,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -247,14 +289,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -272,14 +316,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -297,14 +343,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -322,14 +370,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -347,14 +397,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -372,14 +424,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -397,14 +451,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -422,14 +478,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -447,14 +505,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -472,14 +532,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -497,14 +559,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -522,14 +586,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -547,14 +613,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -572,14 +640,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -597,15 +667,18 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
-        "VAT": false,
+        "VAT": true,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
-      }
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
+      },
+      "vatNumber": "23VAT799719"
     },
     {
       "id": "cli-1792925712010-779",
@@ -622,14 +695,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -647,14 +722,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -672,14 +749,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -697,14 +776,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -722,14 +803,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -747,14 +830,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -772,14 +857,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -797,14 +884,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -822,14 +911,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -847,14 +938,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -872,14 +965,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -897,14 +992,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -922,14 +1019,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -947,14 +1046,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -972,14 +1073,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -997,14 +1100,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1022,14 +1127,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1047,14 +1154,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1072,14 +1181,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1097,14 +1208,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1122,14 +1235,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1147,14 +1262,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1172,14 +1289,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1197,14 +1316,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1222,14 +1343,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1247,14 +1370,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1272,14 +1397,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1297,14 +1424,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1322,14 +1451,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1347,14 +1478,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1372,14 +1505,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1397,14 +1532,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1422,14 +1559,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1447,14 +1586,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1472,14 +1613,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1497,14 +1640,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1522,15 +1667,18 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
-        "VAT": false,
+        "VAT": true,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
-      }
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
+      },
+      "vatNumber": "23VAT441876"
     },
     {
       "id": "cli-1792925711987-626",
@@ -1547,14 +1695,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1572,14 +1722,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1597,14 +1749,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1622,14 +1776,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1647,14 +1803,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1672,14 +1830,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1697,14 +1857,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1722,14 +1884,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1747,14 +1911,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     },
     {
@@ -1772,14 +1938,16 @@
       "portalPassword": "client123",
       "createdAt": "2026-10-25",
       "complianceApplicability": {
-        "GST": true,
-        "TDS": true,
+        "GST": false,
+        "TDS": false,
         "ITR": true,
         "AUDIT": false,
         "VAT": false,
         "E_INVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE_86B": false,
+        "GSTR_9": false,
+        "GSTR_9C": false
       }
     }
   ],
@@ -4978,6 +5146,102 @@
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
       "financialYear": "2026-2027"
+    },
+    {
+      "id": "tsk-vat-q-0-1793027439077",
+      "clientId": "cli-1792925576133-615",
+      "clientName": "S. R. TRADING COMPANY",
+      "title": "VAT Quarterly Return Filing",
+      "category": "VAT",
+      "frequency": "QUARTERLY",
+      "dueDayOrDate": "25",
+      "dueDate": "2026-10-30",
+      "status": "PENDING",
+      "assignedTeamId": "team-1",
+      "assignedTeamName": "Assigned Staff",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27",
+      "period": "Q2 (Jul-Sep 2026)"
+    },
+    {
+      "id": "tsk-vat-m-0-1793027439078",
+      "clientId": "cli-1792925576133-615",
+      "clientName": "S. R. TRADING COMPANY",
+      "title": "Monthly VAT Tax Payment & Challan Deposit",
+      "category": "VAT",
+      "frequency": "MONTHLY",
+      "dueDayOrDate": "5",
+      "dueDate": "2026-09-10",
+      "status": "PENDING",
+      "assignedTeamId": "team-1",
+      "assignedTeamName": "Assigned Staff",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27",
+      "period": "August 2026"
+    },
+    {
+      "id": "tsk-vat-q-1-1793027439078",
+      "clientId": "cli-1792925526886-383",
+      "clientName": "SYED BROTHERS, NOWGONG",
+      "title": "VAT Quarterly Return Filing",
+      "category": "VAT",
+      "frequency": "QUARTERLY",
+      "dueDayOrDate": "25",
+      "dueDate": "2026-10-30",
+      "status": "PENDING",
+      "assignedTeamId": "team-1",
+      "assignedTeamName": "Assigned Staff",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27",
+      "period": "Q2 (Jul-Sep 2026)"
+    },
+    {
+      "id": "tsk-vat-m-1-1793027439078",
+      "clientId": "cli-1792925526886-383",
+      "clientName": "SYED BROTHERS, NOWGONG",
+      "title": "Monthly VAT Tax Payment & Challan Deposit",
+      "category": "VAT",
+      "frequency": "MONTHLY",
+      "dueDayOrDate": "5",
+      "dueDate": "2026-09-10",
+      "status": "PENDING",
+      "assignedTeamId": "team-1",
+      "assignedTeamName": "Assigned Staff",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27",
+      "period": "August 2026"
+    },
+    {
+      "id": "tsk-vat-q-2-1793027439078",
+      "clientId": "cli-1792925712031-862",
+      "clientName": "RAJARAM SWAMIPRASAD TRADING COMPANY",
+      "title": "VAT Quarterly Return Filing",
+      "category": "VAT",
+      "frequency": "QUARTERLY",
+      "dueDayOrDate": "25",
+      "dueDate": "2026-10-30",
+      "status": "PENDING",
+      "assignedTeamId": "team-1",
+      "assignedTeamName": "Assigned Staff",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27",
+      "period": "Q2 (Jul-Sep 2026)"
+    },
+    {
+      "id": "tsk-vat-m-2-1793027439078",
+      "clientId": "cli-1792925712031-862",
+      "clientName": "RAJARAM SWAMIPRASAD TRADING COMPANY",
+      "title": "Monthly VAT Tax Payment & Challan Deposit",
+      "category": "VAT",
+      "frequency": "MONTHLY",
+      "dueDayOrDate": "5",
+      "dueDate": "2026-09-10",
+      "status": "PENDING",
+      "assignedTeamId": "team-1",
+      "assignedTeamName": "Assigned Staff",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27",
+      "period": "August 2026"
     }
   ],
   "team": [
