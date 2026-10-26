@@ -529,6 +529,80 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     ];
 
+    // If client has VAT applicability or VAT registration number, seed VAT Quarterly Return & Monthly Tax tasks
+    if (newClient.complianceApplicability?.VAT || (newClient.vatNumber && newClient.vatNumber.trim().length >= 3)) {
+      sampleTasks.push(
+        {
+          id: 'tsk-' + Date.now() + '-' + randSuffix + '-vat-q',
+          clientId: newClient.id,
+          clientName: newClient.tradeName,
+          title: 'VAT Quarterly Return Filing',
+          category: 'VAT',
+          frequency: 'QUARTERLY',
+          dueDayOrDate: '25',
+          dueDate: '2026-10-30',
+          status: 'PENDING',
+          assignedTeamId: newClient.assignedTeamId,
+          assignedTeamName: newClient.assignedTeamName,
+          priority: 'HIGH',
+          financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
+        },
+        {
+          id: 'tsk-' + Date.now() + '-' + randSuffix + '-vat-m',
+          clientId: newClient.id,
+          clientName: newClient.tradeName,
+          title: 'Monthly VAT Tax Payment & Challan Deposit',
+          category: 'VAT',
+          frequency: 'MONTHLY',
+          dueDayOrDate: '5',
+          dueDate: '2026-09-10',
+          status: 'PENDING',
+          assignedTeamId: newClient.assignedTeamId,
+          assignedTeamName: newClient.assignedTeamName,
+          priority: 'HIGH',
+          financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
+        }
+      );
+    }
+
+    // If client has GSTR-9 applicability
+    if (newClient.complianceApplicability?.GSTR_9) {
+      sampleTasks.push({
+        id: 'tsk-' + Date.now() + '-' + randSuffix + '-gstr9',
+        clientId: newClient.id,
+        clientName: newClient.tradeName,
+        title: 'GSTR-9 Annual Return',
+        category: 'GST',
+        frequency: 'YEARLY',
+        dueDayOrDate: '26',
+        dueDate: '2026-12-31',
+        status: 'PENDING',
+        assignedTeamId: newClient.assignedTeamId,
+        assignedTeamName: newClient.assignedTeamName,
+        priority: 'HIGH',
+        financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
+      });
+    }
+
+    // If client has GSTR-9C applicability
+    if (newClient.complianceApplicability?.GSTR_9C) {
+      sampleTasks.push({
+        id: 'tsk-' + Date.now() + '-' + randSuffix + '-gstr9c',
+        clientId: newClient.id,
+        clientName: newClient.tradeName,
+        title: 'GSTR-9C Reconciliation Statement & Audit Certification',
+        category: 'GST',
+        frequency: 'YEARLY',
+        dueDayOrDate: '26',
+        dueDate: '2026-12-31',
+        status: 'PENDING',
+        assignedTeamId: newClient.assignedTeamId,
+        assignedTeamName: newClient.assignedTeamName,
+        priority: 'HIGH',
+        financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
+      });
+    }
+
     const normTrade = (newClient.tradeName || '').trim().toLowerCase();
     const nonDuplicateSampleTasks = sampleTasks.filter(st => {
       const normTitle = (st.title || '').trim().toLowerCase();
@@ -724,6 +798,44 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!taskAlreadyExists('GSTR-3B Monthly Return & Tax Settlement', '2026-09-20')) {
           newTasksToCreate.push(tsk3);
         }
+
+        // If client has VAT applicability or VAT registration number
+        if (newClient.complianceApplicability?.VAT || (newClient.vatNumber && newClient.vatNumber.trim().length >= 3)) {
+          if (!taskAlreadyExists('VAT Quarterly Return Filing', '2026-10-30')) {
+            newTasksToCreate.push({
+              id: 'tsk-' + Date.now() + '-' + idx + '-' + randSuffix + '-vat-q',
+              clientId: newClient.id,
+              clientName: newClient.tradeName,
+              title: 'VAT Quarterly Return Filing',
+              category: 'VAT',
+              frequency: 'QUARTERLY',
+              dueDayOrDate: '25',
+              dueDate: '2026-10-30',
+              status: 'PENDING',
+              assignedTeamId: newClient.assignedTeamId || '',
+              assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
+              priority: 'HIGH',
+              financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
+            });
+          }
+          if (!taskAlreadyExists('Monthly VAT Tax Payment & Challan Deposit', '2026-09-10')) {
+            newTasksToCreate.push({
+              id: 'tsk-' + Date.now() + '-' + idx + '-' + randSuffix + '-vat-m',
+              clientId: newClient.id,
+              clientName: newClient.tradeName,
+              title: 'Monthly VAT Tax Payment & Challan Deposit',
+              category: 'VAT',
+              frequency: 'MONTHLY',
+              dueDayOrDate: '5',
+              dueDate: '2026-09-10',
+              status: 'PENDING',
+              assignedTeamId: newClient.assignedTeamId || '',
+              assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
+              priority: 'HIGH',
+              financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
+            });
+          }
+        }
       }
     });
 
@@ -823,7 +935,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!taskData.dueDayOrDate || taskData.dueDayOrDate.trim() === '') {
       if (taskData.frequency === 'DAILY') {
         taskData.dueDayOrDate = 'Daily';
-      } else if (taskData.frequency === 'MONTHLY' && taskData.dueDate) {
+      } else if ((taskData.frequency === 'MONTHLY' || taskData.frequency === 'QUARTERLY') && taskData.dueDate) {
         const day = parseInt(taskData.dueDate.split('-')[2] || '0', 10);
         if (day > 0) {
           taskData.dueDayOrDate = Math.max(1, day - 5).toString();

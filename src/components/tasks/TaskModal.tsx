@@ -168,9 +168,10 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ComplianceCategory)}
-                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs"
+                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-semibold"
               >
                 <option value="GST">GST Compliance</option>
+                <option value="VAT">VAT / State Tax</option>
                 <option value="TDS">TDS / TCS</option>
                 <option value="INCOME_TAX">Income Tax</option>
                 <option value="AUDIT">Tax & Statutory Audit</option>
@@ -190,24 +191,153 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
                   setFrequency(newFreq);
                   if (newFreq === 'DAILY') {
                     setDueDayOrDate('Daily');
-                  } else if (newFreq === 'MONTHLY' && dueDate) {
+                  } else if ((newFreq === 'MONTHLY' || newFreq === 'QUARTERLY') && dueDate) {
                     const day = parseInt(dueDate.split('-')[2] || '0', 10);
                     if (day > 0) {
                       setDueDayOrDate(Math.max(1, day - 5).toString());
                     }
                   }
                 }}
-                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs"
+                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-semibold"
               >
                 <option value="DAILY">Daily (Daily Task)</option>
                 <option value="WEEKLY">Weekly (Days)</option>
                 <option value="MONTHLY">Monthly (Specific Date)</option>
-                <option value="QUARTERLY">Quarterly</option>
+                <option value="QUARTERLY">Quarterly (After Quarter End)</option>
                 <option value="YEARLY">Yearly (Annual Due Date)</option>
                 <option value="ONE_TIME">One-Time Assignment</option>
               </select>
             </div>
           </div>
+
+          {/* Quick Frequency & Filing Presets for GST and VAT */}
+          {category === 'VAT' && (
+            <div className="p-2.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 space-y-1.5 animate-in fade-in duration-150">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300 block">
+                ⚡ VAT Preset Options (Quarterly / Yearly Return & Monthly Tax)
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitle('VAT Quarterly Return Filing');
+                    setFrequency('QUARTERLY');
+                    setDueDate('2026-10-30');
+                    setDueDayOrDate('25');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-[11px] font-bold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors shadow-xs"
+                >
+                  📄 VAT Return (Quarterly - 30th / Rule 25)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitle('VAT Annual Return Filing');
+                    setFrequency('YEARLY');
+                    setDueDate('2027-04-30');
+                    setDueDayOrDate('25');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-[11px] font-bold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors shadow-xs"
+                >
+                  📅 VAT Return (Yearly - 30th / Rule 25)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitle('Monthly VAT Tax Payment');
+                    setFrequency('MONTHLY');
+                    setDueDate('2026-09-10');
+                    setDueDayOrDate('5');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-[11px] font-bold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors shadow-xs"
+                >
+                  💰 Monthly VAT Tax Payment (10th / Rule 5)
+                </button>
+              </div>
+            </div>
+          )}
+
+          {category === 'GST' && (
+            <div className="p-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 space-y-1.5 animate-in fade-in duration-150">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 block">
+                ⚡ GST Preset Options (Monthly / Quarterly QRMP / GSTR-9 / 9C)
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitle('GSTR-1 Monthly Outward Return');
+                    setFrequency('MONTHLY');
+                    setDueDate('2026-09-11');
+                    setDueDayOrDate('6');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 text-[11px] font-bold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors shadow-xs"
+                >
+                  GSTR-1 (Monthly - 11th)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitle('GSTR-1 Quarterly Return (QRMP Scheme)');
+                    setFrequency('QUARTERLY');
+                    setDueDate('2026-10-13');
+                    setDueDayOrDate('8');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 text-[11px] font-bold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors shadow-xs"
+                >
+                  GSTR-1 (Quarterly / QRMP - 13th)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitle('GSTR-3B Monthly Return & Tax Settlement');
+                    setFrequency('MONTHLY');
+                    setDueDate('2026-09-20');
+                    setDueDayOrDate('15');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 text-[11px] font-bold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors shadow-xs"
+                >
+                  GSTR-3B (Monthly - 20th)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitle('GSTR-3B Quarterly Return (QRMP Scheme)');
+                    setFrequency('QUARTERLY');
+                    setDueDate('2026-10-22');
+                    setDueDayOrDate('17');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 text-[11px] font-bold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors shadow-xs"
+                >
+                  GSTR-3B (Quarterly / QRMP - 22nd)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitle('GSTR-9 Annual Return');
+                    setFrequency('YEARLY');
+                    setDueDate('2026-12-31');
+                    setDueDayOrDate('26');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 text-[11px] font-bold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors shadow-xs"
+                >
+                  GSTR-9 (Annual Return - 31 Dec)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTitle('GSTR-9C Reconciliation Statement & Audit Certification');
+                    setFrequency('YEARLY');
+                    setDueDate('2026-12-31');
+                    setDueDayOrDate('26');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 text-[11px] font-bold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors shadow-xs"
+                >
+                  GSTR-9C (Reconciliation / Audit - 31 Dec)
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Due Rule & Due Date */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -215,14 +345,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-xs font-bold text-slate-800 dark:text-slate-200">Due Rule / Day</label>
                 <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono">
-                  {frequency === 'MONTHLY' ? '5 Days Prior' : frequency === 'DAILY' ? 'Daily' : ''}
+                  {frequency === 'MONTHLY' || frequency === 'QUARTERLY' ? '5 Days Prior' : frequency === 'DAILY' ? 'Daily' : ''}
                 </span>
               </div>
               <input
                 type="text"
                 value={dueDayOrDate}
                 onChange={(e) => setDueDayOrDate(e.target.value)}
-                placeholder={frequency === 'DAILY' ? 'Daily' : 'e.g. 2, 6, 15, Daily'}
+                placeholder={frequency === 'DAILY' ? 'Daily' : 'e.g. 5, 6, 15, 25, Daily'}
                 className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono font-bold"
               />
             </div>
@@ -235,7 +365,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
                 onChange={(e) => {
                   const newDate = e.target.value;
                   setDueDate(newDate);
-                  if (frequency === 'MONTHLY' && newDate) {
+                  if ((frequency === 'MONTHLY' || frequency === 'QUARTERLY') && newDate) {
                     const day = parseInt(newDate.split('-')[2] || '0', 10);
                     if (day > 0) {
                       setDueDayOrDate(Math.max(1, day - 5).toString());

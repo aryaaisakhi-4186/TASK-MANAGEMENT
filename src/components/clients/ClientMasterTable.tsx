@@ -279,9 +279,9 @@ export const ClientMasterTable: React.FC = () => {
                     </div>
                   </td>
 
-                  {/* 8 Compliances in Up-Down Vertical Columns (4 per column: AUDIT, GST, TDS, ITR | VAT, E-INVOICE, RCM, 86B) */}
+                  {/* 10 Compliances in Up-Down Vertical Columns (5 per column: AUDIT, GST, GSTR-9, GSTR-9C, TDS | ITR, VAT, E-INVOICE, RCM, 86B) */}
                   <td className="px-2 py-2">
-                    <div className="grid grid-rows-4 grid-flow-col gap-0.5 w-fit">
+                    <div className="grid grid-rows-5 grid-flow-col gap-0.5 w-fit">
                       {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                         const isApp = appMap[item.key];
                         return (

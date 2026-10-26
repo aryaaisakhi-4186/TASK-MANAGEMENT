@@ -155,14 +155,16 @@ export const TaskMatrixGrid: React.FC<{
     const pan = client?.pan && client.pan !== 'N/A' ? client.pan : null;
     const gstin = client?.gstin && client.gstin !== 'N/A' ? client.gstin : null;
     const tan = client?.tan && client.tan !== 'N/A' ? client.tan : null;
+    const vatNumber = client?.vatNumber && client.vatNumber !== 'N/A' ? client.vatNumber : null;
 
     const cat = (task.category || '').toUpperCase();
     const title = (task.title || '').toUpperCase();
 
     const isGst = cat === 'GST' || title.includes('GST') || title.includes('3B');
     const isTds = cat === 'TDS' || title.includes('TDS') || title.includes('281') || title.includes('24Q') || title.includes('26Q');
+    const isVat = cat === 'VAT' || title.includes('VAT');
 
-    return { pan, gstin, tan, isGst, isTds };
+    return { pan, gstin, tan, vatNumber, isGst, isTds, isVat };
   };
 
   const isTaskInCategory = (t: TaskItem, catKey: string): boolean => {
@@ -175,6 +177,10 @@ export const TaskMatrixGrid: React.FC<{
         return false;
       }
       return taskCat === 'GST' || taskCat.includes('GST') || taskTitle.includes('GSTR') || taskTitle.includes('3B');
+    }
+
+    if (catKey === 'VAT') {
+      return taskCat === 'VAT' || taskCat.includes('VAT') || taskTitle.includes('VAT');
     }
 
     if (catKey === 'TDS') {
@@ -641,6 +647,7 @@ export const TaskMatrixGrid: React.FC<{
             >
               <option value="ALL">All Categories</option>
               <option value="GST">GST</option>
+              <option value="VAT">VAT / State Tax</option>
               <option value="TDS">TDS / TCS</option>
               <option value="INCOME_TAX">Income Tax</option>
               <option value="AUDIT">Tax Audit</option>
@@ -746,8 +753,8 @@ export const TaskMatrixGrid: React.FC<{
                           {client.legalName} • <span className="font-semibold text-slate-700 dark:text-slate-300">{client.category}</span> • Assigned: <span className="text-amber-700 dark:text-amber-400 font-bold">{client.assignedTeamName || 'General Staff'}</span>
                         </p>
 
-                        {/* 8 Compliances in Up-Down Vertical Columns (4 per column: AUDIT, GST, TDS, ITR | VAT, E-INVOICE, RCM, 86B) */}
-                        <div className="grid grid-rows-4 grid-flow-col gap-0.5 mt-1 w-fit" onClick={(e) => e.stopPropagation()}>
+                        {/* 10 Compliances in Up-Down Vertical Columns (5 per column: AUDIT, GST, GSTR-9, GSTR-9C, TDS | ITR, VAT, E-INVOICE, RCM, 86B) */}
+                        <div className="grid grid-rows-5 grid-flow-col gap-0.5 mt-1 w-fit" onClick={(e) => e.stopPropagation()}>
                           {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                             const appMap = resolveClientApplicability(client);
                             const isApp = appMap[item.key];
@@ -855,6 +862,24 @@ export const TaskMatrixGrid: React.FC<{
                                             </div>
                                           ) : (
                                             <span className="text-[10px] text-slate-400 italic">No GSTIN</span>
+                                          )}
+                                          {tax.pan && (
+                                            <div className="text-[10px] text-slate-500">
+                                              <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    } else if (tax.isVat) {
+                                      return (
+                                        <div className="space-y-0.5">
+                                          {tax.vatNumber ? (
+                                            <div className="flex items-center gap-1">
+                                              <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-cyan-500/15 text-cyan-800 dark:text-cyan-300 border border-cyan-500/30">VAT</span>
+                                              <span className="font-bold text-cyan-700 dark:text-cyan-400">{tax.vatNumber}</span>
+                                            </div>
+                                          ) : (
+                                            <span className="text-[10px] text-slate-400 italic">No VAT No</span>
                                           )}
                                           {tax.pan && (
                                             <div className="text-[10px] text-slate-500">
@@ -1061,6 +1086,24 @@ export const TaskMatrixGrid: React.FC<{
                                   </div>
                                 ) : (
                                   <span className="text-[10px] text-slate-400 italic">No GSTIN</span>
+                                )}
+                                {tax.pan && (
+                                  <div className="text-[10px] text-slate-500">
+                                    <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          } else if (tax.isVat) {
+                            return (
+                              <div className="space-y-0.5">
+                                {tax.vatNumber ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-cyan-500/15 text-cyan-800 dark:text-cyan-300 border border-cyan-500/30">VAT</span>
+                                    <span className="font-bold text-cyan-700 dark:text-cyan-400">{tax.vatNumber}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 italic">No VAT No</span>
                                 )}
                                 {tax.pan && (
                                   <div className="text-[10px] text-slate-500">

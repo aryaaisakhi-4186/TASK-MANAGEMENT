@@ -64,11 +64,13 @@ export interface ClientRepoDoc {
   uploadedAt: string;
 }
 
-export type ComplianceApplicabilityKey = 'AUDIT' | 'GST' | 'TDS' | 'ITR' | 'VAT' | 'E_INVOICE' | 'RCM' | 'RULE_86B';
+export type ComplianceApplicabilityKey = 'AUDIT' | 'GST' | 'GSTR_9' | 'GSTR_9C' | 'TDS' | 'ITR' | 'VAT' | 'E_INVOICE' | 'RCM' | 'RULE_86B';
 
 export interface ClientComplianceApplicability {
   AUDIT: boolean;
   GST: boolean;
+  GSTR_9?: boolean;
+  GSTR_9C?: boolean;
   TDS: boolean;
   ITR: boolean;
   VAT: boolean;
@@ -109,7 +111,7 @@ export interface Client {
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type TaskFrequency = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'YEARLY' | 'ONE_TIME';
 export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'DONE' | 'NOT_APPLICABLE';
-export type ComplianceCategory = 'GST' | 'TDS' | 'INCOME_TAX' | 'ROC' | 'AUDIT' | 'BOOKKEEPING' | 'PF_ESIC' | 'ADVANCE_TAX';
+export type ComplianceCategory = 'GST' | 'TDS' | 'INCOME_TAX' | 'ROC' | 'AUDIT' | 'BOOKKEEPING' | 'PF_ESIC' | 'ADVANCE_TAX' | 'VAT';
 
 export interface TaskItem {
   id: string;

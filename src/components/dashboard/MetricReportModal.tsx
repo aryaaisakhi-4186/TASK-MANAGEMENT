@@ -91,6 +91,10 @@ export const MetricReportModal: React.FC<Props> = ({
       return taskCat === 'GST' || taskCat.includes('GST') || taskTitle.includes('GSTR') || taskTitle.includes('3B');
     }
 
+    if (catKey === 'VAT') {
+      return taskCat === 'VAT' || taskCat.includes('VAT') || taskTitle.includes('VAT');
+    }
+
     if (catKey === 'TDS') {
       // Must NOT be GST obligations
       if (taskCat === 'GST' || taskTitle.includes('GSTR') || taskTitle.includes('GST') || taskTitle.includes('3B')) {
@@ -116,7 +120,7 @@ export const MetricReportModal: React.FC<Props> = ({
     }
 
     if (catKey === 'OTHER') {
-      const known = ['GST', 'TDS', 'INCOME_TAX', 'AUDIT', 'ROC', 'BOOKKEEPING'];
+      const known = ['GST', 'VAT', 'TDS', 'INCOME_TAX', 'AUDIT', 'ROC', 'BOOKKEEPING'];
       return !known.some(k => isTaskInCategory(t, k));
     }
 
@@ -128,6 +132,7 @@ export const MetricReportModal: React.FC<Props> = ({
     return {
       ALL: baseTasksForTab.length,
       GST: baseTasksForTab.filter(t => isTaskInCategory(t, 'GST')).length,
+      VAT: baseTasksForTab.filter(t => isTaskInCategory(t, 'VAT')).length,
       TDS: baseTasksForTab.filter(t => isTaskInCategory(t, 'TDS')).length,
       INCOME_TAX: baseTasksForTab.filter(t => isTaskInCategory(t, 'INCOME_TAX')).length,
       AUDIT: baseTasksForTab.filter(t => isTaskInCategory(t, 'AUDIT')).length,
@@ -165,14 +170,16 @@ export const MetricReportModal: React.FC<Props> = ({
     const pan = client?.pan && client.pan !== 'N/A' ? client.pan : null;
     const gstin = client?.gstin && client.gstin !== 'N/A' ? client.gstin : null;
     const tan = client?.tan && client.tan !== 'N/A' ? client.tan : null;
+    const vatNumber = client?.vatNumber && client.vatNumber !== 'N/A' ? client.vatNumber : null;
 
     const cat = (task.category || '').toUpperCase();
     const title = (task.title || '').toUpperCase();
 
     const isGst = cat === 'GST' || title.includes('GST') || title.includes('3B');
     const isTds = cat === 'TDS' || title.includes('TDS') || title.includes('281') || title.includes('24Q') || title.includes('26Q');
+    const isVat = cat === 'VAT' || title.includes('VAT');
 
-    return { pan, gstin, tan, isGst, isTds };
+    return { pan, gstin, tan, vatNumber, isGst, isTds, isVat };
   };
 
   // Filter tasks with Search Term (Client, Title, Category, Staff, FY, Due Date, Tax IDs)
@@ -294,6 +301,7 @@ export const MetricReportModal: React.FC<Props> = ({
   const categoryTabs = [
     { key: 'ALL', label: 'All Obligations', count: categoryCounts.ALL },
     { key: 'GST', label: 'GST Returns', count: categoryCounts.GST },
+    { key: 'VAT', label: 'VAT Returns & Tax', count: categoryCounts.VAT },
     { key: 'TDS', label: 'TDS / TCS', count: categoryCounts.TDS },
     { key: 'INCOME_TAX', label: 'Income Tax', count: categoryCounts.INCOME_TAX },
     { key: 'AUDIT', label: 'Tax Audit', count: categoryCounts.AUDIT },
@@ -583,6 +591,24 @@ export const MetricReportModal: React.FC<Props> = ({
                                   </div>
                                 ) : (
                                   <span className="text-[10px] text-slate-400 italic">No GSTIN</span>
+                                )}
+                                {tax.pan && (
+                                  <div className="text-[10px] text-slate-500">
+                                    <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          } else if (tax.isVat) {
+                            return (
+                              <div className="space-y-0.5">
+                                {tax.vatNumber ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-[9px] font-sans font-bold px-1 py-0.2 rounded bg-cyan-500/15 text-cyan-800 dark:text-cyan-300 border border-cyan-500/30">VAT</span>
+                                    <span className="font-bold text-cyan-700 dark:text-cyan-400">{tax.vatNumber}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 italic">No VAT No</span>
                                 )}
                                 {tax.pan && (
                                   <div className="text-[10px] text-slate-500">

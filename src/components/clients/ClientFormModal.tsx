@@ -773,14 +773,14 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
                   </p>
                 </div>
 
-                {/* Compliances (AUDIT, GST, TDS, ITR | VAT, E-INVOICE, RCM, 86B) */}
+                {/* Compliances (AUDIT, GST, GSTR-9, GSTR-9C, TDS | ITR, VAT, E-INVOICE, RCM, 86B) */}
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-800/80 space-y-1.5">
                   <label className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                     <ShieldCheck size={14} className="text-emerald-500" />
-                    <span>Compliances</span>
+                    <span>Compliances Applicability</span>
                   </label>
 
-                  <div className="grid grid-rows-4 grid-flow-col gap-1 w-fit">
+                  <div className="grid grid-rows-5 grid-flow-col gap-1 w-fit">
                     {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                       const isApp = complianceApplicability[item.key];
                       return (
