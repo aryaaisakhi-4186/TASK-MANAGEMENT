@@ -1785,7 +1785,7 @@
   ],
   "tasks": [
     {
-      "id": "tsk-1792925712032-1",
+      "id": "tsk-1-cli-1792925712032-998-TDS",
       "clientId": "cli-1792925712032-998",
       "clientName": "SHRI SATGURU HOSIERY & READYMADE",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -1800,7 +1800,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712032-2",
+      "id": "tsk-2-cli-1792925712032-998-GST",
       "clientId": "cli-1792925712032-998",
       "clientName": "SHRI SATGURU HOSIERY & READYMADE",
       "title": "GSTR-1 Monthly Outward Return",
@@ -1815,7 +1815,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712032-3",
+      "id": "tsk-3-cli-1792925712032-998-GST",
       "clientId": "cli-1792925712032-998",
       "clientName": "SHRI SATGURU HOSIERY & READYMADE",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -1830,7 +1830,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712031-1",
+      "id": "tsk-4-cli-1792925712031-862-TDS",
       "clientId": "cli-1792925712031-862",
       "clientName": "RAJARAM SWAMIPRASAD TRADING COMPANY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -1845,7 +1845,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712031-2",
+      "id": "tsk-5-cli-1792925712031-862-GST",
       "clientId": "cli-1792925712031-862",
       "clientName": "RAJARAM SWAMIPRASAD TRADING COMPANY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -1860,7 +1860,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712031-3",
+      "id": "tsk-6-cli-1792925712031-862-GST",
       "clientId": "cli-1792925712031-862",
       "clientName": "RAJARAM SWAMIPRASAD TRADING COMPANY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -1875,7 +1875,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712031-1",
+      "id": "tsk-7-cli-1792925712031-455-TDS",
       "clientId": "cli-1792925712031-455",
       "clientName": "MAA BAGRAJAN TRADING COMPANY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -1890,7 +1890,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712031-2",
+      "id": "tsk-8-cli-1792925712031-455-GST",
       "clientId": "cli-1792925712031-455",
       "clientName": "MAA BAGRAJAN TRADING COMPANY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -1905,7 +1905,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712031-3",
+      "id": "tsk-9-cli-1792925712031-455-GST",
       "clientId": "cli-1792925712031-455",
       "clientName": "MAA BAGRAJAN TRADING COMPANY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -1920,7 +1920,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712030-1",
+      "id": "tsk-10-cli-1792925712030-869-TDS",
       "clientId": "cli-1792925712030-869",
       "clientName": "ASHIRWAD BAKERS",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -1935,7 +1935,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712030-2",
+      "id": "tsk-11-cli-1792925712030-869-GST",
       "clientId": "cli-1792925712030-869",
       "clientName": "ASHIRWAD BAKERS",
       "title": "GSTR-1 Monthly Outward Return",
@@ -1950,7 +1950,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712030-3",
+      "id": "tsk-12-cli-1792925712030-869-GST",
       "clientId": "cli-1792925712030-869",
       "clientName": "ASHIRWAD BAKERS",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -1965,7 +1965,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712030-1",
+      "id": "tsk-13-cli-1792925712030-578-TDS",
       "clientId": "cli-1792925712030-578",
       "clientName": "KOMAL SAREES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -1980,7 +1980,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712030-2",
+      "id": "tsk-14-cli-1792925712030-578-GST",
       "clientId": "cli-1792925712030-578",
       "clientName": "KOMAL SAREES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -1995,7 +1995,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712030-3",
+      "id": "tsk-15-cli-1792925712030-578-GST",
       "clientId": "cli-1792925712030-578",
       "clientName": "KOMAL SAREES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2010,7 +2010,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712029-1",
+      "id": "tsk-16-cli-1792925712029-721-TDS",
       "clientId": "cli-1792925712029-721",
       "clientName": "ODHNI SAREES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2025,7 +2025,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712029-2",
+      "id": "tsk-17-cli-1792925712029-721-GST",
       "clientId": "cli-1792925712029-721",
       "clientName": "ODHNI SAREES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2040,7 +2040,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712029-3",
+      "id": "tsk-18-cli-1792925712029-721-GST",
       "clientId": "cli-1792925712029-721",
       "clientName": "ODHNI SAREES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2055,7 +2055,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712028-1",
+      "id": "tsk-19-cli-1792925712028-118-TDS",
       "clientId": "cli-1792925712028-118",
       "clientName": "ASHIRWAD PAINT SANITARY AND HARDWARE",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2070,7 +2070,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712028-2",
+      "id": "tsk-20-cli-1792925712028-118-GST",
       "clientId": "cli-1792925712028-118",
       "clientName": "ASHIRWAD PAINT SANITARY AND HARDWARE",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2085,7 +2085,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712028-3",
+      "id": "tsk-21-cli-1792925712028-118-GST",
       "clientId": "cli-1792925712028-118",
       "clientName": "ASHIRWAD PAINT SANITARY AND HARDWARE",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2100,7 +2100,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712027-1",
+      "id": "tsk-22-cli-1792925712027-728-TDS",
       "clientId": "cli-1792925712027-728",
       "clientName": "SATGURU ENTERPRISES-HARDWARE",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2115,7 +2115,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712027-2",
+      "id": "tsk-23-cli-1792925712027-728-GST",
       "clientId": "cli-1792925712027-728",
       "clientName": "SATGURU ENTERPRISES-HARDWARE",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2130,7 +2130,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712027-3",
+      "id": "tsk-24-cli-1792925712027-728-GST",
       "clientId": "cli-1792925712027-728",
       "clientName": "SATGURU ENTERPRISES-HARDWARE",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2145,7 +2145,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712026-1",
+      "id": "tsk-25-cli-1792925712026-329-TDS",
       "clientId": "cli-1792925712026-329",
       "clientName": "SATGURU ENTERPRISES-SANITARY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2160,7 +2160,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712026-2",
+      "id": "tsk-26-cli-1792925712026-329-GST",
       "clientId": "cli-1792925712026-329",
       "clientName": "SATGURU ENTERPRISES-SANITARY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2175,7 +2175,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712026-3",
+      "id": "tsk-27-cli-1792925712026-329-GST",
       "clientId": "cli-1792925712026-329",
       "clientName": "SATGURU ENTERPRISES-SANITARY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2190,7 +2190,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712025-1",
+      "id": "tsk-28-cli-1792925712025-935-TDS",
       "clientId": "cli-1792925712025-935",
       "clientName": "PAWAN HARDWARE & PLYWOOD",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2205,7 +2205,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712025-2",
+      "id": "tsk-29-cli-1792925712025-935-GST",
       "clientId": "cli-1792925712025-935",
       "clientName": "PAWAN HARDWARE & PLYWOOD",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2220,7 +2220,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712025-3",
+      "id": "tsk-30-cli-1792925712025-935-GST",
       "clientId": "cli-1792925712025-935",
       "clientName": "PAWAN HARDWARE & PLYWOOD",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2235,7 +2235,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712024-1",
+      "id": "tsk-31-cli-1792925712024-87-TDS",
       "clientId": "cli-1792925712024-87",
       "clientName": "SURESH SOUND",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2250,7 +2250,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712024-2",
+      "id": "tsk-32-cli-1792925712024-87-GST",
       "clientId": "cli-1792925712024-87",
       "clientName": "SURESH SOUND",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2265,7 +2265,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712024-3",
+      "id": "tsk-33-cli-1792925712024-87-GST",
       "clientId": "cli-1792925712024-87",
       "clientName": "SURESH SOUND",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2280,7 +2280,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712023-1",
+      "id": "tsk-34-cli-1792925712023-382-TDS",
       "clientId": "cli-1792925712023-382",
       "clientName": "ANANT SHAKTI MOBILE GALLERY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2295,7 +2295,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712023-2",
+      "id": "tsk-35-cli-1792925712023-382-GST",
       "clientId": "cli-1792925712023-382",
       "clientName": "ANANT SHAKTI MOBILE GALLERY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2310,7 +2310,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712023-3",
+      "id": "tsk-36-cli-1792925712023-382-GST",
       "clientId": "cli-1792925712023-382",
       "clientName": "ANANT SHAKTI MOBILE GALLERY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2325,7 +2325,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712022-1",
+      "id": "tsk-37-cli-1792925712022-719-TDS",
       "clientId": "cli-1792925712022-719",
       "clientName": "THE WHITE STORE BY VARYA'S",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2340,7 +2340,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712022-2",
+      "id": "tsk-38-cli-1792925712022-719-GST",
       "clientId": "cli-1792925712022-719",
       "clientName": "THE WHITE STORE BY VARYA'S",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2355,7 +2355,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712022-3",
+      "id": "tsk-39-cli-1792925712022-719-GST",
       "clientId": "cli-1792925712022-719",
       "clientName": "THE WHITE STORE BY VARYA'S",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2370,7 +2370,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712021-1",
+      "id": "tsk-40-cli-1792925712021-131-TDS",
       "clientId": "cli-1792925712021-131",
       "clientName": "VARDHMAN GENERAL STORE",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2385,7 +2385,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712021-2",
+      "id": "tsk-41-cli-1792925712021-131-GST",
       "clientId": "cli-1792925712021-131",
       "clientName": "VARDHMAN GENERAL STORE",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2400,7 +2400,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712021-3",
+      "id": "tsk-42-cli-1792925712021-131-GST",
       "clientId": "cli-1792925712021-131",
       "clientName": "VARDHMAN GENERAL STORE",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2415,7 +2415,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712020-1",
+      "id": "tsk-43-cli-1792925712020-324-TDS",
       "clientId": "cli-1792925712020-324",
       "clientName": "MAHAVEER GENERAL STORE",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2430,7 +2430,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712020-2",
+      "id": "tsk-44-cli-1792925712020-324-GST",
       "clientId": "cli-1792925712020-324",
       "clientName": "MAHAVEER GENERAL STORE",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2445,7 +2445,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712020-3",
+      "id": "tsk-45-cli-1792925712020-324-GST",
       "clientId": "cli-1792925712020-324",
       "clientName": "MAHAVEER GENERAL STORE",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2460,7 +2460,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712019-1",
+      "id": "tsk-46-cli-1792925712019-990-TDS",
       "clientId": "cli-1792925712019-990",
       "clientName": "VARDHMAN TRADERS",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2475,7 +2475,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712019-2",
+      "id": "tsk-47-cli-1792925712019-990-GST",
       "clientId": "cli-1792925712019-990",
       "clientName": "VARDHMAN TRADERS",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2490,7 +2490,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712019-3",
+      "id": "tsk-48-cli-1792925712019-990-GST",
       "clientId": "cli-1792925712019-990",
       "clientName": "VARDHMAN TRADERS",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2505,7 +2505,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712019-1",
+      "id": "tsk-49-cli-1792925712019-885-TDS",
       "clientId": "cli-1792925712019-885",
       "clientName": "GEETA TELECOM",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2520,7 +2520,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712019-2",
+      "id": "tsk-50-cli-1792925712019-885-GST",
       "clientId": "cli-1792925712019-885",
       "clientName": "GEETA TELECOM",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2535,7 +2535,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712019-3",
+      "id": "tsk-51-cli-1792925712019-885-GST",
       "clientId": "cli-1792925712019-885",
       "clientName": "GEETA TELECOM",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2550,7 +2550,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712018-1",
+      "id": "tsk-52-cli-1792925712018-677-TDS",
       "clientId": "cli-1792925712018-677",
       "clientName": "RAWAT INFOCOM SERVICES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2565,7 +2565,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712018-2",
+      "id": "tsk-53-cli-1792925712018-677-GST",
       "clientId": "cli-1792925712018-677",
       "clientName": "RAWAT INFOCOM SERVICES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2580,7 +2580,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712018-3",
+      "id": "tsk-54-cli-1792925712018-677-GST",
       "clientId": "cli-1792925712018-677",
       "clientName": "RAWAT INFOCOM SERVICES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2595,7 +2595,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712016-1",
+      "id": "tsk-55-cli-1792925712016-554-TDS",
       "clientId": "cli-1792925712016-554",
       "clientName": "HOTEL EVA GALAXY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2610,7 +2610,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712016-2",
+      "id": "tsk-56-cli-1792925712016-554-GST",
       "clientId": "cli-1792925712016-554",
       "clientName": "HOTEL EVA GALAXY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2625,7 +2625,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712016-3",
+      "id": "tsk-57-cli-1792925712016-554-GST",
       "clientId": "cli-1792925712016-554",
       "clientName": "HOTEL EVA GALAXY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2640,7 +2640,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712012-1",
+      "id": "tsk-58-cli-1792925712012-696-TDS",
       "clientId": "cli-1792925712012-696",
       "clientName": "BALAJI PULSES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2655,7 +2655,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712012-2",
+      "id": "tsk-59-cli-1792925712012-696-GST",
       "clientId": "cli-1792925712012-696",
       "clientName": "BALAJI PULSES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2670,7 +2670,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712012-3",
+      "id": "tsk-60-cli-1792925712012-696-GST",
       "clientId": "cli-1792925712012-696",
       "clientName": "BALAJI PULSES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2685,7 +2685,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712011-1",
+      "id": "tsk-61-cli-1792925712011-889-TDS",
       "clientId": "cli-1792925712011-889",
       "clientName": "GAHOI TRADING COMPANY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2700,7 +2700,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712011-2",
+      "id": "tsk-62-cli-1792925712011-889-GST",
       "clientId": "cli-1792925712011-889",
       "clientName": "GAHOI TRADING COMPANY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2715,7 +2715,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712011-3",
+      "id": "tsk-63-cli-1792925712011-889-GST",
       "clientId": "cli-1792925712011-889",
       "clientName": "GAHOI TRADING COMPANY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2730,7 +2730,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712010-1",
+      "id": "tsk-64-cli-1792925712010-779-TDS",
       "clientId": "cli-1792925712010-779",
       "clientName": "SANJAY DALL INDUSTRIES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2745,7 +2745,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712010-2",
+      "id": "tsk-65-cli-1792925712010-779-GST",
       "clientId": "cli-1792925712010-779",
       "clientName": "SANJAY DALL INDUSTRIES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2760,7 +2760,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712010-3",
+      "id": "tsk-66-cli-1792925712010-779-GST",
       "clientId": "cli-1792925712010-779",
       "clientName": "SANJAY DALL INDUSTRIES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2775,7 +2775,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712009-1",
+      "id": "tsk-67-cli-1792925712009-837-TDS",
       "clientId": "cli-1792925712009-837",
       "clientName": "BALAJI FILLING STATION",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2790,7 +2790,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712009-2",
+      "id": "tsk-68-cli-1792925712009-837-GST",
       "clientId": "cli-1792925712009-837",
       "clientName": "BALAJI FILLING STATION",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2805,7 +2805,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712009-3",
+      "id": "tsk-69-cli-1792925712009-837-GST",
       "clientId": "cli-1792925712009-837",
       "clientName": "BALAJI FILLING STATION",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2820,7 +2820,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712008-1",
+      "id": "tsk-70-cli-1792925712008-247-TDS",
       "clientId": "cli-1792925712008-247",
       "clientName": "AGRAWAL AGENCIES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2835,7 +2835,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712008-2",
+      "id": "tsk-71-cli-1792925712008-247-GST",
       "clientId": "cli-1792925712008-247",
       "clientName": "AGRAWAL AGENCIES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2850,7 +2850,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712008-3",
+      "id": "tsk-72-cli-1792925712008-247-GST",
       "clientId": "cli-1792925712008-247",
       "clientName": "AGRAWAL AGENCIES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2865,7 +2865,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712007-1",
+      "id": "tsk-73-cli-1792925712007-138-TDS",
       "clientId": "cli-1792925712007-138",
       "clientName": "PRAVENDRA AGENCIES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2880,7 +2880,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712007-2",
+      "id": "tsk-74-cli-1792925712007-138-GST",
       "clientId": "cli-1792925712007-138",
       "clientName": "PRAVENDRA AGENCIES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2895,7 +2895,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712007-3",
+      "id": "tsk-75-cli-1792925712007-138-GST",
       "clientId": "cli-1792925712007-138",
       "clientName": "PRAVENDRA AGENCIES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2910,7 +2910,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712006-1",
+      "id": "tsk-76-cli-1792925712006-106-TDS",
       "clientId": "cli-1792925712006-106",
       "clientName": "DEVENDRA AGENCIES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2925,7 +2925,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712006-2",
+      "id": "tsk-77-cli-1792925712006-106-GST",
       "clientId": "cli-1792925712006-106",
       "clientName": "DEVENDRA AGENCIES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2940,7 +2940,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712006-3",
+      "id": "tsk-78-cli-1792925712006-106-GST",
       "clientId": "cli-1792925712006-106",
       "clientName": "DEVENDRA AGENCIES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -2955,7 +2955,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712006-1",
+      "id": "tsk-79-cli-1792925712006-476-TDS",
       "clientId": "cli-1792925712006-476",
       "clientName": "THE BUNDELA",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -2970,7 +2970,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712006-2",
+      "id": "tsk-80-cli-1792925712006-476-GST",
       "clientId": "cli-1792925712006-476",
       "clientName": "THE BUNDELA",
       "title": "GSTR-1 Monthly Outward Return",
@@ -2985,7 +2985,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712006-3",
+      "id": "tsk-81-cli-1792925712006-476-GST",
       "clientId": "cli-1792925712006-476",
       "clientName": "THE BUNDELA",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3000,7 +3000,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712006-1",
+      "id": "tsk-82-cli-1792925712006-276-TDS",
       "clientId": "cli-1792925712006-276",
       "clientName": "NOWGONG FILLING STATION",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3015,7 +3015,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712006-2",
+      "id": "tsk-83-cli-1792925712006-276-GST",
       "clientId": "cli-1792925712006-276",
       "clientName": "NOWGONG FILLING STATION",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3030,7 +3030,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712006-3",
+      "id": "tsk-84-cli-1792925712006-276-GST",
       "clientId": "cli-1792925712006-276",
       "clientName": "NOWGONG FILLING STATION",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3045,7 +3045,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712005-1",
+      "id": "tsk-85-cli-1792925712005-702-TDS",
       "clientId": "cli-1792925712005-702",
       "clientName": "NEW DULHAN SAREE CENTRE",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3060,7 +3060,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712005-2",
+      "id": "tsk-86-cli-1792925712005-702-GST",
       "clientId": "cli-1792925712005-702",
       "clientName": "NEW DULHAN SAREE CENTRE",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3075,7 +3075,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712005-3",
+      "id": "tsk-87-cli-1792925712005-702-GST",
       "clientId": "cli-1792925712005-702",
       "clientName": "NEW DULHAN SAREE CENTRE",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3090,7 +3090,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712005-1",
+      "id": "tsk-88-cli-1792925712005-815-TDS",
       "clientId": "cli-1792925712005-815",
       "clientName": "DULHAN SAREE CENTER",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3105,7 +3105,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712005-2",
+      "id": "tsk-89-cli-1792925712005-815-GST",
       "clientId": "cli-1792925712005-815",
       "clientName": "DULHAN SAREE CENTER",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3120,7 +3120,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712005-3",
+      "id": "tsk-90-cli-1792925712005-815-GST",
       "clientId": "cli-1792925712005-815",
       "clientName": "DULHAN SAREE CENTER",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3135,7 +3135,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712004-1",
+      "id": "tsk-91-cli-1792925712004-598-TDS",
       "clientId": "cli-1792925712004-598",
       "clientName": "BAHU BETI EMPORIUM",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3150,7 +3150,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712004-2",
+      "id": "tsk-92-cli-1792925712004-598-GST",
       "clientId": "cli-1792925712004-598",
       "clientName": "BAHU BETI EMPORIUM",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3165,7 +3165,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712004-3",
+      "id": "tsk-93-cli-1792925712004-598-GST",
       "clientId": "cli-1792925712004-598",
       "clientName": "BAHU BETI EMPORIUM",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3180,7 +3180,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712003-1",
+      "id": "tsk-94-cli-1792925712003-159-TDS",
       "clientId": "cli-1792925712003-159",
       "clientName": "NEW BAHU BETI COLLECTION",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3195,7 +3195,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712003-2",
+      "id": "tsk-95-cli-1792925712003-159-GST",
       "clientId": "cli-1792925712003-159",
       "clientName": "NEW BAHU BETI COLLECTION",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3210,7 +3210,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712003-3",
+      "id": "tsk-96-cli-1792925712003-159-GST",
       "clientId": "cli-1792925712003-159",
       "clientName": "NEW BAHU BETI COLLECTION",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3225,7 +3225,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712003-1",
+      "id": "tsk-97-cli-1792925712003-181-TDS",
       "clientId": "cli-1792925712003-181",
       "clientName": "MAA SHARDA TRADERS",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3240,7 +3240,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712003-2",
+      "id": "tsk-98-cli-1792925712003-181-GST",
       "clientId": "cli-1792925712003-181",
       "clientName": "MAA SHARDA TRADERS",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3255,7 +3255,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712003-3",
+      "id": "tsk-99-cli-1792925712003-181-GST",
       "clientId": "cli-1792925712003-181",
       "clientName": "MAA SHARDA TRADERS",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3270,7 +3270,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712003-1",
+      "id": "tsk-100-cli-1792925712003-675-TDS",
       "clientId": "cli-1792925712003-675",
       "clientName": "RUCHI MAHILA MANDAL",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3285,7 +3285,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712003-2",
+      "id": "tsk-101-cli-1792925712003-675-GST",
       "clientId": "cli-1792925712003-675",
       "clientName": "RUCHI MAHILA MANDAL",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3300,7 +3300,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712003-3",
+      "id": "tsk-102-cli-1792925712003-675-GST",
       "clientId": "cli-1792925712003-675",
       "clientName": "RUCHI MAHILA MANDAL",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3315,7 +3315,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712002-1",
+      "id": "tsk-103-cli-1792925712002-241-TDS",
       "clientId": "cli-1792925712002-241",
       "clientName": "MANJULA MAHILA MANDAL",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3330,7 +3330,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712002-2",
+      "id": "tsk-104-cli-1792925712002-241-GST",
       "clientId": "cli-1792925712002-241",
       "clientName": "MANJULA MAHILA MANDAL",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3345,7 +3345,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712002-3",
+      "id": "tsk-105-cli-1792925712002-241-GST",
       "clientId": "cli-1792925712002-241",
       "clientName": "MANJULA MAHILA MANDAL",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3360,7 +3360,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712002-1",
+      "id": "tsk-106-cli-1792925712002-528-TDS",
       "clientId": "cli-1792925712002-528",
       "clientName": "KAMAKHYA FILLING STATION",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3375,7 +3375,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712002-2",
+      "id": "tsk-107-cli-1792925712002-528-GST",
       "clientId": "cli-1792925712002-528",
       "clientName": "KAMAKHYA FILLING STATION",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3390,7 +3390,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712002-3",
+      "id": "tsk-108-cli-1792925712002-528-GST",
       "clientId": "cli-1792925712002-528",
       "clientName": "KAMAKHYA FILLING STATION",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3405,7 +3405,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712001-1",
+      "id": "tsk-109-cli-1792925712001-399-TDS",
       "clientId": "cli-1792925712001-399",
       "clientName": "HOTEL KAMAKHYA INN",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3420,7 +3420,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712001-2",
+      "id": "tsk-110-cli-1792925712001-399-GST",
       "clientId": "cli-1792925712001-399",
       "clientName": "HOTEL KAMAKHYA INN",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3435,7 +3435,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712001-3",
+      "id": "tsk-111-cli-1792925712001-399-GST",
       "clientId": "cli-1792925712001-399",
       "clientName": "HOTEL KAMAKHYA INN",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3450,7 +3450,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712001-1",
+      "id": "tsk-112-cli-1792925712001-665-TDS",
       "clientId": "cli-1792925712001-665",
       "clientName": "KAMAKHYA FASHION HUB",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3465,7 +3465,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712001-2",
+      "id": "tsk-113-cli-1792925712001-665-GST",
       "clientId": "cli-1792925712001-665",
       "clientName": "KAMAKHYA FASHION HUB",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3480,7 +3480,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712001-3",
+      "id": "tsk-114-cli-1792925712001-665-GST",
       "clientId": "cli-1792925712001-665",
       "clientName": "KAMAKHYA FASHION HUB",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3495,7 +3495,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712000-1",
+      "id": "tsk-115-cli-1792925712000-543-TDS",
       "clientId": "cli-1792925712000-543",
       "clientName": "NAMDEO TRADERS",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3510,7 +3510,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712000-2",
+      "id": "tsk-116-cli-1792925712000-543-GST",
       "clientId": "cli-1792925712000-543",
       "clientName": "NAMDEO TRADERS",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3525,7 +3525,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712000-3",
+      "id": "tsk-117-cli-1792925712000-543-GST",
       "clientId": "cli-1792925712000-543",
       "clientName": "NAMDEO TRADERS",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3540,7 +3540,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712000-1",
+      "id": "tsk-118-cli-1792925712000-807-TDS",
       "clientId": "cli-1792925712000-807",
       "clientName": "NAMDEO WAREHOUSEING",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3555,7 +3555,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712000-2",
+      "id": "tsk-119-cli-1792925712000-807-GST",
       "clientId": "cli-1792925712000-807",
       "clientName": "NAMDEO WAREHOUSEING",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3570,7 +3570,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925712000-3",
+      "id": "tsk-120-cli-1792925712000-807-GST",
       "clientId": "cli-1792925712000-807",
       "clientName": "NAMDEO WAREHOUSEING",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3585,7 +3585,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711999-1",
+      "id": "tsk-121-cli-1792925711999-323-TDS",
       "clientId": "cli-1792925711999-323",
       "clientName": "RAKHI TRADERS",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3600,7 +3600,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711999-2",
+      "id": "tsk-122-cli-1792925711999-323-GST",
       "clientId": "cli-1792925711999-323",
       "clientName": "RAKHI TRADERS",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3615,7 +3615,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711999-3",
+      "id": "tsk-123-cli-1792925711999-323-GST",
       "clientId": "cli-1792925711999-323",
       "clientName": "RAKHI TRADERS",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3630,7 +3630,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711999-1",
+      "id": "tsk-124-cli-1792925711999-625-TDS",
       "clientId": "cli-1792925711999-625",
       "clientName": "VEERA STEEL CORPORATION",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3645,7 +3645,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711999-2",
+      "id": "tsk-125-cli-1792925711999-625-GST",
       "clientId": "cli-1792925711999-625",
       "clientName": "VEERA STEEL CORPORATION",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3660,7 +3660,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711999-3",
+      "id": "tsk-126-cli-1792925711999-625-GST",
       "clientId": "cli-1792925711999-625",
       "clientName": "VEERA STEEL CORPORATION",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3675,7 +3675,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711999-1",
+      "id": "tsk-127-cli-1792925711999-178-TDS",
       "clientId": "cli-1792925711999-178",
       "clientName": "AGRAWALS STEELS",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3690,7 +3690,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711999-2",
+      "id": "tsk-128-cli-1792925711999-178-GST",
       "clientId": "cli-1792925711999-178",
       "clientName": "AGRAWALS STEELS",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3705,7 +3705,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711999-3",
+      "id": "tsk-129-cli-1792925711999-178-GST",
       "clientId": "cli-1792925711999-178",
       "clientName": "AGRAWALS STEELS",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3720,7 +3720,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711998-1",
+      "id": "tsk-130-cli-1792925711998-640-TDS",
       "clientId": "cli-1792925711998-640",
       "clientName": "ARYAN STEELS",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3735,7 +3735,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711998-2",
+      "id": "tsk-131-cli-1792925711998-640-GST",
       "clientId": "cli-1792925711998-640",
       "clientName": "ARYAN STEELS",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3750,7 +3750,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711998-3",
+      "id": "tsk-132-cli-1792925711998-640-GST",
       "clientId": "cli-1792925711998-640",
       "clientName": "ARYAN STEELS",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3765,7 +3765,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711998-1",
+      "id": "tsk-133-cli-1792925711998-378-TDS",
       "clientId": "cli-1792925711998-378",
       "clientName": "ANMOL CEMENT AGENCY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3780,7 +3780,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711998-2",
+      "id": "tsk-134-cli-1792925711998-378-GST",
       "clientId": "cli-1792925711998-378",
       "clientName": "ANMOL CEMENT AGENCY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3795,7 +3795,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711998-3",
+      "id": "tsk-135-cli-1792925711998-378-GST",
       "clientId": "cli-1792925711998-378",
       "clientName": "ANMOL CEMENT AGENCY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3810,7 +3810,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711998-1",
+      "id": "tsk-136-cli-1792925711998-931-TDS",
       "clientId": "cli-1792925711998-931",
       "clientName": "SARITA STEELS",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3825,7 +3825,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711998-2",
+      "id": "tsk-137-cli-1792925711998-931-GST",
       "clientId": "cli-1792925711998-931",
       "clientName": "SARITA STEELS",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3840,7 +3840,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711998-3",
+      "id": "tsk-138-cli-1792925711998-931-GST",
       "clientId": "cli-1792925711998-931",
       "clientName": "SARITA STEELS",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3855,7 +3855,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711997-1",
+      "id": "tsk-139-cli-1792925711997-851-TDS",
       "clientId": "cli-1792925711997-851",
       "clientName": "RAJESH KUMAR RAHUL KUMAR JAIN - RANI JAIN",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3870,7 +3870,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711997-2",
+      "id": "tsk-140-cli-1792925711997-851-GST",
       "clientId": "cli-1792925711997-851",
       "clientName": "RAJESH KUMAR RAHUL KUMAR JAIN - RANI JAIN",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3885,7 +3885,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711997-3",
+      "id": "tsk-141-cli-1792925711997-851-GST",
       "clientId": "cli-1792925711997-851",
       "clientName": "RAJESH KUMAR RAHUL KUMAR JAIN - RANI JAIN",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3900,7 +3900,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711997-1",
+      "id": "tsk-142-cli-1792925711996-632-TDS",
       "clientId": "cli-1792925711996-632",
       "clientName": "SEY CYBER CAFÉ & MOBILE SHOP",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3915,7 +3915,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711997-2",
+      "id": "tsk-143-cli-1792925711996-632-GST",
       "clientId": "cli-1792925711996-632",
       "clientName": "SEY CYBER CAFÉ & MOBILE SHOP",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3930,7 +3930,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711997-3",
+      "id": "tsk-144-cli-1792925711996-632-GST",
       "clientId": "cli-1792925711996-632",
       "clientName": "SEY CYBER CAFÉ & MOBILE SHOP",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3945,7 +3945,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711995-1",
+      "id": "tsk-145-cli-1792925711994-990-TDS",
       "clientId": "cli-1792925711994-990",
       "clientName": "SHIKSHA SAHITYA SADAN",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -3960,7 +3960,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711995-2",
+      "id": "tsk-146-cli-1792925711994-990-GST",
       "clientId": "cli-1792925711994-990",
       "clientName": "SHIKSHA SAHITYA SADAN",
       "title": "GSTR-1 Monthly Outward Return",
@@ -3975,7 +3975,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711995-3",
+      "id": "tsk-147-cli-1792925711994-990-GST",
       "clientId": "cli-1792925711994-990",
       "clientName": "SHIKSHA SAHITYA SADAN",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -3990,7 +3990,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711993-1",
+      "id": "tsk-148-cli-1792925711993-579-TDS",
       "clientId": "cli-1792925711993-579",
       "clientName": "ALOK PUSTAK SADAN",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4005,7 +4005,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711993-2",
+      "id": "tsk-149-cli-1792925711993-579-GST",
       "clientId": "cli-1792925711993-579",
       "clientName": "ALOK PUSTAK SADAN",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4020,7 +4020,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711993-3",
+      "id": "tsk-150-cli-1792925711993-579-GST",
       "clientId": "cli-1792925711993-579",
       "clientName": "ALOK PUSTAK SADAN",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4035,7 +4035,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711992-1",
+      "id": "tsk-151-cli-1792925711992-613-TDS",
       "clientId": "cli-1792925711992-613",
       "clientName": "BABULAL GYAN CHAND JAIN",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4050,7 +4050,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711992-2",
+      "id": "tsk-152-cli-1792925711992-613-GST",
       "clientId": "cli-1792925711992-613",
       "clientName": "BABULAL GYAN CHAND JAIN",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4065,7 +4065,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711992-3",
+      "id": "tsk-153-cli-1792925711992-613-GST",
       "clientId": "cli-1792925711992-613",
       "clientName": "BABULAL GYAN CHAND JAIN",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4080,7 +4080,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711992-1",
+      "id": "tsk-154-cli-1792925711992-681-TDS",
       "clientId": "cli-1792925711992-681",
       "clientName": "SANJAY TRADERS",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4095,7 +4095,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711992-2",
+      "id": "tsk-155-cli-1792925711992-681-GST",
       "clientId": "cli-1792925711992-681",
       "clientName": "SANJAY TRADERS",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4110,7 +4110,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711992-3",
+      "id": "tsk-156-cli-1792925711992-681-GST",
       "clientId": "cli-1792925711992-681",
       "clientName": "SANJAY TRADERS",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4125,7 +4125,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711991-1",
+      "id": "tsk-157-cli-1792925711991-567-TDS",
       "clientId": "cli-1792925711991-567",
       "clientName": "TEEKAM GENERAL STORES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4140,7 +4140,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711991-2",
+      "id": "tsk-158-cli-1792925711991-567-GST",
       "clientId": "cli-1792925711991-567",
       "clientName": "TEEKAM GENERAL STORES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4155,7 +4155,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711991-3",
+      "id": "tsk-159-cli-1792925711991-567-GST",
       "clientId": "cli-1792925711991-567",
       "clientName": "TEEKAM GENERAL STORES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4170,7 +4170,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711990-1",
+      "id": "tsk-160-cli-1792925711990-68-TDS",
       "clientId": "cli-1792925711990-68",
       "clientName": "ANKIT AGENCY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4185,7 +4185,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711990-2",
+      "id": "tsk-161-cli-1792925711990-68-GST",
       "clientId": "cli-1792925711990-68",
       "clientName": "ANKIT AGENCY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4200,7 +4200,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711990-3",
+      "id": "tsk-162-cli-1792925711990-68-GST",
       "clientId": "cli-1792925711990-68",
       "clientName": "ANKIT AGENCY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4215,7 +4215,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711989-1",
+      "id": "tsk-163-cli-1792925711989-534-TDS",
       "clientId": "cli-1792925711989-534",
       "clientName": "MADHUBAN FASHION CORNER",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4230,7 +4230,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711989-2",
+      "id": "tsk-164-cli-1792925711989-534-GST",
       "clientId": "cli-1792925711989-534",
       "clientName": "MADHUBAN FASHION CORNER",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4245,7 +4245,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711989-3",
+      "id": "tsk-165-cli-1792925711989-534-GST",
       "clientId": "cli-1792925711989-534",
       "clientName": "MADHUBAN FASHION CORNER",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4260,7 +4260,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711988-1",
+      "id": "tsk-166-cli-1792925711988-288-TDS",
       "clientId": "cli-1792925711988-288",
       "clientName": "APSARA FASHION HOUSE",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4275,7 +4275,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711988-2",
+      "id": "tsk-167-cli-1792925711988-288-GST",
       "clientId": "cli-1792925711988-288",
       "clientName": "APSARA FASHION HOUSE",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4290,7 +4290,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711988-3",
+      "id": "tsk-168-cli-1792925711988-288-GST",
       "clientId": "cli-1792925711988-288",
       "clientName": "APSARA FASHION HOUSE",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4305,7 +4305,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711988-1",
+      "id": "tsk-169-cli-1792925711988-939-TDS",
       "clientId": "cli-1792925711988-939",
       "clientName": "APSARA SAREES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4320,7 +4320,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711988-2",
+      "id": "tsk-170-cli-1792925711988-939-GST",
       "clientId": "cli-1792925711988-939",
       "clientName": "APSARA SAREES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4335,7 +4335,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711988-3",
+      "id": "tsk-171-cli-1792925711988-939-GST",
       "clientId": "cli-1792925711988-939",
       "clientName": "APSARA SAREES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4350,7 +4350,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711987-1",
+      "id": "tsk-172-cli-1792925711987-943-TDS",
       "clientId": "cli-1792925711987-943",
       "clientName": "DHRUV TRADING COMPANY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4365,7 +4365,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711987-2",
+      "id": "tsk-173-cli-1792925711987-943-GST",
       "clientId": "cli-1792925711987-943",
       "clientName": "DHRUV TRADING COMPANY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4380,7 +4380,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711987-3",
+      "id": "tsk-174-cli-1792925711987-943-GST",
       "clientId": "cli-1792925711987-943",
       "clientName": "DHRUV TRADING COMPANY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4395,7 +4395,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711987-1",
+      "id": "tsk-175-cli-1792925711987-626-TDS",
       "clientId": "cli-1792925711987-626",
       "clientName": "PREMNARAYAN SAHU",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4410,7 +4410,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711987-2",
+      "id": "tsk-176-cli-1792925711987-626-GST",
       "clientId": "cli-1792925711987-626",
       "clientName": "PREMNARAYAN SAHU",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4425,7 +4425,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711987-3",
+      "id": "tsk-177-cli-1792925711987-626-GST",
       "clientId": "cli-1792925711987-626",
       "clientName": "PREMNARAYAN SAHU",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4440,7 +4440,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711987-1",
+      "id": "tsk-178-cli-1792925711987-475-TDS",
       "clientId": "cli-1792925711987-475",
       "clientName": "RAJESH KUMAR RAKESH KUMAR RUSIA",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4455,7 +4455,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711987-2",
+      "id": "tsk-179-cli-1792925711987-475-GST",
       "clientId": "cli-1792925711987-475",
       "clientName": "RAJESH KUMAR RAKESH KUMAR RUSIA",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4470,7 +4470,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711987-3",
+      "id": "tsk-180-cli-1792925711987-475-GST",
       "clientId": "cli-1792925711987-475",
       "clientName": "RAJESH KUMAR RAKESH KUMAR RUSIA",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4485,7 +4485,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711986-1",
+      "id": "tsk-181-cli-1792925711986-252-TDS",
       "clientId": "cli-1792925711986-252",
       "clientName": "GREEN ROOTS BIOMASS INDUSTRIES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4500,7 +4500,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711986-2",
+      "id": "tsk-182-cli-1792925711986-252-GST",
       "clientId": "cli-1792925711986-252",
       "clientName": "GREEN ROOTS BIOMASS INDUSTRIES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4515,7 +4515,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711986-3",
+      "id": "tsk-183-cli-1792925711986-252-GST",
       "clientId": "cli-1792925711986-252",
       "clientName": "GREEN ROOTS BIOMASS INDUSTRIES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4530,7 +4530,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711986-1",
+      "id": "tsk-184-cli-1792925711986-544-TDS",
       "clientId": "cli-1792925711986-544",
       "clientName": "NUTRI TRADE",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4545,7 +4545,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711986-2",
+      "id": "tsk-185-cli-1792925711986-544-GST",
       "clientId": "cli-1792925711986-544",
       "clientName": "NUTRI TRADE",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4560,7 +4560,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711986-3",
+      "id": "tsk-186-cli-1792925711986-544-GST",
       "clientId": "cli-1792925711986-544",
       "clientName": "NUTRI TRADE",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4575,7 +4575,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711985-1",
+      "id": "tsk-187-cli-1792925711985-61-TDS",
       "clientId": "cli-1792925711985-61",
       "clientName": "K. B. PULSES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4590,7 +4590,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711985-2",
+      "id": "tsk-188-cli-1792925711985-61-GST",
       "clientId": "cli-1792925711985-61",
       "clientName": "K. B. PULSES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4605,7 +4605,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711985-3",
+      "id": "tsk-189-cli-1792925711985-61-GST",
       "clientId": "cli-1792925711985-61",
       "clientName": "K. B. PULSES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4620,7 +4620,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711985-1",
+      "id": "tsk-190-cli-1792925711985-357-TDS",
       "clientId": "cli-1792925711985-357",
       "clientName": "CLASSIC WHEELZ",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4635,7 +4635,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711985-2",
+      "id": "tsk-191-cli-1792925711985-357-GST",
       "clientId": "cli-1792925711985-357",
       "clientName": "CLASSIC WHEELZ",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4650,7 +4650,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711985-3",
+      "id": "tsk-192-cli-1792925711985-357-GST",
       "clientId": "cli-1792925711985-357",
       "clientName": "CLASSIC WHEELZ",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4665,7 +4665,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711984-1",
+      "id": "tsk-193-cli-1792925711984-420-TDS",
       "clientId": "cli-1792925711984-420",
       "clientName": "ASHOK AGENCIES",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4680,7 +4680,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711984-2",
+      "id": "tsk-194-cli-1792925711984-420-GST",
       "clientId": "cli-1792925711984-420",
       "clientName": "ASHOK AGENCIES",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4695,7 +4695,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711984-3",
+      "id": "tsk-195-cli-1792925711984-420-GST",
       "clientId": "cli-1792925711984-420",
       "clientName": "ASHOK AGENCIES",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4710,7 +4710,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711984-1",
+      "id": "tsk-196-cli-1792925711984-853-TDS",
       "clientId": "cli-1792925711984-853",
       "clientName": "BALKRISHNA PREMNARAYAN",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4725,7 +4725,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711984-2",
+      "id": "tsk-197-cli-1792925711984-853-GST",
       "clientId": "cli-1792925711984-853",
       "clientName": "BALKRISHNA PREMNARAYAN",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4740,7 +4740,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711984-3",
+      "id": "tsk-198-cli-1792925711984-853-GST",
       "clientId": "cli-1792925711984-853",
       "clientName": "BALKRISHNA PREMNARAYAN",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4755,7 +4755,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711984-1",
+      "id": "tsk-199-cli-1792925711984-605-TDS",
       "clientId": "cli-1792925711984-605",
       "clientName": "AMAN KUMAR ANUJ KUMAR NAMDEO",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4770,7 +4770,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711984-2",
+      "id": "tsk-200-cli-1792925711984-605-GST",
       "clientId": "cli-1792925711984-605",
       "clientName": "AMAN KUMAR ANUJ KUMAR NAMDEO",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4785,7 +4785,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711984-3",
+      "id": "tsk-201-cli-1792925711984-605-GST",
       "clientId": "cli-1792925711984-605",
       "clientName": "AMAN KUMAR ANUJ KUMAR NAMDEO",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4800,7 +4800,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711983-1",
+      "id": "tsk-202-cli-1792925711983-546-TDS",
       "clientId": "cli-1792925711983-546",
       "clientName": "RAKHI AGENCY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4815,7 +4815,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711983-2",
+      "id": "tsk-203-cli-1792925711983-546-GST",
       "clientId": "cli-1792925711983-546",
       "clientName": "RAKHI AGENCY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4830,7 +4830,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925711983-3",
+      "id": "tsk-204-cli-1792925711983-546-GST",
       "clientId": "cli-1792925711983-546",
       "clientName": "RAKHI AGENCY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4845,7 +4845,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925576133-1",
+      "id": "tsk-205-cli-1792925576133-615-TDS",
       "clientId": "cli-1792925576133-615",
       "clientName": "S. R. TRADING COMPANY",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4860,7 +4860,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925576133-2",
+      "id": "tsk-206-cli-1792925576133-615-GST",
       "clientId": "cli-1792925576133-615",
       "clientName": "S. R. TRADING COMPANY",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4875,7 +4875,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925576133-3",
+      "id": "tsk-207-cli-1792925576133-615-GST",
       "clientId": "cli-1792925576133-615",
       "clientName": "S. R. TRADING COMPANY",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4890,7 +4890,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925526886-1",
+      "id": "tsk-208-cli-1792925526886-383-TDS",
       "clientId": "cli-1792925526886-383",
       "clientName": "SYED BROTHERS, NOWGONG",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4905,7 +4905,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925526886-2",
+      "id": "tsk-209-cli-1792925526886-383-GST",
       "clientId": "cli-1792925526886-383",
       "clientName": "SYED BROTHERS, NOWGONG",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4920,7 +4920,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925526886-3",
+      "id": "tsk-210-cli-1792925526886-383-GST",
       "clientId": "cli-1792925526886-383",
       "clientName": "SYED BROTHERS, NOWGONG",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
@@ -4935,7 +4935,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925518993-1",
+      "id": "tsk-211-cli-1792925518993-415-TDS",
       "clientId": "cli-1792925518993-415",
       "clientName": "SYED INFOCOM",
       "title": "Monthly TDS Payment (Challan 281)",
@@ -4950,7 +4950,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925518993-2",
+      "id": "tsk-212-cli-1792925518993-415-GST",
       "clientId": "cli-1792925518993-415",
       "clientName": "SYED INFOCOM",
       "title": "GSTR-1 Monthly Outward Return",
@@ -4965,7 +4965,7 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-1792925518993-3",
+      "id": "tsk-213-cli-1792925518993-415-GST",
       "clientId": "cli-1792925518993-415",
       "clientName": "SYED INFOCOM",
       "title": "GSTR-3B Monthly Return & Tax Settlement",

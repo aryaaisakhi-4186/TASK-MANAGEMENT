@@ -77,37 +77,70 @@ export const MetricReportModal: React.FC<Props> = ({
     return visibleTasks;
   }, [visibleTasks, activeReportTab]);
 
+  // Robust Category Matcher
+  const isTaskInCategory = (t: TaskItem, catKey: string): boolean => {
+    if (catKey === 'ALL') return true;
+    const taskCat = (t.category || '').toUpperCase().trim();
+    const taskTitle = (t.title || '').toUpperCase().trim();
+
+    if (catKey === 'GST') {
+      // Must NOT be TDS or other obligations
+      if (taskCat === 'TDS' || taskTitle.includes('TDS') || taskTitle.includes('CHALLAN 281') || taskTitle.includes('26Q') || taskTitle.includes('24Q')) {
+        return false;
+      }
+      return taskCat === 'GST' || taskCat.includes('GST') || taskTitle.includes('GSTR') || taskTitle.includes('3B');
+    }
+
+    if (catKey === 'TDS') {
+      // Must NOT be GST obligations
+      if (taskCat === 'GST' || taskTitle.includes('GSTR') || taskTitle.includes('GST') || taskTitle.includes('3B')) {
+        return false;
+      }
+      return taskCat === 'TDS' || taskCat.includes('TDS') || taskTitle.includes('TDS') || taskTitle.includes('281') || taskTitle.includes('26Q') || taskTitle.includes('24Q');
+    }
+
+    if (catKey === 'INCOME_TAX') {
+      return taskCat === 'INCOME_TAX' || taskCat.includes('INCOME') || taskTitle.includes('ITR') || taskTitle.includes('INCOME TAX');
+    }
+
+    if (catKey === 'AUDIT') {
+      return taskCat === 'AUDIT' || taskCat.includes('AUDIT') || taskTitle.includes('AUDIT') || taskTitle.includes('44AB') || taskTitle.includes('3CD');
+    }
+
+    if (catKey === 'ROC') {
+      return taskCat === 'ROC' || taskCat.includes('ROC') || taskCat.includes('MCA') || taskTitle.includes('ROC') || taskTitle.includes('MGT') || taskTitle.includes('AOC');
+    }
+
+    if (catKey === 'BOOKKEEPING') {
+      return taskCat === 'BOOKKEEPING' || taskCat.includes('BOOK') || taskCat.includes('ACCOUNT') || taskTitle.includes('ACCOUNT') || taskTitle.includes('TALLY');
+    }
+
+    if (catKey === 'OTHER') {
+      const known = ['GST', 'TDS', 'INCOME_TAX', 'AUDIT', 'ROC', 'BOOKKEEPING'];
+      return !known.some(k => isTaskInCategory(t, k));
+    }
+
+    return taskCat === catKey.toUpperCase();
+  };
+
   // Counts per Category for Category Sub-Tabs
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = {
+    return {
       ALL: baseTasksForTab.length,
-      GST: 0,
-      TDS: 0,
-      INCOME_TAX: 0,
-      AUDIT: 0,
-      ROC: 0,
-      BOOKKEEPING: 0,
-      OTHER: 0
+      GST: baseTasksForTab.filter(t => isTaskInCategory(t, 'GST')).length,
+      TDS: baseTasksForTab.filter(t => isTaskInCategory(t, 'TDS')).length,
+      INCOME_TAX: baseTasksForTab.filter(t => isTaskInCategory(t, 'INCOME_TAX')).length,
+      AUDIT: baseTasksForTab.filter(t => isTaskInCategory(t, 'AUDIT')).length,
+      ROC: baseTasksForTab.filter(t => isTaskInCategory(t, 'ROC')).length,
+      BOOKKEEPING: baseTasksForTab.filter(t => isTaskInCategory(t, 'BOOKKEEPING')).length,
+      OTHER: baseTasksForTab.filter(t => isTaskInCategory(t, 'OTHER')).length
     };
-    baseTasksForTab.forEach(t => {
-      const cat = t.category || 'OTHER';
-      if (counts[cat] !== undefined) {
-        counts[cat]++;
-      } else {
-        counts.OTHER++;
-      }
-    });
-    return counts;
   }, [baseTasksForTab]);
 
   // Filter tasks based on Category
   const tasksAfterCategory = useMemo(() => {
     if (selectedCategory === 'ALL') return baseTasksForTab;
-    if (selectedCategory === 'OTHER') {
-      const known = ['GST', 'TDS', 'INCOME_TAX', 'AUDIT', 'ROC', 'BOOKKEEPING'];
-      return baseTasksForTab.filter(t => !known.includes(t.category));
-    }
-    return baseTasksForTab.filter(t => t.category === selectedCategory);
+    return baseTasksForTab.filter(t => isTaskInCategory(t, selectedCategory));
   }, [baseTasksForTab, selectedCategory]);
 
   // Map clients for quick lookup of statutory tax numbers
@@ -525,7 +558,7 @@ export const MetricReportModal: React.FC<Props> = ({
                   </tr>
                 ) : (
                   filteredTasks.map((task, idx) => (
-                    <tr key={task.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
+                    <tr key={`${task.id || 'tsk'}-${task.clientId || task.clientName}-${task.category}-${idx}`} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
                       <td className="p-3 text-center text-slate-400 font-mono text-[11px]">
                         {idx + 1}
                       </td>

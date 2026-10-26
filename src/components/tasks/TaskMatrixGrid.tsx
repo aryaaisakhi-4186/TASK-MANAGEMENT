@@ -165,10 +165,48 @@ export const TaskMatrixGrid: React.FC<{
     return { pan, gstin, tan, isGst, isTds };
   };
 
+  const isTaskInCategory = (t: TaskItem, catKey: string): boolean => {
+    if (catKey === 'ALL') return true;
+    const taskCat = (t.category || '').toUpperCase().trim();
+    const taskTitle = (t.title || '').toUpperCase().trim();
+
+    if (catKey === 'GST') {
+      if (taskCat === 'TDS' || taskTitle.includes('TDS') || taskTitle.includes('CHALLAN 281') || taskTitle.includes('26Q') || taskTitle.includes('24Q')) {
+        return false;
+      }
+      return taskCat === 'GST' || taskCat.includes('GST') || taskTitle.includes('GSTR') || taskTitle.includes('3B');
+    }
+
+    if (catKey === 'TDS') {
+      if (taskCat === 'GST' || taskTitle.includes('GSTR') || taskTitle.includes('GST') || taskTitle.includes('3B')) {
+        return false;
+      }
+      return taskCat === 'TDS' || taskCat.includes('TDS') || taskTitle.includes('TDS') || taskTitle.includes('281') || taskTitle.includes('26Q') || taskTitle.includes('24Q');
+    }
+
+    if (catKey === 'INCOME_TAX') {
+      return taskCat === 'INCOME_TAX' || taskCat.includes('INCOME') || taskTitle.includes('ITR') || taskTitle.includes('INCOME TAX');
+    }
+
+    if (catKey === 'AUDIT') {
+      return taskCat === 'AUDIT' || taskCat.includes('AUDIT') || taskTitle.includes('AUDIT') || taskTitle.includes('44AB') || taskTitle.includes('3CD');
+    }
+
+    if (catKey === 'ROC') {
+      return taskCat === 'ROC' || taskCat.includes('ROC') || taskCat.includes('MCA') || taskTitle.includes('ROC') || taskTitle.includes('MGT') || taskTitle.includes('AOC');
+    }
+
+    if (catKey === 'BOOKKEEPING') {
+      return taskCat === 'BOOKKEEPING' || taskCat.includes('BOOK') || taskCat.includes('ACCOUNT') || taskTitle.includes('ACCOUNT') || taskTitle.includes('TALLY');
+    }
+
+    return taskCat === catKey.toUpperCase();
+  };
+
   const filteredTasks = useMemo(() => {
     return visibleTasks.filter(t => {
       if (activeTab !== 'ALL' && t.frequency !== activeTab) return false;
-      if (selectedCategory !== 'ALL' && t.category !== selectedCategory) return false;
+      if (selectedCategory !== 'ALL' && !isTaskInCategory(t, selectedCategory)) return false;
       if (selectedStatus !== 'ALL' && t.status !== selectedStatus) return false;
       if (searchTerm) {
         const q = searchTerm.toLowerCase();
@@ -790,7 +828,7 @@ export const TaskMatrixGrid: React.FC<{
                             const isThisTaskTimed = activeTimedTask?.id === task.id;
 
                             return (
-                              <tr key={task.id} className={'transition-colors group ' + (isThisTaskTimed ? 'bg-emerald-500/10 dark:bg-emerald-950/30' : 'hover:bg-amber-50/40 dark:hover:bg-slate-800/30')}>
+                              <tr key={`${task.id || 'tsk'}-${task.clientId || ''}-${idx}`} className={'transition-colors group ' + (isThisTaskTimed ? 'bg-emerald-500/10 dark:bg-emerald-950/30' : 'hover:bg-amber-50/40 dark:hover:bg-slate-800/30')}>
                                 
                                 <td className="p-3 text-center text-slate-400 font-mono text-[11px]">
                                   {idx + 1}
@@ -992,7 +1030,7 @@ export const TaskMatrixGrid: React.FC<{
                   const isThisTaskTimed = activeTimedTask?.id === task.id;
 
                   return (
-                    <tr key={task.id} className={'transition-colors group ' + (isThisTaskTimed ? 'bg-emerald-500/10 dark:bg-emerald-950/30 font-medium' : 'hover:bg-amber-50/40 dark:hover:bg-slate-800/40')}>
+                    <tr key={`${task.id || 'tsk'}-${task.clientId || ''}-${task.category}-${task.dueDate || ''}`} className={'transition-colors group ' + (isThisTaskTimed ? 'bg-emerald-500/10 dark:bg-emerald-950/30 font-medium' : 'hover:bg-amber-50/40 dark:hover:bg-slate-800/40')}>
                       <td className="p-3.5 text-center">
                         <input
                           type="checkbox"

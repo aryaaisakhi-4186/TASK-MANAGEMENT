@@ -93,7 +93,11 @@ export const deduplicateTasks = (taskList: TaskItem[], currentClients?: Client[]
     }
 
     const clientKey = normClientName || normalizeTaskKey(targetClientId);
-    const compositeKey = `${clientKey}::${normCategory}::${normTitle}::${normDate}`;
+    
+    // For standard recurring monthly tasks, ensure strictly one active task per client
+    const isMonthly = t.frequency === 'MONTHLY' || normTitle.includes('monthly') || normTitle.includes('gstr') || normTitle.includes('challan 281');
+    const dateKey = isMonthly ? '' : `::${normDate}`;
+    const compositeKey = `${clientKey}::${normCategory}::${normTitle}${dateKey}`;
 
     const taskWithHarmonizedId: TaskItem = targetClientId && targetClientId !== t.clientId
       ? { ...t, clientId: targetClientId }

@@ -480,9 +480,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setClients(updated);
     
     // Auto generate standard recurring tasks for new client ONLY if not already existing
+    const randSuffix = Math.random().toString(36).substring(2, 7);
     const sampleTasks: TaskItem[] = [
       {
-        id: 'tsk-' + Date.now() + '-1',
+        id: 'tsk-' + Date.now() + '-' + randSuffix + '-1',
         clientId: newClient.id,
         clientName: newClient.tradeName,
         title: 'Monthly TDS Payment (Challan 281)',
@@ -497,7 +498,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
       },
       {
-        id: 'tsk-' + Date.now() + '-2',
+        id: 'tsk-' + Date.now() + '-' + randSuffix + '-2',
         clientId: newClient.id,
         clientName: newClient.tradeName,
         title: 'GSTR-1 Monthly Outward Return',
@@ -512,7 +513,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
       },
       {
-        id: 'tsk-' + Date.now() + '-3',
+        id: 'tsk-' + Date.now() + '-' + randSuffix + '-3',
         clientId: newClient.id,
         clientName: newClient.tradeName,
         title: 'GSTR-3B Monthly Return & Tax Settlement',
@@ -649,8 +650,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdCount++;
 
         // Add standard statutory compliance tasks for new client ONLY if not already existing
+        const randSuffix = Math.random().toString(36).substring(2, 7);
         const tsk1: TaskItem = {
-          id: 'tsk-' + Date.now() + '-' + idx + '-1',
+          id: 'tsk-' + Date.now() + '-' + idx + '-' + randSuffix + '-1',
           clientId: newClient.id,
           clientName: newClient.tradeName,
           title: 'Monthly TDS Payment (Challan 281)',
@@ -665,7 +667,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
         };
         const tsk2: TaskItem = {
-          id: 'tsk-' + Date.now() + '-' + idx + '-2',
+          id: 'tsk-' + Date.now() + '-' + idx + '-' + randSuffix + '-2',
           clientId: newClient.id,
           clientName: newClient.tradeName,
           title: 'GSTR-1 Monthly Outward Return',
@@ -673,6 +675,21 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           frequency: 'MONTHLY',
           dueDayOrDate: '11',
           dueDate: '2026-09-11',
+          status: 'PENDING',
+          assignedTeamId: newClient.assignedTeamId || '',
+          assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
+          priority: 'CRITICAL',
+          financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
+        };
+        const tsk3: TaskItem = {
+          id: 'tsk-' + Date.now() + '-' + idx + '-' + randSuffix + '-3',
+          clientId: newClient.id,
+          clientName: newClient.tradeName,
+          title: 'GSTR-3B Monthly Return & Tax Settlement',
+          category: 'GST',
+          frequency: 'MONTHLY',
+          dueDayOrDate: '20',
+          dueDate: '2026-09-20',
           status: 'PENDING',
           assignedTeamId: newClient.assignedTeamId || '',
           assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
@@ -703,6 +720,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         if (!taskAlreadyExists('GSTR-1 Monthly Outward Return', '2026-09-11')) {
           newTasksToCreate.push(tsk2);
+        }
+        if (!taskAlreadyExists('GSTR-3B Monthly Return & Tax Settlement', '2026-09-20')) {
+          newTasksToCreate.push(tsk3);
         }
       }
     });
