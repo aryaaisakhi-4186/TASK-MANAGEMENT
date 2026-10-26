@@ -64,7 +64,7 @@ const MainPortal: React.FC = () => {
   }, [currentRole, currentUser?.trialInfo?.isDemoSetup]);
 
   return (
-    <div className="min-h-[100dvh] bg-slate-100/80 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-amber-500/30 selection:text-amber-800 transition-colors duration-200">
+    <div className="min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-slate-100/80 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-amber-500/30 selection:text-amber-800 transition-colors duration-200">
       
       {/* Top Corporate Navigation */}
       <Navbar 

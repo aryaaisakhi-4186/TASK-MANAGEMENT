@@ -270,7 +270,7 @@ export const MetricReportModal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-6 bg-slate-950/85 backdrop-blur-md animate-in zoom-in-95 duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-6 bg-slate-950/85 backdrop-blur-md overflow-hidden overscroll-none animate-in zoom-in-95 duration-200"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div

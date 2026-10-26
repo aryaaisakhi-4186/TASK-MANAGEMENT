@@ -104,11 +104,11 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-hidden overscroll-none select-none animate-in fade-in duration-150"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div 
-        className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-amber-400/40 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-amber-400/40 rounded-3xl p-5 sm:p-6 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto overflow-x-hidden select-text"
         onClick={(e) => e.stopPropagation()}
       >
         <button 
@@ -119,7 +119,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
           <X size={18} />
         </button>
 
-        <div className="mb-4">
+        <div className="mb-4 select-none">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white font-serif flex items-center gap-2">
             {isEditing ? 'Edit Statutory Compliance Task' : 'Create New Statutory Task'}
           </h2>
