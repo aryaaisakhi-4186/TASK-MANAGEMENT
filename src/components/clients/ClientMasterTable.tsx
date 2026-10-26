@@ -176,21 +176,21 @@ export const ClientMasterTable: React.FC = () => {
         </div>
       </GlassCard>
 
-      {/* Master Table with Single Combined Statutory ID Column */}
+      {/* Master Table with Single Combined Statutory ID Column (Sticky Frozen Header) */}
       <GlassCard className="overflow-hidden" variant="elevated">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-[calc(100vh-230px)] overflow-y-auto relative scrollbar-thin">
           <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-slate-100/90 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider">
-                <th className="p-3.5">Client & Legal Name</th>
-                <th className="p-3.5">Statutory IDs (PAN / GST / TAN / VAT)</th>
-                <th className="p-3.5">Compliances</th>
-                <th className="p-3.5">Entity Status / Type</th>
-                <th className="p-3.5">Contact Person</th>
-                <th className="p-3.5">Client Employee (Sub-Login)</th>
-                <th className="p-3.5">Aadhar, DOB & Formation Date</th>
-                <th className="p-3.5">Assigned CA Staff</th>
-                <th className="p-3.5 text-right">Actions</th>
+            <thead className="sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800">
+              <tr className="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-[11px]">
+                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Client & Legal Name</th>
+                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Statutory IDs (PAN / GST / TAN / VAT)</th>
+                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Compliances</th>
+                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Entity Status / Type</th>
+                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Contact Person</th>
+                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Client Employee (Sub-Login)</th>
+                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Aadhar, DOB & Formation Date</th>
+                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Assigned CA Staff</th>
+                <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm text-right whitespace-nowrap">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">

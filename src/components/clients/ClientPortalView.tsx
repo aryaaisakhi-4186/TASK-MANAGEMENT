@@ -171,16 +171,16 @@ export const ClientPortalView: React.FC = () => {
           <ShieldCheck size={18} className="text-amber-500" /> Statutory Compliance Calendar & Status
         </h3>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-[500px] overflow-y-auto relative scrollbar-thin">
           <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-slate-100/90 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold uppercase">
-                <th className="p-3">Compliance Title</th>
-                <th className="p-3">Category</th>
-                <th className="p-3">Frequency</th>
-                <th className="p-3">Statutory Due Date</th>
-                <th className="p-3">Assigned CA Partner</th>
-                <th className="p-3 text-right">Status</th>
+            <thead className="sticky top-0 z-10 bg-slate-100 dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800">
+              <tr className="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase text-[11px]">
+                <th className="p-3 sticky top-0 bg-slate-100 dark:bg-slate-900">Compliance Title</th>
+                <th className="p-3 sticky top-0 bg-slate-100 dark:bg-slate-900">Category</th>
+                <th className="p-3 sticky top-0 bg-slate-100 dark:bg-slate-900">Frequency</th>
+                <th className="p-3 sticky top-0 bg-slate-100 dark:bg-slate-900">Statutory Due Date</th>
+                <th className="p-3 sticky top-0 bg-slate-100 dark:bg-slate-900">Assigned CA Partner</th>
+                <th className="p-3 text-right sticky top-0 bg-slate-100 dark:bg-slate-900">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">

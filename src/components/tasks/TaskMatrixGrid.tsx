@@ -861,11 +861,11 @@ export const TaskMatrixGrid: React.FC<{
       ) : (
         /* 2. FLAT MASTER TABLE VIEW (ALTERNATIVE) */
         <GlassCard className="overflow-hidden" variant="elevated">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[calc(100vh-250px)] overflow-y-auto relative scrollbar-thin">
             <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-slate-100/90 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider">
-                  <th className="p-3.5 w-10 text-center">
+              <thead className="sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800">
+                <tr className="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-[11px]">
+                  <th className="p-3.5 w-10 text-center sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
                     <input
                       type="checkbox"
                       checked={selectedTaskIds.length > 0 && selectedTaskIds.length === filteredTasks.length}
@@ -873,14 +873,14 @@ export const TaskMatrixGrid: React.FC<{
                       className="rounded border-slate-300 text-amber-500 focus:ring-amber-400"
                     />
                   </th>
-                  <th className="p-3.5">Client & Entity</th>
-                  <th className="p-3.5">Compliance Task</th>
-                  <th className="p-3.5">Category</th>
-                  <th className="p-3.5">Due Rule / Date</th>
-                  <th className="p-3.5">Assigned Staff</th>
-                  <th className="p-3.5 text-center">Quick Access & Camera</th>
-                  <th className="p-3.5 text-center">Status</th>
-                  <th className="p-3.5 text-right">Actions</th>
+                  <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Client & Entity</th>
+                  <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Compliance Task</th>
+                  <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Category</th>
+                  <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Due Rule / Date</th>
+                  <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Assigned Staff</th>
+                  <th className="p-3.5 text-center sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Quick Access & Camera</th>
+                  <th className="p-3.5 text-center sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Status</th>
+                  <th className="p-3.5 text-right sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
