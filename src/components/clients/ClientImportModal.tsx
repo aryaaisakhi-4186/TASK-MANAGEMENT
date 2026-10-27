@@ -156,12 +156,12 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
     }
 
     try {
-      const rawData = await fetchGoogleSheetData(urlToFetch);
+      const rawData = await fetchGoogleSheetData(urlToFetch, 'business');
       if (!rawData || rawData.length === 0) {
-        throw new Error('The Google Sheet contains no data rows.');
+        throw new Error('The Google Sheet contains no data rows in Business Master.');
       }
 
-      const classification = classifyRawTabularData(rawData, 'Google Drive Master Sheet');
+      const classification = classifyRawTabularData(rawData, 'Business Master Sheet');
 
       if (classification.domain === 'TEAM_DIRECTORY') {
         setMisclassificationAlert({

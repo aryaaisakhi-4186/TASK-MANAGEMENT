@@ -167,10 +167,10 @@ app.post('/api/reports/sync-audit-log', async (req: Request, res: Response) => {
   }
 });
 
-// Fetch Public or Shared Google Sheets Data as CSV for Direct Drive Import
+// Fetch Public or Shared Google Sheets Data as CSV or Multi-sheet JSON for Direct Drive Import
 app.post('/api/reports/fetch-google-sheet', async (req: Request, res: Response) => {
   try {
-    const { sheetUrlOrId } = req.body;
+    const { sheetUrlOrId, sheetName } = req.body;
     if (!sheetUrlOrId) {
       return res.status(400).json({ error: 'Sheet URL or ID is required' });
     }
@@ -181,17 +181,29 @@ app.post('/api/reports/fetch-google-sheet', async (req: Request, res: Response) 
       sheetId = match[1];
     }
 
-    const exportUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
-    const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
+    const sheetParam = sheetName ? `&sheet=${encodeURIComponent(sheetName)}` : '';
+    const exportUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv${sheetParam}`;
+    const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv${sheetParam}`;
 
     let csvData = '';
     try {
-      const response = await fetch(exportUrl);
+      const response = await fetch(gvizUrl);
       if (response.ok) {
         csvData = await response.text();
       }
     } catch (e) {
-      console.warn('Export fetch warning:', e);
+      console.warn('Gviz fetch warning:', e);
+    }
+
+    if (!csvData || csvData.includes('<!DOCTYPE html>')) {
+      try {
+        const response = await fetch(exportUrl);
+        if (response.ok) {
+          csvData = await response.text();
+        }
+      } catch (e) {
+        console.warn('Export fetch warning:', e);
+      }
     }
 
     if (!csvData || csvData.includes('<!DOCTYPE html>')) {

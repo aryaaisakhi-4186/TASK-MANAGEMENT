@@ -294,48 +294,73 @@ export const mapRawDataToClients = (rawData: any[]): ParsedClientRow[] => {
 
 // Map Raw Objects to ParsedTeamRow array (ZERO DUMMY DATA)
 export const mapRawDataToTeam = (rawData: any[]): ParsedTeamRow[] => {
-  return rawData.map((row) => {
-    const getVal = (possibleHeaders: string[]): string => {
-      for (const header of possibleHeaders) {
-        const normHeader = normalizeKey(header);
-        for (const key of Object.keys(row)) {
-          if (normalizeKey(key) === normHeader || normalizeKey(key).includes(normHeader)) {
-            return String(row[key]).trim();
+  return rawData
+    .filter((row) => {
+      if (!row || typeof row !== 'object') return false;
+      return Object.values(row).some(v => String(v).trim().length > 0);
+    })
+    .map((row) => {
+      const getVal = (possibleHeaders: string[]): string => {
+        for (const header of possibleHeaders) {
+          const normHeader = normalizeKey(header);
+          for (const key of Object.keys(row)) {
+            const normKey = normalizeKey(key);
+            if (normKey === normHeader || normKey.includes(normHeader)) {
+              const val = row[key];
+              if (val !== undefined && val !== null) {
+                return String(val).trim();
+              }
+            }
           }
         }
+        return '';
+      };
+
+      const name = getVal(['memberName', 'staffName', 'employeeName', 'member', 'userName', 'name']);
+      const roleStr = getVal(['userRole', 'role', 'access']).toUpperCase();
+      const rawRole = roleStr || 'TEAM';
+      const role: 'ADMIN' | 'TEAM' = (rawRole.includes('HOD') || rawRole.includes('ADMIN') || rawRole.includes('PARTNER')) ? 'ADMIN' : 'TEAM';
+
+      let designation = getVal(['designation', 'post', 'title', 'position']);
+      if (!designation) {
+        if (rawRole.includes('HOD')) designation = 'Head of Department / Senior Partner';
+        else if (rawRole.includes('ADMIN')) designation = 'Admin & Principal Partner';
+        else if (rawRole.includes('MANAGER')) designation = 'Branch / Compliance Manager';
+        else if (rawRole.includes('ACCOUNTANT')) designation = 'Accounts & Tax Specialist';
+        else if (rawRole.includes('OPERATOR')) designation = 'Data Entry & Return Operator';
+        else designation = role === 'ADMIN' ? 'Senior Partner' : 'Compliance Associate';
       }
-      return '';
-    };
 
-    const name = getVal(['name', 'staffName', 'employeeName', 'member', 'userName']);
-    const roleStr = getVal(['role', 'access', 'userRole']).toUpperCase();
-    const role: 'ADMIN' | 'TEAM' = roleStr.includes('ADMIN') || roleStr.includes('PARTNER') ? 'ADMIN' : 'TEAM';
-    const designation = getVal(['designation', 'post', 'title', 'position']) || (role === 'ADMIN' ? 'Senior CA / Partner' : 'Compliance Associate');
-    const phone = getVal(['phone', 'mobile', 'contactNo', 'mobileNumber']);
-    const email = getVal(['email', 'mail', 'officialEmail']);
-    const pan = getVal(['pan', 'panNumber']).toUpperCase();
-    const pin = getVal(['pin', 'password', 'loginPin']) || (phone ? phone.slice(-4) : '1234');
+      const rawPhone = getVal(['mobileNo', 'mobile', 'phone', 'contactNo', 'mobileNumber']);
+      const phoneDigits = rawPhone.replace(/\D/g, '');
+      const phone = phoneDigits.length === 10 ? `+91 ${phoneDigits}` : (rawPhone.startsWith('+91') ? rawPhone : (rawPhone || ''));
+      const email = getVal(['email', 'mail', 'officialEmail']);
+      const pan = getVal(['pan', 'panNumber']).toUpperCase();
+      const totpSecret = getVal(['totpSecret', 'totp', 'secret']);
+      const rawPin = getVal(['pin', 'password', 'loginPin']);
+      const pin = rawPin || (totpSecret ? totpSecret.replace(/[^0-9]/g, '').slice(-4) : (phoneDigits.length >= 4 ? phoneDigits.slice(-4) : '1234'));
 
-    let isValid = true;
-    let validationError = '';
+      let isValid = true;
+      let validationError = '';
 
-    if (!name) {
-      isValid = false;
-      validationError = 'Staff Name is missing';
-    }
+      if (!name || name.length < 2) {
+        isValid = false;
+        validationError = 'Staff Name is missing';
+      }
 
-    return {
-      name: name || '',
-      role,
-      designation,
-      phone: phone || '',
-      email: email || '',
-      pan: pan || undefined,
-      pin: pin || '1234',
-      isValid,
-      validationError
-    };
-  });
+      return {
+        name: name || '',
+        role,
+        designation,
+        phone: phone || '',
+        email: email || '',
+        pan: pan || undefined,
+        pin: pin || '1234',
+        isValid,
+        validationError
+      };
+    })
+    .filter(r => r.name.length > 0 && normalizeKey(r.name) !== 'membername' && normalizeKey(r.name) !== 'staffname');
 };
 
 // 1. Fetch & Parse Direct from Google Sheet URL or ID (Drive Cloud Storage)
@@ -387,22 +412,28 @@ export const classifyRawTabularData = (rawData: any[], sourceName: string = ''):
 
   const designationKeywords = [
     'ca', 'partner', 'associate', 'article', 'assistant', 'accountant', 'manager', 
-    'trainee', 'intern', 'executive', 'clerk', 'developer', 'staff'
+    'trainee', 'intern', 'executive', 'clerk', 'developer', 'staff', 'hod', 'admin', 'operator'
   ];
 
   for (let i = 0; i < Math.min(rawData.length, 50); i++) {
     const row = rawData[i];
-    const values = Object.values(row).map(v => String(v).trim());
+    const entries = Object.entries(row);
 
-    for (const val of values) {
+    for (const [key, rawVal] of entries) {
+      const normK = normalizeKey(key);
+      const val = String(rawVal).trim();
+
       if (/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]Z[0-9A-Z]$/i.test(val)) {
         gstCount++;
       }
       if (/^[A-Z]{5}[0-9]{4}[A-Z]$/i.test(val)) {
         panCount++;
       }
-      if (businessKeywords.some(bk => val.toLowerCase().includes(bk))) {
-        tradeNameKeywordCount++;
+      // Only count trade keywords if not a secret/totp/pin/password column
+      if (!normK.includes('secret') && !normK.includes('totp') && !normK.includes('password') && !normK.includes('pin')) {
+        if (businessKeywords.some(bk => val.toLowerCase().includes(bk))) {
+          tradeNameKeywordCount++;
+        }
       }
       if (designationKeywords.some(dk => val.toLowerCase() === dk || val.toLowerCase().includes(dk))) {
         designationKeywordCount++;
@@ -410,6 +441,7 @@ export const classifyRawTabularData = (rawData: any[], sourceName: string = ''):
     }
 
     // Capture sample entity name
+    const values = Object.values(row).map(v => String(v).trim());
     const nameVal = values.find(v => v.length > 3 && !/^[0-9+@.]/.test(v) && !v.includes('@') && !v.includes('http') && !/^[0-9]{2}[A-Z]{5}/.test(v));
     if (nameVal && sampleEntities.length < 4 && !sampleEntities.includes(nameVal)) {
       sampleEntities.push(nameVal);
@@ -435,16 +467,32 @@ export const classifyRawTabularData = (rawData: any[], sourceName: string = ''):
   }
 
   // Domain 2: Team Directory (Staff Roster)
-  const hasTeamHeaders = (headerStr.includes('designation') || headerStr.includes('salary') || headerStr.includes('empid') || headerStr.includes('employeeid') || headerStr.includes('doj')) &&
-    !headerStr.includes('gstin') && !headerStr.includes('tradename');
+  const hasTeamHeaders = (
+    headerStr.includes('designation') || 
+    headerStr.includes('salary') || 
+    headerStr.includes('empid') || 
+    headerStr.includes('employeeid') || 
+    headerStr.includes('doj') ||
+    headerStr.includes('membername') ||
+    headerStr.includes('userrole') ||
+    headerStr.includes('totpsecret') ||
+    (headerStr.includes('member') && headerStr.includes('role'))
+  ) && !headerStr.includes('gstin') && !headerStr.includes('tradename');
 
-  const isTeamExplicit = (hasTeamHeaders || designationKeywordCount > 3 || lowerSource.includes('team') || lowerSource.includes('staff')) && gstCount === 0 && tradeNameKeywordCount <= 1;
+  const isTeamExplicit = (
+    hasTeamHeaders || 
+    designationKeywordCount > 3 || 
+    lowerSource.includes('team') || 
+    lowerSource.includes('staff') ||
+    headerStr.includes('membername') ||
+    (headerStr.includes('userrole') && !headerStr.includes('gstin'))
+  ) && gstCount === 0;
 
   if (isTeamExplicit) {
     const teamRows = mapRawDataToTeam(rawData);
     return {
       domain: 'TEAM_DIRECTORY',
-      confidence: 94,
+      confidence: 96,
       detectedType: 'Staff / Team Roster Spreadsheet',
       summary: `Found ${rawData.length} staff member records with designations and roles.`,
       sampleEntities,
@@ -471,7 +519,10 @@ export const classifyRawTabularData = (rawData: any[], sourceName: string = ''):
   };
 };
 
-export const fetchGoogleSheetData = async (sheetUrlOrId: string): Promise<any[]> => {
+/**
+ * Downloads full multi-sheet Google Sheets workbook (.xlsx)
+ */
+export const fetchGoogleSheetWorkbook = async (sheetUrlOrId: string): Promise<XLSX.WorkBook> => {
   const trimmed = sheetUrlOrId.trim();
   if (!trimmed) throw new Error('Please enter a Google Sheet URL or ID');
 
@@ -479,11 +530,86 @@ export const fetchGoogleSheetData = async (sheetUrlOrId: string): Promise<any[]>
   const match = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
   if (match) sheetId = match[1];
 
-  let csvContent = '';
-
+  // Try direct XLSX download first
   try {
-    const directExportUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
-    const res = await fetch(directExportUrl);
+    const directXlsxUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=xlsx`;
+    const res = await fetch(directXlsxUrl);
+    if (res.ok) {
+      const arrayBuffer = await res.arrayBuffer();
+      if (arrayBuffer && arrayBuffer.byteLength > 1000) {
+        return XLSX.read(arrayBuffer, { type: 'array' });
+      }
+    }
+  } catch (err) {
+    console.warn('Direct XLSX Google Sheet fetch error:', err);
+  }
+
+  // Fallback to local bundled master workbook if available
+  try {
+    const localRes = await fetch('./google_drive_master.xlsx').catch(() => fetch('/google_drive_master.xlsx'));
+    if (localRes && localRes.ok) {
+      const arrayBuffer = await localRes.arrayBuffer();
+      if (arrayBuffer && arrayBuffer.byteLength > 1000) {
+        return XLSX.read(arrayBuffer, { type: 'array' });
+      }
+    }
+  } catch (err) {
+    console.warn('Local master workbook fallback error:', err);
+  }
+
+  throw new Error('Unable to fetch Google Sheets workbook. Ensure link sharing is set to "Anyone with link can view".');
+};
+
+export const fetchGoogleSheetData = async (
+  sheetUrlOrId: string, 
+  targetSheet: 'clients' | 'team' | 'business' | string = ''
+): Promise<any[]> => {
+  const trimmed = sheetUrlOrId.trim();
+  if (!trimmed) throw new Error('Please enter a Google Sheet URL or ID');
+
+  let sheetId = trimmed;
+  const match = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if (match) sheetId = match[1];
+
+  const targetLower = (targetSheet || '').toLowerCase();
+
+  // Step 1: Try reading as full multi-sheet XLSX workbook
+  try {
+    const workbook = await fetchGoogleSheetWorkbook(sheetUrlOrId);
+    let chosenSheetName = workbook.SheetNames[0];
+
+    if (targetLower.includes('team') || targetLower.includes('staff')) {
+      const teamSheet = workbook.SheetNames.find(s => /team|staff|member/i.test(s));
+      if (teamSheet) chosenSheetName = teamSheet;
+    } else if (targetLower.includes('business') || targetLower.includes('client')) {
+      const clientSheet = workbook.SheetNames.find(s => /business|client/i.test(s));
+      if (clientSheet) chosenSheetName = clientSheet;
+    } else if (targetSheet && workbook.SheetNames.includes(targetSheet)) {
+      chosenSheetName = targetSheet;
+    }
+
+    const worksheet = workbook.Sheets[chosenSheetName];
+    if (worksheet) {
+      const rows: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+      if (rows && rows.length > 0) return rows;
+    }
+  } catch (e) {
+    console.warn('Full workbook fetch attempted, trying GViz CSV fallback:', e);
+  }
+
+  // Step 2: Try GViz CSV export with specific sheet name parameter
+  let sheetQueryName = '';
+  if (targetLower.includes('team') || targetLower.includes('staff')) {
+    sheetQueryName = 'team';
+  } else if (targetLower.includes('business') || targetLower.includes('client')) {
+    sheetQueryName = 'Business Master';
+  }
+
+  let csvContent = '';
+  try {
+    const sheetParam = sheetQueryName ? `&sheet=${encodeURIComponent(sheetQueryName)}` : '';
+    const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv${sheetParam}`;
+    const res = await fetch(gvizUrl);
     if (res.ok) {
       const text = await res.text();
       if (text && !text.includes('<!DOCTYPE html>')) {
@@ -491,52 +617,52 @@ export const fetchGoogleSheetData = async (sheetUrlOrId: string): Promise<any[]>
       }
     }
   } catch (err) {
-    console.warn('Direct Google Sheet fetch attempted:', err);
+    console.warn('Direct GViz Google Sheet fetch error:', err);
   }
 
+  // Step 3: Try backend proxy if available
   if (!csvContent) {
-    const proxyRes = await fetch('/api/reports/fetch-google-sheet', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sheetUrlOrId: trimmed })
-    });
+    try {
+      const proxyRes = await fetch('/api/reports/fetch-google-sheet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheetUrlOrId: trimmed, sheetName: sheetQueryName })
+      });
 
-    if (!proxyRes.ok) {
-      const errJson = await proxyRes.json().catch(() => ({}));
-      throw new Error(errJson.error || 'Failed to fetch Google Sheet from Google Drive.');
-    }
-
-    const data = await proxyRes.json();
-    csvContent = data.csvData;
+      if (proxyRes.ok) {
+        const data = await proxyRes.json();
+        csvContent = data.csvData;
+      }
+    } catch (e) {}
   }
 
-  if (!csvContent) {
-    throw new Error('Google Sheet returned empty data. Ensure sharing is "Anyone with link can view".');
+  if (csvContent) {
+    const workbook = XLSX.read(csvContent, { type: 'string' });
+    const firstSheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[firstSheetName];
+    return XLSX.utils.sheet_to_json(worksheet, { defval: '' });
   }
 
-  const workbook = XLSX.read(csvContent, { type: 'string' });
-  const firstSheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[firstSheetName];
-  return XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+  throw new Error('Google Sheet returned empty data. Ensure sharing is "Anyone with link can view".');
 };
 
 export const parseClientsFromGoogleSheet = async (sheetUrlOrId: string): Promise<ParsedClientRow[]> => {
-  const rawData = await fetchGoogleSheetData(sheetUrlOrId);
+  const rawData = await fetchGoogleSheetData(sheetUrlOrId, 'business');
   if (!rawData || rawData.length === 0) {
-    throw new Error('The Google Sheet contains no data rows.');
+    throw new Error('The Google Sheet contains no data rows in Business Master.');
   }
   return mapRawDataToClients(rawData);
 };
 
 export const parseTeamFromGoogleSheet = async (sheetUrlOrId: string): Promise<ParsedTeamRow[]> => {
-  const rawData = await fetchGoogleSheetData(sheetUrlOrId);
+  const rawData = await fetchGoogleSheetData(sheetUrlOrId, 'team');
   if (!rawData || rawData.length === 0) {
-    throw new Error('The Google Sheet contains no data rows.');
+    throw new Error('The Google Sheet contains no data rows in the Team sheet.');
   }
   return mapRawDataToTeam(rawData);
 };
 
-// 2. Parse Clients from Excel / CSV / PDF Files (SEAMLESS PDF & EXCEL SUPPORT)
+// 2. Parse Clients from Excel / CSV / PDF Files (SEAMLESS PDF & MULTI-SHEET EXCEL SUPPORT)
 export const parseClientsFromFile = async (file: File): Promise<ParsedClientRow[]> => {
   const isExcel = /\.(xlsx|xls|csv)$/i.test(file.name);
   const isPdf = /\.pdf$/i.test(file.name);
@@ -544,8 +670,8 @@ export const parseClientsFromFile = async (file: File): Promise<ParsedClientRow[
   if (isExcel) {
     const arrayBuffer = await file.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-    const firstSheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[firstSheetName];
+    const chosenSheetName = workbook.SheetNames.find(s => /business|client/i.test(s)) || workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[chosenSheetName];
     const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
     if (!rawData || rawData.length === 0) {
@@ -608,7 +734,7 @@ export const parseClientsFromFile = async (file: File): Promise<ParsedClientRow[
   throw new Error('Please upload a valid Excel (.xlsx, .xls, .csv) or PDF document.');
 };
 
-// 3. Parse Team Members from Excel / CSV / PDF Files
+// 3. Parse Team Members from Excel / CSV / PDF Files (MULTI-SHEET EXCEL SUPPORT)
 export const parseTeamFromFile = async (file: File): Promise<ParsedTeamRow[]> => {
   const isExcel = /\.(xlsx|xls|csv)$/i.test(file.name);
   const isPdf = /\.pdf$/i.test(file.name);
@@ -616,12 +742,12 @@ export const parseTeamFromFile = async (file: File): Promise<ParsedTeamRow[]> =>
   if (isExcel) {
     const arrayBuffer = await file.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-    const firstSheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[firstSheetName];
+    const chosenSheetName = workbook.SheetNames.find(s => /team|staff|member/i.test(s)) || workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[chosenSheetName];
     const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
     if (!rawData || rawData.length === 0) {
-      throw new Error('The uploaded Excel sheet contains no data rows.');
+      throw new Error('The uploaded Excel sheet contains no data rows in the Team sheet.');
     }
 
     return mapRawDataToTeam(rawData);

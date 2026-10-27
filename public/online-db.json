@@ -5802,11 +5802,111 @@
     {
       "id": "team-1",
       "name": "RAVI KATARA",
-      "role": "TEAM",
+      "role": "ADMIN",
+      "designation": "Head of Department / Senior Partner",
+      "phone": "+91 8982147763",
       "email": "arya4186@gmail.com",
-      "phone": "+91-8815052555",
-      "pin": "1517",
-      "designation": "Senior Partner (Tax & Audit)",
+      "pin": "7763",
+      "assignedClientIds": []
+    },
+    {
+      "id": "team-2",
+      "name": "RAVI",
+      "role": "ADMIN",
+      "designation": "Admin & Principal Partner",
+      "phone": "+91 8815052555",
+      "email": "ravi@aryaassociates.in",
+      "pin": "2555",
+      "assignedClientIds": []
+    },
+    {
+      "id": "team-3",
+      "name": "DIVYA",
+      "role": "TEAM",
+      "designation": "Branch / Compliance Manager",
+      "phone": "+91 8989914666",
+      "email": "divya@aryaassociates.in",
+      "pin": "4666",
+      "assignedClientIds": []
+    },
+    {
+      "id": "team-4",
+      "name": "PAWAN",
+      "role": "TEAM",
+      "designation": "Branch / Compliance Manager",
+      "phone": "+91 9098089252",
+      "email": "pawan@aryaassociates.in",
+      "pin": "9252",
+      "assignedClientIds": []
+    },
+    {
+      "id": "team-5",
+      "name": "PRADEEP",
+      "role": "TEAM",
+      "designation": "Accounts & Tax Specialist",
+      "phone": "+91 8871912754",
+      "email": "pradeep@aryaassociates.in",
+      "pin": "2754",
+      "assignedClientIds": []
+    },
+    {
+      "id": "team-6",
+      "name": "KABIR",
+      "role": "TEAM",
+      "designation": "Accounts & Tax Specialist",
+      "phone": "+91 8770347353",
+      "email": "kabir@aryaassociates.in",
+      "pin": "7353",
+      "assignedClientIds": []
+    },
+    {
+      "id": "team-7",
+      "name": "AKASH",
+      "role": "TEAM",
+      "designation": "Data Entry & Return Operator",
+      "phone": "+91 7509488887",
+      "email": "akash@aryaassociates.in",
+      "pin": "8887",
+      "assignedClientIds": []
+    },
+    {
+      "id": "team-8",
+      "name": "ISHAN",
+      "role": "TEAM",
+      "designation": "Data Entry & Return Operator",
+      "phone": "+91 9039868172",
+      "email": "ishan@aryaassociates.in",
+      "pin": "8172",
+      "assignedClientIds": []
+    },
+    {
+      "id": "team-9",
+      "name": "VIJAY",
+      "role": "TEAM",
+      "designation": "Accounts & Tax Specialist",
+      "phone": "+91 9407884781",
+      "email": "vijay@aryaassociates.in",
+      "pin": "4781",
+      "assignedClientIds": []
+    },
+    {
+      "id": "team-10",
+      "name": "SANTOSH",
+      "role": "TEAM",
+      "designation": "Accounts & Tax Specialist",
+      "phone": "+91 9713343536",
+      "email": "santosh@aryaassociates.in",
+      "pin": "3536",
+      "assignedClientIds": []
+    },
+    {
+      "id": "team-11",
+      "name": "BHAVESH",
+      "role": "TEAM",
+      "designation": "Data Entry & Return Operator",
+      "phone": "+91 7089676883",
+      "email": "bhavesh@aryaassociates.in",
+      "pin": "6883",
       "assignedClientIds": []
     }
   ],
@@ -5834,6 +5934,6 @@
   },
   "guestLeads": [],
   "firebaseConfig": null,
-  "updatedAt": "2026-10-25T11:01:24.278Z",
-  "updatedAtIST": "25/10/2026, 4:31:24 pm"
+  "updatedAt": "2026-10-27T15:25:22.730Z",
+  "updatedAtIST": "27/10/2026, 8:55:22 pm"
 }

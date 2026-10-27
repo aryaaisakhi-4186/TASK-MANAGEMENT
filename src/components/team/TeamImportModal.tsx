@@ -100,15 +100,16 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToCl
         if (isExcel) {
           const arrayBuffer = await file.arrayBuffer();
           const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-          const firstSheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[firstSheetName];
+          const teamSheetName = workbook.SheetNames.find(s => /team|staff|member/i.test(s));
+          const targetSheetName = teamSheetName || workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[targetSheetName];
           const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
           if (!rawData || rawData.length === 0) {
             continue;
           }
 
-          const classification = classifyRawTabularData(rawData, file.name);
+          const classification = classifyRawTabularData(rawData, teamSheetName ? 'Team Sheet' : file.name);
 
           if (classification.domain === 'CLIENT_MASTER') {
             setMisclassificationAlert({
@@ -176,12 +177,12 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToCl
     }
 
     try {
-      const rawData = await fetchGoogleSheetData(urlToFetch);
+      const rawData = await fetchGoogleSheetData(urlToFetch, 'team');
       if (!rawData || rawData.length === 0) {
-        throw new Error('The Google Sheet contains no data rows.');
+        throw new Error('The Google Sheet contains no data rows in the "team" sheet.');
       }
 
-      const classification = classifyRawTabularData(rawData, 'Google Drive Master Sheet');
+      const classification = classifyRawTabularData(rawData, 'Team Sheet');
 
       if (classification.domain === 'CLIENT_MASTER') {
         setMisclassificationAlert({
