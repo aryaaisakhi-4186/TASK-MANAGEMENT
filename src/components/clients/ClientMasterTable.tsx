@@ -344,7 +344,7 @@ export const ClientMasterTable: React.FC = () => {
                   <td className="px-2.5 py-2">
                     <p className="font-bold text-slate-900 dark:text-white leading-tight">{client.employeeName || 'No Employee Set'}</p>
                     <p className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-bold leading-tight">
-                      {client.employeePhone ? `Mob: ${client.employeePhone} (PIN: ${client.employeePhone.slice(-4)})` : '-'}
+                      {client.employeePhone ? `Mob: ${client.employeePhone}` : '-'}
                     </p>
                   </td>
 

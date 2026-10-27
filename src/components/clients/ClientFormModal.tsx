@@ -892,12 +892,12 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">Employee Mobile Number (Last 4 digits used as PIN)</label>
+                    <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">Employee Mobile Number</label>
                     <input
                       type="text"
                       value={employeePhone}
                       onChange={(e) => setEmployeePhone(e.target.value)}
-                      placeholder="e.g. 9820045678 (Login PIN will be 5678)"
+                      placeholder="e.g. 9820045678"
                       className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono font-bold"
                     />
                   </div>

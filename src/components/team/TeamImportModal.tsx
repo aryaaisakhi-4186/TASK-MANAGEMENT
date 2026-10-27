@@ -633,12 +633,9 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToCl
                       <Edit3 size={14} />
                       <span>Edit Staff Member Details (Row #{editingIndex + 1})</span>
                     </h5>
-                    <span className="text-[10px] text-slate-500 font-mono">
-                      PIN Auto-sync from Mobile No
-                    </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">Staff Full Name *</label>
                       <input
@@ -684,20 +681,13 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToCl
                       <input
                         type="text"
                         value={editFormData.phone || ''}
-                        onChange={(e) => {
-                          const phone = e.target.value;
-                          setEditFormData({
-                            ...editFormData,
-                            phone,
-                            pin: phone.length >= 4 ? phone.slice(-4) : editFormData.pin
-                          });
-                        }}
+                        onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
                         placeholder="+91 98000 00000"
                         className="w-full px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:border-amber-500"
                       />
                     </div>
 
-                    <div>
+                    <div className="sm:col-span-2">
                       <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">Email Address</label>
                       <input
                         type="email"
@@ -705,17 +695,6 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToCl
                         onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
                         placeholder="staff@firm.com"
                         className="w-full px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:border-amber-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase">Login PIN (4-Digit)</label>
-                      <input
-                        type="text"
-                        maxLength={4}
-                        value={editFormData.pin || '1234'}
-                        onChange={(e) => setEditFormData({ ...editFormData, pin: e.target.value })}
-                        className="w-full px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 font-mono font-bold text-amber-600 text-xs focus:border-amber-500"
                       />
                     </div>
                   </div>
@@ -797,7 +776,6 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToCl
                       <th className="p-2.5">Designation</th>
                       <th className="p-2.5">Mobile Phone</th>
                       <th className="p-2.5">Email</th>
-                      <th className="p-2.5">Login PIN</th>
                       <th className="p-2.5 text-right">Action</th>
                     </tr>
                   </thead>
@@ -844,15 +822,12 @@ export const TeamImportModal: React.FC<Props> = ({ isOpen, onClose, onSwitchToCl
                         <td className="p-2.5 text-slate-600 dark:text-slate-300">
                           {row.email || '-'}
                         </td>
-                        <td className="p-2.5 font-mono font-bold text-amber-600 dark:text-amber-400">
-                          {row.pin || '1234'}
-                        </td>
                         <td className="p-2.5 text-right">
                           <div className="flex items-center justify-end gap-1">
                             <button
                               type="button"
                               onClick={() => startEditRow(idx)}
-                              title="Edit Role, Designation, Name & PIN"
+                              title="Edit Role, Designation & Name"
                               className="p-1 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-500/10 transition-all"
                             >
                               <Edit3 size={14} />

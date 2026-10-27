@@ -20,8 +20,6 @@ export const TeamMemberModal: React.FC<Props> = ({ isOpen, member, onClose }) =>
   const [designation, setDesignation] = useState('Senior Partner (Tax & Audit)');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [pin, setPin] = useState('1234');
-  const [showPin, setShowPin] = useState(false);
   const [avatar, setAvatar] = useState('');
   const [assignedClientIds, setAssignedClientIds] = useState<string[]>([]);
   const [clientSearch, setClientSearch] = useState('');
@@ -32,7 +30,6 @@ export const TeamMemberModal: React.FC<Props> = ({ isOpen, member, onClose }) =>
       setDesignation(member.designation || 'Staff Associate');
       setEmail(member.email || '');
       setPhone(member.phone || '');
-      setPin(member.pin || '1234');
       setAvatar(member.avatar || '');
       setAssignedClientIds(member.assignedClientIds || []);
     } else {
@@ -40,12 +37,10 @@ export const TeamMemberModal: React.FC<Props> = ({ isOpen, member, onClose }) =>
       setDesignation('Audit Associate');
       setEmail('');
       setPhone('');
-      setPin('1234');
       setAvatar('');
       setAssignedClientIds([]);
     }
     setClientSearch('');
-    setShowPin(false);
   }, [member, isOpen]);
 
   if (!isOpen) return null;
@@ -85,7 +80,6 @@ export const TeamMemberModal: React.FC<Props> = ({ isOpen, member, onClose }) =>
       designation: designation.trim(),
       email: email.trim(),
       phone: phone.trim(),
-      pin: pin.trim(),
       avatar: avatar.trim() || undefined,
       assignedClientIds,
     };
@@ -124,7 +118,7 @@ export const TeamMemberModal: React.FC<Props> = ({ isOpen, member, onClose }) =>
               {isEditing ? ('Edit Team Member: ' + (member ? member.name : '')) : 'Add New Team Member / Associate'}
             </h3>
             <p className="text-xs text-slate-500">
-              Update partner details, role designation, 4-digit login PIN & client portfolio
+              Update partner details, role designation & client portfolio
             </p>
           </div>
         </div>
@@ -157,7 +151,7 @@ export const TeamMemberModal: React.FC<Props> = ({ isOpen, member, onClose }) =>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">Official Email Address</label>
               <input
@@ -178,29 +172,6 @@ export const TeamMemberModal: React.FC<Props> = ({ isOpen, member, onClose }) =>
                 placeholder="+91 98111 22334"
                 className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:border-amber-500 focus:outline-none"
               />
-            </div>
-
-            <div>
-              <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">4-Digit Login PIN *</label>
-              <div className="relative">
-                <input
-                  type={showPin ? 'text' : 'password'}
-                  maxLength={4}
-                  required
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                  placeholder="1234"
-                  className="w-full pl-3.5 pr-10 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono font-bold tracking-widest text-center focus:border-amber-500 focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPin(!showPin)}
-                  title={showPin ? 'Hide PIN' : 'Show PIN'}
-                  className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-                >
-                  {showPin ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
             </div>
           </div>
 

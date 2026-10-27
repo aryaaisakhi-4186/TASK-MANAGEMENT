@@ -861,8 +861,7 @@ export const downloadTeamExcelTemplate = () => {
       'Designation': 'Senior GST & Audit Associate',
       'Mobile Number': '9820112345',
       'Email Address': 'rohit.sharma@cadomain.in',
-      'PAN Number': 'ABCPS1234M',
-      'Login PIN': '2345'
+      'PAN Number': 'ABCPS1234M'
     },
     {
       'Staff Name': 'Priya Nair',
@@ -870,8 +869,7 @@ export const downloadTeamExcelTemplate = () => {
       'Designation': 'TDS & Direct Tax Specialist',
       'Mobile Number': '9820267890',
       'Email Address': 'priya.nair@cadomain.in',
-      'PAN Number': 'ABCPN5678Q',
-      'Login PIN': '7890'
+      'PAN Number': 'ABCPN5678Q'
     },
     {
       'Staff Name': 'CA Ananya Deshmukh',
@@ -879,8 +877,7 @@ export const downloadTeamExcelTemplate = () => {
       'Designation': 'Partner - Corporate Audit & ROC',
       'Mobile Number': '9820399887',
       'Email Address': 'ananya.ca@cadomain.in',
-      'PAN Number': 'ABCDA9988Z',
-      'Login PIN': '9887'
+      'PAN Number': 'ABCDA9988Z'
     }
   ];
 

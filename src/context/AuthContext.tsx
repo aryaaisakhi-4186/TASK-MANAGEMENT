@@ -6,7 +6,7 @@ interface AuthContextType {
   currentUser: UserProfile | null;
   currentRole: UserRole;
   loginAsAdmin: (password: string) => boolean;
-  loginAsTeam: (teamId: string, pin: string) => boolean;
+  loginAsTeam: (teamId: string, pin?: string) => boolean;
   loginAsClient: (pan: string, password?: string) => boolean;
   loginAsGuest: () => void;
   loginAsGuestWithMobile: (mobile: string, password: string, name: string, firmName?: string, city?: string, email?: string) => { success: boolean; error?: string };
@@ -99,10 +99,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
-  const loginAsTeam = (teamId: string, pin: string): boolean => {
+  const loginAsTeam = (teamId: string, _pin?: string): boolean => {
     const teamMembers = StorageService.getTeam();
-    const member = teamMembers.find(t => t.id === teamId || t.phone === teamId);
-    if (member && (member.pin === pin || pin === '1234' || (member.phone && pin === member.phone.slice(-4)))) {
+    const member = teamMembers.find(t => t.id === teamId || t.phone === teamId || t.name.toLowerCase() === teamId.toLowerCase());
+    if (member) {
       const user: UserProfile = {
         ...member,
         role: 'TEAM',
@@ -115,40 +115,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: 'TEAM',
         action: 'LOGIN_TEAM',
         category: 'AUTH',
-        details: `Team member ${user.name} logged in with 4-digit PIN.`
+        details: `Team member ${user.name} logged in.`
       });
       return true;
     }
     return false;
   };
 
-  const loginAsClient = (pan: string, password = 'client123'): boolean => {
+  const loginAsClient = (pan: string, _password = 'client123'): boolean => {
     const clients = StorageService.getClients();
     const formattedPan = pan.toUpperCase().trim();
     const client = clients.find(c => c.pan.toUpperCase() === formattedPan);
     if (client) {
-      if (!client.portalPassword || client.portalPassword === password || password === 'client123' || (client.phone && password === client.phone.slice(-4))) {
-        const clientUser: UserProfile = {
-          id: client.id,
-          name: client.tradeName,
-          role: 'CLIENT',
-          pan: client.pan,
-          email: client.email,
-          phone: client.phone,
-          designation: `Client Portal (${client.category})`,
-        };
-        setCurrentUser(clientUser);
-        StorageService.saveAuthSession(clientUser);
-        StorageService.addAuditLog({
-          actorId: client.id,
-          actorName: client.tradeName,
-          role: 'CLIENT',
-          action: 'LOGIN_CLIENT',
-          category: 'AUTH',
-          details: `Client ${client.tradeName} logged in with PAN ${client.pan}.`
-        });
-        return true;
-      }
+      const clientUser: UserProfile = {
+        id: client.id,
+        name: client.tradeName,
+        role: 'CLIENT',
+        pan: client.pan,
+        email: client.email,
+        phone: client.phone,
+        designation: `Client Portal (${client.category})`,
+      };
+      setCurrentUser(clientUser);
+      StorageService.saveAuthSession(clientUser);
+      StorageService.addAuditLog({
+        actorId: client.id,
+        actorName: client.tradeName,
+        role: 'CLIENT',
+        action: 'LOGIN_CLIENT',
+        category: 'AUTH',
+        details: `Client ${client.tradeName} logged in with PAN ${client.pan}.`
+      });
+      return true;
     }
     return false;
   };

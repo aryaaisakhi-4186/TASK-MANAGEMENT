@@ -41,28 +41,8 @@ export const ClientLoginModal: React.FC<Props> = ({ isOpen, onClose, onBack }) =
       return;
     }
 
-    if (loginMode === 'DIRECTOR') {
-      // Primary Director Login with Password
-      if (!found.portalPassword || found.portalPassword === password || password === 'client123') {
-        loginAsClient(found.pan, password);
-        onClose();
-      } else {
-        setError(true);
-        setErrorMsg('Invalid portal password for Director Login.');
-      }
-    } else {
-      // Employee / Accountant Sub-Login (Last 4 digits of Employee Mobile)
-      const empPhone = found.employeePhone || '9820045678';
-      const last4Digits = empPhone.replace(/\D/g, '').slice(-4);
-
-      if (employeePin.trim() === last4Digits || employeePin.trim() === '5678' || employeePin.trim() === '1234' || employeePin.trim() === '4567') {
-        loginAsClient(found.pan, found.portalPassword || 'client123');
-        onClose();
-      } else {
-        setError(true);
-        setErrorMsg('Invalid Employee PIN. Must be last 4 digits of registered mobile (' + last4Digits + ')');
-      }
-    }
+    loginAsClient(found.pan);
+    onClose();
   };
 
   return (
@@ -111,7 +91,7 @@ export const ClientLoginModal: React.FC<Props> = ({ isOpen, onClose, onBack }) =
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           
           {/* Company PAN */}
           <div>
@@ -127,60 +107,6 @@ export const ClientLoginModal: React.FC<Props> = ({ isOpen, onClose, onBack }) =
             />
           </div>
 
-          {/* Director Mode: Password */}
-          {loginMode === 'DIRECTOR' ? (
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Company Portal Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(false); }}
-                  placeholder="Password (Default: client123)"
-                  className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:border-blue-500 focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  title={showPassword ? 'Hide Password' : 'Show Password'}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* Employee Mode: Last 4 digits of Mobile Number */
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Employee Mobile Last 4 Digits
-              </label>
-              <div className="relative">
-                <input
-                  type={showEmployeePin ? 'text' : 'password'}
-                  maxLength={4}
-                  required
-                  value={employeePin}
-                  onChange={(e) => { setEmployeePin(e.target.value); setError(false); }}
-                  placeholder="Last 4 Digits (e.g. 5678)"
-                  className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono text-center tracking-widest font-bold focus:border-blue-500 focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowEmployeePin(!showEmployeePin)}
-                  title={showEmployeePin ? 'Hide PIN' : 'Show PIN'}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-                >
-                  {showEmployeePin ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-              <p className="text-[10px] text-slate-500 mt-1">
-                Enter the last 4 digits of your registered employee mobile number.
-              </p>
-            </div>
-          )}
-
           {error && (
             <p className="text-[10px] text-red-500 text-center font-semibold bg-red-500/10 p-2 rounded-lg border border-red-500/20">
               {errorMsg}
@@ -189,9 +115,9 @@ export const ClientLoginModal: React.FC<Props> = ({ isOpen, onClose, onBack }) =
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition-all mt-2"
+            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition-all mt-2 active:scale-95"
           >
-            {loginMode === 'DIRECTOR' ? 'Access Director Portal' : 'Access Employee Portal'}
+            Access Client Portal
           </button>
         </form>
 

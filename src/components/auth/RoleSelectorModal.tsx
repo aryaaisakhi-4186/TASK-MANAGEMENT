@@ -64,7 +64,7 @@ export const RoleSelectorModal: React.FC<Props> = ({ isOpen, onClose }) => {
                   <Users size={18} />
                 </div>
                 <h4 className="font-bold text-slate-900 dark:text-white text-xs group-hover:text-emerald-600">Team / Staff</h4>
-                <p className="text-[10px] text-slate-500 mt-0.5">4-digit PIN, punch-in & assigned tasks</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Punch-in & assigned tasks</p>
               </button>
 
               {/* Client */}

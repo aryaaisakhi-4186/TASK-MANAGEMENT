@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTasks } from '../../context/TaskContext';
-import { Users, ArrowLeft, X, Eye, EyeOff } from 'lucide-react';
+import { Users, ArrowLeft, X } from 'lucide-react';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 interface Props {
@@ -14,9 +14,6 @@ export const TeamLoginModal: React.FC<Props> = ({ isOpen, onClose, onBack }) => 
   const { loginAsTeam } = useAuth();
   const { team } = useTasks();
   const [selectedStaffId, setSelectedStaffId] = useState(team[0]?.id || '');
-  const [pin, setPin] = useState('');
-  const [showPin, setShowPin] = useState(false);
-  const [error, setError] = useState(false);
 
   useEscapeKey(onClose, isOpen);
 
@@ -24,11 +21,15 @@ export const TeamLoginModal: React.FC<Props> = ({ isOpen, onClose, onBack }) => 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const success = loginAsTeam(selectedStaffId, pin);
-    if (success) {
-      onClose();
-    } else {
-      setError(true);
+    if (!selectedStaffId && team.length > 0) {
+      setSelectedStaffId(team[0].id);
+    }
+    const staffIdToLogin = selectedStaffId || team[0]?.id;
+    if (staffIdToLogin) {
+      const success = loginAsTeam(staffIdToLogin);
+      if (success) {
+        onClose();
+      }
     }
   };
 
@@ -53,7 +54,7 @@ export const TeamLoginModal: React.FC<Props> = ({ isOpen, onClose, onBack }) => 
             <Users size={22} />
           </div>
           <h3 className="text-lg font-bold text-slate-900 dark:text-white font-serif">Staff / Article Punch-In</h3>
-          <p className="text-xs text-slate-500">Select your name and enter 4-digit security PIN</p>
+          <p className="text-xs text-slate-500">Select your name to punch in and access tasks</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -70,35 +71,11 @@ export const TeamLoginModal: React.FC<Props> = ({ isOpen, onClose, onBack }) => 
             </select>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">4-Digit Security PIN</label>
-            <div className="relative">
-              <input
-                type={showPin ? 'text' : 'password'}
-                maxLength={4}
-                required
-                value={pin}
-                onChange={(e) => { setPin(e.target.value); setError(false); }}
-                placeholder="PIN (Default: 1234)"
-                className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs text-center font-mono tracking-widest focus:border-emerald-500 focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPin(!showPin)}
-                title={showPin ? 'Hide PIN' : 'Show PIN'}
-                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-              >
-                {showPin ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-            {error && <p className="text-[10px] text-red-500 text-center mt-1">Invalid PIN. Try: 1234</p>}
-          </div>
-
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all"
+            className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all active:scale-95"
           >
-            Unlock Staff Portal
+            Punch-In & Unlock Staff Portal
           </button>
         </form>
       </div>

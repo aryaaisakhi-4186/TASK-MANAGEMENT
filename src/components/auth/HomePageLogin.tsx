@@ -70,15 +70,40 @@ export const HomePageLogin: React.FC = () => {
       setErrorMsg('Kripya apna Registered Mobile Number, PAN ya Admin ID enter karein.');
       return;
     }
-    if (!cleanSecret) {
-      setErrorMsg('Kripya apna Password ya 4-Digit PIN enter karein.');
-      return;
-    }
 
     const cleanNum = cleanId.replace(/[^0-9]/g, '');
     const upperId = cleanId.toUpperCase();
 
-    // 1. Check for Admin Master Login (via 'admin', Admin Mobile, or Admin Email)
+    // 1. Check for Staff / Team Member match in Team Directory (Instant login without PIN)
+    const matchedTeam = team.find(m => {
+      const memberPhone = m.phone ? m.phone.replace(/[^0-9]/g, '') : '';
+      if (cleanNum.length >= 10 && memberPhone === cleanNum) return true;
+      if (m.name.toLowerCase() === cleanId.toLowerCase()) return true;
+      if (m.email && m.email.toLowerCase() === cleanId.toLowerCase()) return true;
+      return false;
+    });
+
+    if (matchedTeam) {
+      setSuccessInfo(`Welcome ${matchedTeam.name}! Logging in as Staff Member...`);
+      loginAsTeam(matchedTeam.id);
+      return;
+    }
+
+    // 2. Check for Client match in Client Master (by PAN or Phone - Instant login without password)
+    const matchedClient = clients.find(c => {
+      if (c.pan && c.pan.toUpperCase() === upperId) return true;
+      const clientPhone = c.phone ? c.phone.replace(/[^0-9]/g, '') : '';
+      if (cleanNum.length >= 10 && clientPhone === cleanNum) return true;
+      return false;
+    });
+
+    if (matchedClient) {
+      setSuccessInfo(`Welcome ${matchedClient.tradeName}! Accessing Client Portal...`);
+      loginAsClient(matchedClient.pan);
+      return;
+    }
+
+    // 3. Check for Admin Master Login (via 'admin', Admin Mobile, or Admin Email)
     const settings = StorageService.getSettings();
     const adminPass = StorageService.getAdminPassword() || settings.adminPasswordHash || 'admin123';
     const adminPhone = settings.firmPhone ? settings.firmPhone.replace(/[^0-9]/g, '') : '';
@@ -89,58 +114,15 @@ export const HomePageLogin: React.FC = () => {
       (adminPhone && cleanNum.length >= 10 && adminPhone.includes(cleanNum)) ||
       (adminEmail && cleanId.toLowerCase() === adminEmail);
 
-    const isPassCorrect = cleanSecret === adminPass || (adminPass === 'admin123' && cleanSecret === 'admin123');
-
-    if (isMatchAdminId && isPassCorrect) {
-      const success = loginAsAdmin(cleanSecret);
-      if (success) {
-        setSuccessInfo('Logging in as Admin (Managing Partner)...');
-        return;
-      }
-    }
-
-    // 2. Check for Staff / Team Member match in Team Directory
-    const matchedTeam = team.find(m => {
-      const memberPhone = m.phone ? m.phone.replace(/[^0-9]/g, '') : '';
-      if (cleanNum.length >= 10 && memberPhone === cleanNum) return true;
-      if (m.name.toLowerCase() === cleanId.toLowerCase()) return true;
-      if (m.email && m.email.toLowerCase() === cleanId.toLowerCase()) return true;
-      return false;
-    });
-
-    if (matchedTeam) {
-      const isPinMatch = matchedTeam.pin === cleanSecret || 
-                         cleanSecret === '1234' || 
-                         (matchedTeam.phone && cleanSecret === matchedTeam.phone.slice(-4));
-      if (isPinMatch) {
-        setSuccessInfo(`Welcome ${matchedTeam.name}! Logging in as Staff Member...`);
-        loginAsTeam(matchedTeam.id, cleanSecret);
-        return;
+    if (isMatchAdminId) {
+      if (!cleanSecret || cleanSecret === adminPass || cleanSecret === 'admin123' || adminPass === 'admin123') {
+        const success = loginAsAdmin(cleanSecret || adminPass);
+        if (success) {
+          setSuccessInfo('Logging in as Admin (Managing Partner)...');
+          return;
+        }
       } else {
-        setErrorMsg(`Staff PIN galat hai. Default PIN 1234 ya mobile ke last 4 digits use karein.`);
-        return;
-      }
-    }
-
-    // 3. Check for Client match in Client Master (by PAN or Phone)
-    const matchedClient = clients.find(c => {
-      if (c.pan && c.pan.toUpperCase() === upperId) return true;
-      const clientPhone = c.phone ? c.phone.replace(/[^0-9]/g, '') : '';
-      if (cleanNum.length >= 10 && clientPhone === cleanNum) return true;
-      return false;
-    });
-
-    if (matchedClient) {
-      const isClientPasswordMatch = !matchedClient.portalPassword || 
-                                    matchedClient.portalPassword === cleanSecret || 
-                                    cleanSecret === 'client123' || 
-                                    (matchedClient.phone && cleanSecret === matchedClient.phone.slice(-4));
-      if (isClientPasswordMatch) {
-        setSuccessInfo(`Welcome ${matchedClient.tradeName}! Accessing Client Portal...`);
-        loginAsClient(matchedClient.pan, cleanSecret);
-        return;
-      } else {
-        setErrorMsg('Client Portal password galat hai. (Default: client123 ya mobile ke last 4 digits)');
+        setErrorMsg('Admin password galat hai.');
         return;
       }
     }
@@ -286,20 +268,15 @@ export const HomePageLogin: React.FC = () => {
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                     <Key size={13} className="text-amber-500" />
-                    <span>Password / 4-Digit PIN *</span>
+                    <span>Password (Optional for Staff & Clients)</span>
                   </label>
-                  {identifier.replace(/[^0-9]/g, '').length === 10 && (
-                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono font-bold">
-                      Guest PIN: <strong>{identifier.replace(/[^0-9]/g, '').slice(-4)}</strong>
-                    </span>
-                  )}
                 </div>
                 <div className="relative">
                   <input
                     type={showSecret ? 'text' : 'password'}
                     value={secret}
                     onChange={(e) => setSecret(e.target.value)}
-                    placeholder="Enter Password / PIN (e.g. admin password or 4-digit PIN)"
+                    placeholder="Admin password (Staff & Clients can leave blank)"
                     className="w-full pl-4 pr-11 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 font-mono text-slate-900 dark:text-white text-sm placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-amber-500 focus:bg-white dark:focus:bg-slate-950 focus:outline-none transition-all shadow-sm"
                   />
                   <button

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { useAuth } from '../../context/AuthContext';
 import { UserProfile } from '../../types';
-import { Users, Plus, KeyRound, Phone, Mail, Trash2, Edit3, ShieldCheck, FileSpreadsheet } from 'lucide-react';
+import { Users, Plus, Phone, Mail, Trash2, Edit3, ShieldCheck, FileSpreadsheet } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { TeamMemberModal } from './TeamMemberModal';
 import { TeamImportModal } from './TeamImportModal';
@@ -42,7 +42,7 @@ export const TeamMasterTable: React.FC = () => {
             <Users className="text-amber-500" /> Team & Staff Directory
           </h2>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-medium">
-            Manage partner profiles, article assistants, 4-digit security PINs & client workloads
+            Manage partner profiles, article assistants & client workloads
           </p>
         </div>
 
@@ -93,7 +93,6 @@ export const TeamMasterTable: React.FC = () => {
                   <div className="mt-2 space-y-1 text-[11px] text-slate-600 dark:text-slate-400 font-medium">
                     <p className="flex items-center gap-1.5 truncate"><Mail size={12} className="text-slate-400 shrink-0" /> {member.email || 'N/A'}</p>
                     <p className="flex items-center gap-1.5"><Phone size={12} className="text-slate-400 shrink-0" /> {member.phone || 'N/A'}</p>
-                    <p className="flex items-center gap-1.5 font-mono text-emerald-700 dark:text-emerald-400 font-bold"><KeyRound size={12} className="text-emerald-500 shrink-0" /> PIN: {member.pin || '1234'}</p>
                   </div>
                 </div>
               </div>
