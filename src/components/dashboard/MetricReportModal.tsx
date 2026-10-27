@@ -478,7 +478,7 @@ export const MetricReportModal: React.FC<Props> = ({
         </div>
 
         {/* Scrollable Report Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl scrollbar-thin">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl scrollbar-thin overscroll-y-contain">
           
           {activeReportTab === 'EXTRA_FEES' ? (
             /* Extra Fees Due Table */
