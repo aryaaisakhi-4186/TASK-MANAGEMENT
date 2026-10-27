@@ -5806,7 +5806,6 @@
       "designation": "Head of Department / Senior Partner",
       "phone": "+91 8982147763",
       "email": "arya4186@gmail.com",
-      "pin": "7763",
       "assignedClientIds": []
     },
     {
@@ -5816,7 +5815,6 @@
       "designation": "Admin & Principal Partner",
       "phone": "+91 8815052555",
       "email": "ravi@aryaassociates.in",
-      "pin": "2555",
       "assignedClientIds": []
     },
     {
@@ -5826,7 +5824,6 @@
       "designation": "Branch / Compliance Manager",
       "phone": "+91 8989914666",
       "email": "divya@aryaassociates.in",
-      "pin": "4666",
       "assignedClientIds": []
     },
     {
@@ -5836,7 +5833,6 @@
       "designation": "Branch / Compliance Manager",
       "phone": "+91 9098089252",
       "email": "pawan@aryaassociates.in",
-      "pin": "9252",
       "assignedClientIds": []
     },
     {
@@ -5846,7 +5842,6 @@
       "designation": "Accounts & Tax Specialist",
       "phone": "+91 8871912754",
       "email": "pradeep@aryaassociates.in",
-      "pin": "2754",
       "assignedClientIds": []
     },
     {
@@ -5856,7 +5851,6 @@
       "designation": "Accounts & Tax Specialist",
       "phone": "+91 8770347353",
       "email": "kabir@aryaassociates.in",
-      "pin": "7353",
       "assignedClientIds": []
     },
     {
@@ -5866,7 +5860,6 @@
       "designation": "Data Entry & Return Operator",
       "phone": "+91 7509488887",
       "email": "akash@aryaassociates.in",
-      "pin": "8887",
       "assignedClientIds": []
     },
     {
@@ -5876,7 +5869,6 @@
       "designation": "Data Entry & Return Operator",
       "phone": "+91 9039868172",
       "email": "ishan@aryaassociates.in",
-      "pin": "8172",
       "assignedClientIds": []
     },
     {
@@ -5886,7 +5878,6 @@
       "designation": "Accounts & Tax Specialist",
       "phone": "+91 9407884781",
       "email": "vijay@aryaassociates.in",
-      "pin": "4781",
       "assignedClientIds": []
     },
     {
@@ -5896,7 +5887,6 @@
       "designation": "Accounts & Tax Specialist",
       "phone": "+91 9713343536",
       "email": "santosh@aryaassociates.in",
-      "pin": "3536",
       "assignedClientIds": []
     },
     {
@@ -5906,7 +5896,6 @@
       "designation": "Data Entry & Return Operator",
       "phone": "+91 7089676883",
       "email": "bhavesh@aryaassociates.in",
-      "pin": "6883",
       "assignedClientIds": []
     }
   ],
@@ -5934,6 +5923,6 @@
   },
   "guestLeads": [],
   "firebaseConfig": null,
-  "updatedAt": "2026-10-27T15:25:22.730Z",
-  "updatedAtIST": "27/10/2026, 8:55:22 pm"
+  "updatedAt": "2026-10-27T15:45:56.198Z",
+  "updatedAtIST": "27/10/2026, 9:15:56 pm"
 }
