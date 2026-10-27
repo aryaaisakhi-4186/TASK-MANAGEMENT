@@ -42,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
   const visibleItems = navItems.filter(item => item.roles.includes(currentRole));
 
   return (
-    <aside className="hidden md:flex flex-col w-64 shrink-0 bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl border-r border-slate-200/90 dark:border-slate-800/80 min-h-[calc(100vh-65px)] p-4 transition-all">
+    <aside className="hidden md:flex flex-col w-64 shrink-0 bg-white/70 dark:bg-slate-950/60 backdrop-blur-xl border-r border-slate-200/90 dark:border-slate-800/80 sticky top-[61px] h-[calc(100vh-61px)] p-4 overflow-y-auto scrollbar-thin transition-all">
       <div className="mb-4 px-2">
         <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">Operations Navigation</p>
       </div>

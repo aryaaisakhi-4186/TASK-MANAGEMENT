@@ -69,7 +69,7 @@ const MainPortal: React.FC = () => {
   }, [currentRole, currentUser?.trialInfo?.isDemoSetup]);
 
   return (
-    <div className="min-h-[100dvh] w-full max-w-full bg-slate-100/80 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-amber-500/30 selection:text-amber-800 transition-colors duration-200 overflow-x-hidden">
+    <div className="min-h-[100dvh] w-full max-w-full bg-slate-100/80 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col selection:bg-amber-500/30 selection:text-amber-800 transition-colors duration-200">
       
       {/* Top Corporate Navigation */}
       <Navbar 
@@ -103,7 +103,7 @@ const MainPortal: React.FC = () => {
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {/* Content Viewport */}
-        <main className="flex-1 p-3.5 sm:p-4 md:p-6 lg:p-8 min-w-0 w-full overflow-x-hidden">
+        <main className="flex-1 p-3.5 sm:p-4 md:p-6 lg:p-8 min-w-0 w-full">
           {activeTab === 'dashboard' && (
             <DashboardOverview
               onOpenTaskModal={(task) => setSelectedTask(task)}

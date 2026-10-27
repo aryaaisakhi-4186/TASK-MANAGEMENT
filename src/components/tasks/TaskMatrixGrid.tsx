@@ -625,82 +625,85 @@ export const TaskMatrixGrid: React.FC<{
         </div>
       )}
 
-      {/* Categorized Recurring Tabs */}
-      <RecurringCompliance activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* Sticky Compliance Tabs & Search Filter Header (Stays Visible When Scrolling) */}
+      <div className="sticky top-[61px] z-20 bg-slate-100/95 dark:bg-slate-950/95 backdrop-blur-md pt-2 pb-3 space-y-2.5 -mx-3.5 sm:-mx-4 md:-mx-6 lg:-mx-8 px-3.5 sm:px-4 md:px-6 lg:px-8 border-b border-slate-200/80 dark:border-slate-800/80 shadow-xs">
+        {/* Categorized Recurring Tabs */}
+        <RecurringCompliance activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Filter and Search Bar with Voice Mic */}
-      <GlassCard className="p-4">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-          
-          <VoiceSearchBar
-            value={searchTerm}
-            onChange={setSearchTerm}
-            placeholder="Search by client, title, staff, PAN (or speak in Hindi/English)..."
-            className="w-full md:w-96"
-          />
+        {/* Filter and Search Bar with Voice Mic */}
+        <GlassCard className="p-3 shadow-xs">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+            
+            <VoiceSearchBar
+              value={searchTerm}
+              onChange={setSearchTerm}
+              placeholder="Search by client, title, staff, PAN (or speak in Hindi/English)..."
+              className="w-full md:w-96"
+            />
 
-          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs focus:border-amber-500 focus:outline-none shadow-sm font-semibold"
-            >
-              <option value="ALL">All Categories</option>
-              <option value="GST">GST</option>
-              <option value="VAT">VAT / State Tax</option>
-              <option value="TDS">TDS / TCS</option>
-              <option value="INCOME_TAX">Income Tax</option>
-              <option value="AUDIT">Tax Audit</option>
-              <option value="ROC">ROC / MCA</option>
-              <option value="BOOKKEEPING">Bookkeeping</option>
-              <option value="PF_ESIC">PF & ESIC</option>
-            </select>
+            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs focus:border-amber-500 focus:outline-none shadow-sm font-semibold"
+              >
+                <option value="ALL">All Categories</option>
+                <option value="GST">GST</option>
+                <option value="VAT">VAT / State Tax</option>
+                <option value="TDS">TDS / TCS</option>
+                <option value="INCOME_TAX">Income Tax</option>
+                <option value="AUDIT">Tax Audit</option>
+                <option value="ROC">ROC / MCA</option>
+                <option value="BOOKKEEPING">Bookkeeping</option>
+                <option value="PF_ESIC">PF & ESIC</option>
+              </select>
 
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs focus:border-amber-500 focus:outline-none shadow-sm font-semibold"
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="DONE">Completed (Done)</option>
-              <option value="NOT_APPLICABLE">Not Applicable</option>
-            </select>
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs focus:border-amber-500 focus:outline-none shadow-sm font-semibold"
+              >
+                <option value="ALL">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="DONE">Completed (Done)</option>
+                <option value="NOT_APPLICABLE">Not Applicable</option>
+              </select>
 
-            {viewMode === 'CLIENT_WISE' && (
-              <div className="flex items-center gap-1 pl-2 border-l border-slate-200 dark:border-slate-800">
-                <button
-                  type="button"
-                  onClick={handleExpandAll}
-                  className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-200"
-                >
-                  Expand All
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCollapseAll}
-                  className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-200"
-                >
-                  Collapse All
-                </button>
-              </div>
-            )}
+              {viewMode === 'CLIENT_WISE' && (
+                <div className="flex items-center gap-1 pl-2 border-l border-slate-200 dark:border-slate-800">
+                  <button
+                    type="button"
+                    onClick={handleExpandAll}
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-200"
+                  >
+                    Expand All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCollapseAll}
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-200"
+                  >
+                    Collapse All
+                  </button>
+                </div>
+              )}
 
-            {selectedTaskIds.length > 0 && (
-              <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200 dark:border-slate-800">
-                <button
-                  onClick={() => { bulkUpdateTasks(selectedTaskIds, 'DONE'); setSelectedTaskIds([]); }}
-                  className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all border border-emerald-500/30 shadow-sm"
-                >
-                  ✓ Mark ({selectedTaskIds.length}) Done
-                </button>
-              </div>
-            )}
+              {selectedTaskIds.length > 0 && (
+                <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200 dark:border-slate-800">
+                  <button
+                    onClick={() => { bulkUpdateTasks(selectedTaskIds, 'DONE'); setSelectedTaskIds([]); }}
+                    className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all border border-emerald-500/30 shadow-sm"
+                  >
+                    ✓ Mark ({selectedTaskIds.length}) Done
+                  </button>
+                </div>
+              )}
+            </div>
+
           </div>
-
-        </div>
-      </GlassCard>
+        </GlassCard>
+      </div>
 
       {/* 1. CLIENT-WISE ORGANIZED MATRIX VIEW (PRIMARY / DEFAULT) */}
       {viewMode === 'CLIENT_WISE' ? (
