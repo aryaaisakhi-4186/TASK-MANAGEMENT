@@ -1,5 +1,6 @@
 import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord, AIMemoryItem, GuestLead } from '../types';
 import { SEED_CLIENTS, SEED_TASKS, SEED_TEAM_MEMBERS, SEED_EXTRA_WORK, SEED_DOCUMENTS, SEED_AUDIT_LOGS, INITIAL_SYSTEM_SETTINGS } from '../data/seedData';
+import { resolveClientApplicability } from '../utils/complianceApplicability';
 
 const KEYS = {
   CLIENTS: 'taskvaani_clients_v1',
@@ -144,21 +145,42 @@ export const mergeClients = (localClients: Client[], incomingClients: Client[]):
 
     if (existingIdx !== -1) {
       const existing = mergedList[existingIdx];
+      const resolvedPan = (inc.pan && inc.pan !== 'PAN-PENDING') 
+        ? inc.pan 
+        : (existing.pan && existing.pan !== 'PAN-PENDING' ? existing.pan : inc.pan);
+      const resolvedGst = inc.gstin || existing.gstin || undefined;
+      const resolvedTan = inc.tan || existing.tan || undefined;
+      const resolvedVat = (inc.vatNumber && inc.vatNumber.trim().length >= 4) ? inc.vatNumber.trim() : undefined;
+
+      const baseApp = resolveClientApplicability(existing);
+      const incApp = inc.complianceApplicability ? resolveClientApplicability(inc) : baseApp;
+
       mergedList[existingIdx] = {
         ...existing,
         ...inc,
-        tradeName: existing.tradeName || inc.tradeName,
-        legalName: existing.legalName || inc.legalName || inc.tradeName,
-        pan: (existing.pan && existing.pan !== 'PAN-PENDING') ? existing.pan : inc.pan,
-        gstin: existing.gstin || inc.gstin,
-        phone: existing.phone || inc.phone,
-        email: existing.email || inc.email,
-        contactPerson: existing.contactPerson || inc.contactPerson,
-        employeeName: existing.employeeName || inc.employeeName,
-        googleDriveFolderId: existing.googleDriveFolderId || inc.googleDriveFolderId,
-        complianceApplicability: inc.complianceApplicability
-          ? { ...(existing.complianceApplicability || {}), ...inc.complianceApplicability } as any
-          : existing.complianceApplicability
+        tradeName: inc.tradeName || existing.tradeName,
+        legalName: inc.legalName || existing.legalName || inc.tradeName || existing.tradeName,
+        pan: resolvedPan || (resolvedGst && resolvedGst.length === 15 ? resolvedGst.substring(2, 12) : 'PAN-PENDING'),
+        gstin: resolvedGst,
+        tan: resolvedTan,
+        vatNumber: resolvedVat, // Never retain fake VAT numbers
+        phone: inc.phone || existing.phone,
+        email: inc.email || existing.email,
+        contactPerson: inc.contactPerson || existing.contactPerson,
+        employeeName: inc.employeeName || existing.employeeName,
+        employeePhone: inc.employeePhone || existing.employeePhone,
+        dob: inc.dob || existing.dob,
+        formationDate: inc.formationDate || existing.formationDate,
+        aadharNumber: inc.aadharNumber || existing.aadharNumber,
+        assignedTeamName: inc.assignedTeamName || existing.assignedTeamName,
+        googleDriveFolderId: inc.googleDriveFolderId || existing.googleDriveFolderId,
+        googleDriveFolderUrl: inc.googleDriveFolderUrl || existing.googleDriveFolderUrl,
+        complianceApplicability: {
+          ...baseApp,
+          ...incApp,
+          VAT: !!(resolvedVat && resolvedVat.length >= 4),
+          GST: !!(resolvedGst && resolvedGst.length === 15)
+        }
       };
     } else {
       mergedList.push(inc);

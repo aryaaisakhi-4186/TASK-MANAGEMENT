@@ -190,43 +190,68 @@ export const parseDocumentTextToClientData = (rawText: string, fileName?: string
 export const mapRawDataToClients = (rawData: any[]): ParsedClientRow[] => {
   return rawData.map((row) => {
     const getVal = (possibleHeaders: string[]): string => {
+      // 1. First pass: exact normalized match (highest precision)
       for (const header of possibleHeaders) {
         const normHeader = normalizeKey(header);
         for (const key of Object.keys(row)) {
-          if (normalizeKey(key) === normHeader || normalizeKey(key).includes(normHeader)) {
-            return String(row[key]).trim();
+          if (normalizeKey(key) === normHeader) {
+            const val = String(row[key] ?? '').trim();
+            if (val !== '' && val !== '#N/A' && val !== 'NA' && val !== 'N/A' && val !== 'null' && val !== 'undefined') {
+              return val;
+            }
+          }
+        }
+      }
+      // 2. Second pass: prefix / contains match
+      for (const header of possibleHeaders) {
+        const normHeader = normalizeKey(header);
+        for (const key of Object.keys(row)) {
+          const normKey = normalizeKey(key);
+          if (normKey.includes(normHeader)) {
+            const val = String(row[key] ?? '').trim();
+            if (val !== '' && val !== '#N/A' && val !== 'NA' && val !== 'N/A' && val !== 'null' && val !== 'undefined') {
+              return val;
+            }
           }
         }
       }
       return '';
     };
 
-    const tradeName = getVal(['tradeName', 'clientName', 'client', 'firmName', 'businessName', 'name']);
+    const tradeName = getVal(['businessName', 'tradeName', 'clientName', 'client', 'firmName', 'name']);
     const legalName = getVal(['legalName', 'registeredName', 'companyName']) || tradeName;
-    const gstin = getVal(['gstin', 'gst', 'gstNumber', 'gstno']).toUpperCase();
+    const rawGst = getVal(['gst', 'gstin', 'gstNumber', 'gstno']).toUpperCase();
+    const gstin = (rawGst !== 'NA' && rawGst !== 'N/A' && rawGst.length >= 10) ? rawGst : undefined;
+
     let pan = getVal(['pan', 'panNumber', 'panno']).toUpperCase();
-    if (!pan && gstin && gstin.length === 15) {
+    if ((!pan || pan === 'NA' || pan === 'N/A') && gstin && gstin.length === 15) {
       pan = gstin.substring(2, 12);
     }
-    const tan = getVal(['tan', 'tanNumber', 'tanno']).toUpperCase();
-    const vatNumber = getVal(['vat', 'vatNumber', 'stateId']);
-    const phone = getVal(['phone', 'mobile', 'contactNo', 'whatsapp', 'mobileNumber']);
-    const email = getVal(['email', 'mail', 'emailAddress']);
+    if (pan === 'NA' || pan === 'N/A') pan = '';
+
+    const rawTan = getVal(['tan', 'tanNumber', 'tanno']).toUpperCase();
+    const tan = (rawTan !== 'NA' && rawTan !== 'N/A' && rawTan.length >= 8) ? rawTan : undefined;
+
+    const rawVat = getVal(['vat', 'vatNumber', 'tin', 'stateId']).toUpperCase();
+    const vatNumber = (rawVat !== '' && rawVat !== 'NA' && rawVat !== 'N/A' && rawVat.length >= 4) ? rawVat : undefined;
+
+    const phone = getVal(['contactNumber', 'phone', 'mobile', 'contactNo', 'whatsapp', 'mobileNumber']);
+    const email = getVal(['mailId', 'email', 'mail', 'emailAddress']);
     const contactPerson = getVal(['contactPerson', 'director', 'proprietor', 'authorizedPerson']);
     const employeeName = getVal(['employeeName', 'accountant', 'accountantName']);
-    const employeePhone = getVal(['employeePhone', 'accountantPhone', 'accountantMobile']);
+    const employeePhone = getVal(['employeeContact', 'employeePhone', 'accountantPhone', 'accountantMobile']);
     const aadharNumber = getVal(['aadhar', 'aadharNumber', 'uidai']);
-    const rawDob = getVal(['dob', 'birthDate', 'dateOfBirth']);
-    const rawFormationDate = getVal(['formationDate', 'incorporationDate', 'registrationDate']);
+    const rawDob = getVal(['contactPersonDob', 'personDob', 'dob', 'birthDate', 'dateOfBirth']);
+    const rawFormationDate = getVal(['dobFirm', 'firmDob', 'formationDate', 'incorporationDate', 'registrationDate']);
     const formattedDob = formatExcelOrStandardDate(rawDob);
     const formattedFormationDate = formatExcelOrStandardDate(rawFormationDate);
     const dob = formattedDob !== 'N/A' ? formattedDob : undefined;
     const formationDate = formattedFormationDate !== 'N/A' ? formattedFormationDate : undefined;
-    const assignedTeamName = getVal(['assignedTeamName', 'assignedPartner', 'caStaff', 'assignedStaff']);
-    const googleDriveFolderId = getVal(['googleDriveFolderId', 'driveFolderId', 'driveId']);
-    const googleDriveFolderUrl = getVal(['googleDriveFolderUrl', 'driveFolderUrl', 'driveUrl', 'driveLink']);
+    const assignedTeamName = getVal(['assignedTo', 'assignedStaff', 'assignedTeamName', 'assignedPartner', 'caStaff']);
+    const googleDriveFolderId = getVal(['driveFolderId', 'googleDriveFolderId', 'driveId']);
+    const googleDriveFolderUrl = getVal(['driveFolderUrl', 'googleDriveFolderUrl', 'driveUrl', 'driveLink']);
 
-    const rawCategory = getVal(['category', 'entityType', 'constitution', 'type', 'status']);
+    const rawCategory = getVal(['firmStatus', 'category', 'entityType', 'constitution', 'type', 'status']);
     
     // Accurate Entity Status Resolution using PAN, GSTIN, and Legal Trade Name
     const category: ClientCategory = detectEntityCategoryFromPANAndGSTIN(pan, gstin, tradeName, legalName, rawCategory);
@@ -246,9 +271,9 @@ export const mapRawDataToClients = (rawData: any[]): ParsedClientRow[] => {
       tradeName: tradeName || '',
       legalName: legalName || tradeName || '',
       pan: pan || '',
-      gstin: gstin || undefined,
-      tan: tan || undefined,
-      vatNumber: vatNumber || undefined,
+      gstin,
+      tan,
+      vatNumber,
       category,
       phone: phone || '',
       email: email || '',

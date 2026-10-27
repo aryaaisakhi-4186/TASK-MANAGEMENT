@@ -6,6 +6,7 @@ import { OnlineDataService } from '../services/onlineDataService';
 import { AudioService } from '../services/audioService';
 import { GoogleDriveService } from '../services/googleDriveService';
 import { detectEntityCategoryFromPANAndGSTIN, ParsedClientRow } from '../utils/masterImportExport';
+import { resolveClientApplicability } from '../utils/complianceApplicability';
 import { useAuth } from './AuthContext';
 import { SEED_CLIENTS, SEED_TASKS, SEED_EXTRA_WORK, SEED_DOCUMENTS } from '../data/seedData';
 
@@ -672,37 +673,57 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (existingIndex !== -1) {
         // MERGE & UPDATE EXISTING CLIENT (ZERO DUPLICATES!)
         const existing = updatedClientList[existingIndex];
+        const updatedPan = (normPan && normPan !== 'PAN-PENDING') ? normPan : (existing.pan && existing.pan !== 'PAN-PENDING' ? existing.pan : '');
+        const updatedGst = normGst || existing.gstin || undefined;
+        const updatedTan = row.tan || existing.tan || undefined;
+        const updatedVat = (row.vatNumber && row.vatNumber.trim().length >= 4) ? row.vatNumber.trim() : undefined;
+
         const merged: Client = {
           ...existing,
           tradeName: row.tradeName || existing.tradeName,
           legalName: row.legalName || existing.legalName || row.tradeName || existing.tradeName,
-          pan: (normPan && normPan !== 'PAN-PENDING') ? normPan : existing.pan,
-          gstin: normGst || existing.gstin,
-          tan: row.tan || existing.tan,
+          pan: updatedPan || (updatedGst && updatedGst.length === 15 ? updatedGst.substring(2, 12) : 'PAN-PENDING'),
+          gstin: updatedGst,
+          tan: updatedTan,
+          vatNumber: updatedVat, // Accurately syncs real VAT or removes fake VAT
           category: categoryToUse || existing.category,
           contactPerson: row.contactPerson || existing.contactPerson,
           phone: row.phone || existing.phone,
           email: row.email || existing.email,
+          dob: row.dob || existing.dob,
+          aadharNumber: row.aadharNumber || existing.aadharNumber,
           formationDate: row.formationDate || existing.formationDate,
           employeeName: row.employeeName || existing.employeeName,
           employeePhone: row.employeePhone || existing.employeePhone,
+          assignedTeamName: row.assignedTeamName || existing.assignedTeamName,
           googleDriveFolderId: row.googleDriveFolderId || existing.googleDriveFolderId,
-          googleDriveFolderUrl: row.googleDriveFolderUrl || existing.googleDriveFolderUrl
+          googleDriveFolderUrl: row.googleDriveFolderUrl || existing.googleDriveFolderUrl,
+          complianceApplicability: {
+            ...resolveClientApplicability(existing),
+            GST: !!(updatedGst && updatedGst.length === 15),
+            VAT: !!(updatedVat && updatedVat.length >= 4),
+            TDS: !!(updatedTan && updatedTan.length === 10) || resolveClientApplicability(existing).TDS
+          }
         };
         updatedClientList[existingIndex] = merged;
         updatedCount++;
       } else {
         // CREATE NEW CLIENT RECORD
         const clientId = 'cli-' + Date.now() + '-' + idx + '-' + Math.floor(Math.random() * 1000);
+        const resolvedPan = (normPan && normPan !== 'PAN-PENDING') 
+          ? normPan 
+          : (normGst && normGst.length === 15 ? normGst.substring(2, 12) : 'PAN-PENDING');
+        const resolvedVat = (row.vatNumber && row.vatNumber.trim().length >= 4) ? row.vatNumber.trim() : undefined;
+
         const newClient: Client = {
           id: clientId,
           createdAt: nowIso,
           tradeName: row.tradeName,
           legalName: row.legalName || row.tradeName,
-          pan: normPan || 'PAN-PENDING',
+          pan: resolvedPan,
           gstin: normGst,
           tan: row.tan,
-          vatNumber: row.vatNumber,
+          vatNumber: resolvedVat,
           category: categoryToUse,
           status: 'ACTIVE',
           contactPerson: row.contactPerson || '',
@@ -718,6 +739,18 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           portalPassword: 'client' + (row.phone ? row.phone.slice(-4) : '123'),
           googleDriveFolderId: row.googleDriveFolderId || '',
           googleDriveFolderUrl: row.googleDriveFolderUrl || '',
+          complianceApplicability: {
+            GST: !!(normGst && normGst.length === 15),
+            TDS: !!(row.tan && row.tan.length === 10),
+            ITR: true,
+            AUDIT: false,
+            VAT: !!(resolvedVat && resolvedVat.length >= 4),
+            E_INVOICE: false,
+            RCM: false,
+            RULE_86B: false,
+            GSTR_9: false,
+            GSTR_9C: false
+          },
           customFields: []
         };
         updatedClientList.push(newClient);
