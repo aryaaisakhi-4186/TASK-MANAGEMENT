@@ -33,7 +33,7 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
   const [activeFilter, setActiveFilter] = useState<'ALL' | 'CRITICAL' | 'PENDING' | 'IN_PROGRESS'>('ALL');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
-  const [isExpandedHeight, setIsExpandedHeight] = useState(false);
+  const [heightMode, setHeightMode] = useState<'EXPANDED' | 'FULL' | 'COMPACT'>('EXPANDED');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -270,15 +270,19 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
         </div>
 
         {/* Viewport Height Toggle Button */}
-        <button
-          type="button"
-          onClick={() => setIsExpandedHeight(prev => !prev)}
-          className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
-          title={isExpandedHeight ? "Compact Viewport Height" : "Expand Viewport Height"}
-        >
-          {isExpandedHeight ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
-          <span>{isExpandedHeight ? 'Compact List' : 'Expand Height'}</span>
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setHeightMode(prev => prev === 'EXPANDED' ? 'FULL' : prev === 'FULL' ? 'COMPACT' : 'EXPANDED')}
+            className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+            title="Toggle between Expanded, Full Page Scroll, and Compact View"
+          >
+            {heightMode === 'FULL' ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+            <span>
+              {heightMode === 'FULL' ? '↕ Full Table (Page Scroll)' : heightMode === 'EXPANDED' ? '↕ Expanded (750px)' : '↕ Compact (460px)'}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Filter and Search Bar Controls */}
@@ -359,11 +363,13 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
         <div 
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className={`overflow-x-auto overflow-y-auto ${isExpandedHeight ? 'max-h-[820px]' : 'max-h-[520px]'} rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner scrollbar-thin transition-all duration-200 bg-white dark:bg-slate-950`}
+          style={{ overscrollBehavior: 'auto' }}
+          className={`overflow-x-auto overflow-y-auto ${heightMode === 'EXPANDED' ? 'max-h-[750px]' : heightMode === 'COMPACT' ? 'max-h-[460px]' : 'max-h-none'} rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner scrollbar-thin transition-all duration-200 bg-white dark:bg-slate-950`}
         >
           <table className="w-full text-left text-xs border-collapse min-w-[950px]">
             <thead className="sticky top-0 z-20 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
               <tr>
+                <th className="p-2.5 w-10 text-center sticky top-0 bg-slate-100/95 dark:bg-slate-900/95 shadow-xs font-mono">#</th>
                 <th className="p-3 w-28 sticky top-0 bg-slate-100/95 dark:bg-slate-900/95 shadow-xs">Priority</th>
                 <th className="p-3 sticky top-0 bg-slate-100/95 dark:bg-slate-900/95 shadow-xs">Client & Tax ID</th>
                 <th className="p-3 sticky top-0 bg-slate-100/95 dark:bg-slate-900/95 shadow-xs">Compliance Task</th>
@@ -377,14 +383,14 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
               {filteredTasks.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-8 text-center text-slate-500">
+                  <td colSpan={9} className="p-8 text-center text-slate-500">
                     <CheckCheck size={28} className="mx-auto mb-2 text-emerald-500 opacity-60" />
                     <p className="font-bold text-slate-700 dark:text-slate-300">No compliance tasks found matching this criteria!</p>
                     <p className="text-[11px] mt-0.5">Try resetting search or category filters.</p>
                   </td>
                 </tr>
               ) : (
-                filteredTasks.map((task) => {
+                filteredTasks.map((task, idx) => {
                   let client: Client | undefined;
                   if (task.clientId && clientMap.has(task.clientId)) {
                     client = clientMap.get(task.clientId);
@@ -401,6 +407,11 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
                       key={task.id}
                       className="hover:bg-amber-50/40 dark:hover:bg-slate-800/40 transition-colors group"
                     >
+                      {/* S.No. */}
+                      <td className="p-2.5 text-center text-slate-400 font-mono text-[11px] font-bold">
+                        {idx + 1}
+                      </td>
+
                       {/* Priority Column */}
                       <td className="p-3">
                         {getPriorityBadge(task.priority)}

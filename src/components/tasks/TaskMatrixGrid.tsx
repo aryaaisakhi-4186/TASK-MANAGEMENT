@@ -712,7 +712,7 @@ export const TaskMatrixGrid: React.FC<{
               <p className="text-xs mt-1">Try clearing filters or search term to view client tasks.</p>
             </GlassCard>
           ) : (
-            clientWiseGroups.map(group => {
+            clientWiseGroups.map((group, clientIdx) => {
               const client = group.client;
               const clientId = client.id || 'cli-temp';
               const isCollapsed = collapsedClientIds.includes(clientId);
@@ -729,8 +729,8 @@ export const TaskMatrixGrid: React.FC<{
                     className="p-4 bg-gradient-to-r from-slate-50 via-white to-amber-50/20 dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-950 border-b border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer hover:bg-amber-50/30 dark:hover:bg-slate-800/50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold flex items-center justify-center text-base border border-amber-500/30 shrink-0">
-                        <Building size={20} />
+                      <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold flex items-center justify-center text-sm font-mono border border-amber-500/30 shrink-0">
+                        #{clientIdx + 1}
                       </div>
 
                       <div>
@@ -1039,6 +1039,9 @@ export const TaskMatrixGrid: React.FC<{
                       className="rounded border-slate-300 text-amber-500 focus:ring-amber-400"
                     />
                   </th>
+                  <th className="p-3.5 w-10 text-center sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm font-mono text-[10px]">
+                    #
+                  </th>
                   <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Client & Entity</th>
                   <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Tax ID (PAN / GST / TAN)</th>
                   <th className="p-3.5 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm whitespace-nowrap">Compliance Task</th>
@@ -1051,7 +1054,7 @@ export const TaskMatrixGrid: React.FC<{
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-                {filteredTasks.map(task => {
+                {filteredTasks.map((task, idx) => {
                   const isThisTaskTimed = activeTimedTask?.id === task.id;
 
                   return (
@@ -1063,6 +1066,10 @@ export const TaskMatrixGrid: React.FC<{
                           onChange={() => handleToggleSelect(task.id)}
                           className="rounded border-slate-300 text-amber-500 focus:ring-amber-400"
                         />
+                      </td>
+
+                      <td className="p-3.5 text-center text-slate-400 font-mono text-xs font-bold">
+                        {idx + 1}
                       </td>
 
                       <td className="p-3.5">

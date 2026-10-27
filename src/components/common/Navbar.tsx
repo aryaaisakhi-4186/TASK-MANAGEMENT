@@ -42,26 +42,25 @@ export const Navbar: React.FC<{
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/90 dark:border-slate-800/80 px-4 lg:px-8 py-3 transition-colors shadow-sm">
-      <div className="w-full flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-30 w-full max-w-full bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/90 dark:border-slate-800/80 px-3 lg:px-6 py-2.5 transition-colors shadow-sm overflow-x-hidden">
+      <div className="w-full max-w-full flex items-center justify-between gap-2 md:gap-4">
         
         {/* Logo & Branding */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 text-white shadow-md shadow-amber-500/30 border border-amber-400">
-            <Scale className="text-white" size={24} />
+        <div className="flex items-center gap-2.5 shrink-0">
+          <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 text-white shadow-md shadow-amber-500/30 border border-amber-400 shrink-0">
+            <Scale className="text-white" size={22} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-black tracking-wider text-slate-900 dark:text-white font-serif">TASK-VAANI</span>
-              
+            <div className="flex items-center gap-1.5">
+              <span className="text-base sm:text-lg font-black tracking-wider text-slate-900 dark:text-white font-serif whitespace-nowrap">TASK-VAANI</span>
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 tracking-wide font-medium">Statutory Compliance Hub</p>
+            <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 tracking-wide font-medium whitespace-nowrap">Statutory Compliance Hub</p>
           </div>
         </div>
 
         {/* Center Shift Status & Lunch Break Push Button Widget */}
         {currentRole !== 'CLIENT' && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             {officeStatus === 'LOGGED_OFF' && (
               <button
                 onClick={() => loginOffice(currentUser?.id || 'admin', currentUser?.name || 'Staff')}
@@ -134,7 +133,7 @@ export const Navbar: React.FC<{
         )}
 
         {/* Center Clock Widget */}
-        <div className="hidden xl:flex items-center gap-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-2xl shadow-sm">
+        <div className="hidden 2xl:flex items-center gap-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-2xl shadow-sm shrink-0">
           <AnalogClock size={38} />
           <div className="text-left">
             <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Alarm 10:30 AM</p>
@@ -143,7 +142,7 @@ export const Navbar: React.FC<{
         </div>
 
         {/* Right Action Icons & User Status */}
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           
           {/* 1-Click Update Online Button */}
           {onOpenOnlineUpdate && (

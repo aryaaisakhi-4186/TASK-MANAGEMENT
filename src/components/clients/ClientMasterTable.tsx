@@ -183,6 +183,9 @@ export const ClientMasterTable: React.FC = () => {
           <table className="w-full text-left text-xs border-collapse">
             <thead className="sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800">
               <tr className="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-[10px] leading-tight">
+                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm text-center w-12 min-w-[48px]">
+                  #<br /><span className="text-[9px] text-slate-500 font-normal">S.No.</span>
+                </th>
                 <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[130px]">
                   Client &<br /><span className="text-[9px] text-slate-500 font-normal">Legal Name</span>
                 </th>
@@ -213,11 +216,23 @@ export const ClientMasterTable: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-              {filteredClients.map(client => {
+              {filteredClients.length === 0 && (
+                <tr>
+                  <td colSpan={10} className="p-8 text-center text-slate-500 font-medium">
+                    No clients match your search criteria.
+                  </td>
+                </tr>
+              )}
+              {filteredClients.map((client, idx) => {
                 const appMap = resolveClientApplicability(client);
                 return (
                 <tr key={client.id} className="hover:bg-amber-50/40 dark:hover:bg-slate-800/30 transition-colors group">
                   
+                  {/* S.No. Serial Number */}
+                  <td className="px-2.5 py-2 text-center text-slate-500 dark:text-slate-400 font-mono text-xs font-bold bg-slate-50/50 dark:bg-slate-900/40 border-r border-slate-100 dark:border-slate-800/60">
+                    {idx + 1}
+                  </td>
+
                   {/* Client & Legal Name */}
                   <td className="px-2.5 py-2">
                     <p className="font-bold text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-300 leading-snug">{client.tradeName}</p>
