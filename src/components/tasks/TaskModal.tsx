@@ -106,11 +106,11 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-hidden overscroll-none select-none animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-150"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div 
-        className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-amber-400/40 rounded-3xl p-5 sm:p-6 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto overflow-x-hidden select-text"
+        className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-amber-400/40 rounded-3xl p-5 sm:p-6 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto my-auto scrollbar-thin select-text"
         onClick={(e) => e.stopPropagation()}
       >
         <button 

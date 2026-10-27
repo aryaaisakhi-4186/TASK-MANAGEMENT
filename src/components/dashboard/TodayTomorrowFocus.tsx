@@ -359,7 +359,7 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
         <div 
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className={`overflow-x-auto overflow-y-auto ${isExpandedHeight ? 'max-h-[820px]' : 'max-h-[520px]'} rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner scrollbar-thin overscroll-y-contain transition-all duration-200 bg-white dark:bg-slate-950`}
+          className={`overflow-x-auto overflow-y-auto ${isExpandedHeight ? 'max-h-[820px]' : 'max-h-[520px]'} rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner scrollbar-thin transition-all duration-200 bg-white dark:bg-slate-950`}
         >
           <table className="w-full text-left text-xs border-collapse min-w-[950px]">
             <thead className="sticky top-0 z-20 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider text-[11px]">

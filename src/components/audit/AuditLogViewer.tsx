@@ -499,7 +499,7 @@ export const AuditLogViewer: React.FC = () => {
                 </span>
               </div>
 
-              <div className="overflow-x-auto max-h-[580px]">
+              <div className="overflow-x-auto overflow-y-auto max-h-[580px] scrollbar-thin">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead className="sticky top-0 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 font-bold uppercase z-10">
                     <tr>
@@ -633,7 +633,7 @@ export const AuditLogViewer: React.FC = () => {
                 </span>
               </div>
 
-              <div className="overflow-x-auto max-h-[580px]">
+              <div className="overflow-x-auto overflow-y-auto max-h-[580px] scrollbar-thin">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead className="sticky top-0 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 font-bold uppercase z-10">
                     <tr>
@@ -856,7 +856,7 @@ export const AuditLogViewer: React.FC = () => {
 
           {/* Table Card */}
           <GlassCard className="overflow-hidden" variant="elevated">
-            <div className="overflow-x-auto max-h-[620px]">
+            <div className="overflow-x-auto overflow-y-auto max-h-[620px] scrollbar-thin">
               <table className="w-full text-left text-xs border-collapse">
                 <thead className="sticky top-0 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-400 font-bold uppercase z-10">
                   <tr>

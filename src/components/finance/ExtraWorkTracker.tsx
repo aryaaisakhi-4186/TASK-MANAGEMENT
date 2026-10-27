@@ -103,9 +103,9 @@ export const ExtraWorkTracker: React.FC = () => {
 
       {/* Extra Work Master Table with Edit & Delete */}
       <GlassCard className="overflow-hidden" variant="elevated">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-250px)] scrollbar-thin">
           <table className="w-full text-left text-xs border-collapse">
-            <thead>
+            <thead className="sticky top-0 z-10 bg-slate-100 dark:bg-slate-950">
               <tr className="bg-slate-100/90 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider">
                 <th className="p-3.5">Client & Assignment</th>
                 <th className="p-3.5">Category</th>

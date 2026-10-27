@@ -311,11 +311,11 @@ export const MetricReportModal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-6 bg-slate-950/85 backdrop-blur-md overflow-hidden overscroll-none animate-in zoom-in-95 duration-200"
+      className="fixed inset-0 z-50 overflow-y-auto p-2 md:p-6 bg-slate-950/85 backdrop-blur-md flex items-center justify-center animate-in zoom-in-95 duration-200"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="relative w-full max-w-[98vw] xl:max-w-7xl 2xl:max-w-[1550px] bg-white dark:bg-slate-900 border border-amber-400/40 rounded-3xl p-4 md:p-6 shadow-2xl max-h-[95vh] flex flex-col"
+        className="relative w-full max-w-[98vw] xl:max-w-7xl 2xl:max-w-[1550px] bg-white dark:bg-slate-900 border border-amber-400/40 rounded-3xl p-4 md:p-6 shadow-2xl max-h-[95vh] flex flex-col my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -478,7 +478,7 @@ export const MetricReportModal: React.FC<Props> = ({
         </div>
 
         {/* Scrollable Report Content */}
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl scrollbar-thin overscroll-y-contain">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl scrollbar-thin">
           
           {activeReportTab === 'EXTRA_FEES' ? (
             /* Extra Fees Due Table */
