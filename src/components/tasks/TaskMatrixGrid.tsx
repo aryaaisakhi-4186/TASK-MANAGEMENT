@@ -733,7 +733,7 @@ export const TaskMatrixGrid: React.FC<{
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold flex items-center justify-center text-sm font-mono border border-amber-500/30 shrink-0">
-                        #{clientIdx + 1}
+                        #{client.serialNumber || (clientIdx + 1)}
                       </div>
 
                       <div>
@@ -756,8 +756,8 @@ export const TaskMatrixGrid: React.FC<{
                           {client.legalName} • <span className="font-semibold text-slate-700 dark:text-slate-300">{client.category}</span> • Assigned: <span className="text-amber-700 dark:text-amber-400 font-bold">{client.assignedTeamName || 'General Staff'}</span>
                         </p>
 
-                        {/* 10 Compliances in Up-Down Vertical Columns (5 per column: AUDIT, GST, GSTR-9, GSTR-9C, TDS | ITR, VAT, E-INVOICE, RCM, 86B) */}
-                        <div className="grid grid-rows-5 grid-flow-col gap-0.5 mt-1 w-fit" onClick={(e) => e.stopPropagation()}>
+                        {/* Interactive Compliance Applicability Toggles in a Single Line Left to Right */}
+                        <div className="flex items-center gap-1 mt-1.5 flex-nowrap overflow-x-auto scrollbar-none py-0.5 max-w-full" onClick={(e) => e.stopPropagation()}>
                           {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                             const appMap = resolveClientApplicability(client);
                             const isApp = appMap[item.key];
@@ -777,17 +777,21 @@ export const TaskMatrixGrid: React.FC<{
                                   }
                                 }}
                                 title={item.fullTitle}
-                                className="px-1 py-[2px] rounded bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 hover:border-slate-400 transition-all flex items-center justify-between gap-1 cursor-pointer whitespace-nowrap leading-none"
+                                className={`px-1.5 py-[3px] rounded-md border transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap leading-none shrink-0 shadow-2xs ${
+                                  isApp
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700/80 text-emerald-800 dark:text-emerald-300'
+                                    : 'bg-white dark:bg-slate-800 border-slate-200/90 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400'
+                                }`}
                               >
-                                <span className="font-mono font-bold text-[8px] leading-none uppercase text-slate-800 dark:text-slate-200 whitespace-nowrap">
+                                <span className="font-mono font-bold text-[8.5px] leading-none uppercase whitespace-nowrap">
                                   {item.label}
                                 </span>
                                 <span
-                                  className={`w-4 h-2.5 rounded-full p-[1px] flex items-center shrink-0 transition-colors duration-200 ${
+                                  className={`w-3.5 h-2 rounded-full p-[1px] flex items-center shrink-0 transition-colors duration-200 ${
                                     isApp ? 'bg-emerald-500 justify-end' : 'bg-red-500 justify-start'
                                   }`}
                                 >
-                                  <span className="w-2 h-2 rounded-full bg-white shadow-sm block" />
+                                  <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs block" />
                                 </span>
                               </button>
                             );
