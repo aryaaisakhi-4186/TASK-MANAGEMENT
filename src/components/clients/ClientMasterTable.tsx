@@ -43,21 +43,65 @@ export const ClientMasterTable: React.FC = () => {
   const [modalInitialTab, setModalInitialTab] = useState<'DETAILS' | 'REPOSITORY'>('DETAILS');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  const filteredClients = clients.filter(c => {
+  const filteredClients = clients.filter((c, idx) => {
     if (selectedCategory !== 'ALL' && c.category !== selectedCategory) return false;
-    if (searchTerm) {
-      const q = searchTerm.toLowerCase();
-      return (
-        c.tradeName.toLowerCase().includes(q) ||
-        c.legalName.toLowerCase().includes(q) ||
-        c.pan.toLowerCase().includes(q) ||
-        (c.gstin && c.gstin.toLowerCase().includes(q)) ||
-        (c.tan && c.tan.toLowerCase().includes(q)) ||
-        (c.contactPerson && c.contactPerson.toLowerCase().includes(q)) ||
-        (c.employeeName && c.employeeName.toLowerCase().includes(q))
-      );
+    if (!searchTerm || !searchTerm.trim()) return true;
+
+    const qTrim = searchTerm.trim().toLowerCase();
+
+    // 1. Check Serial Number (#21, 21, sno 21)
+    const cleanQ = qTrim.replace(/^(pan|gst|gstin|tan|vat|sno)[:\s#]*/i, '').trim();
+    const cleanQAlnum = cleanQ.replace(/[^a-z0-9]/gi, '');
+    const sNoStr = String(idx + 1);
+    if (qTrim === sNoStr || qTrim === '#' + sNoStr || cleanQ === sNoStr) return true;
+
+    // 2. Direct PAN / GSTIN / TAN / VAT alphanumeric match (handles spaces, hyphens, prefixes)
+    const cPanAlnum = (c.pan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+    const cGstAlnum = (c.gstin || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+    const cTanAlnum = (c.tan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+    const cVatAlnum = (c.vatNumber || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+
+    if (cleanQAlnum.length >= 3) {
+      if (cPanAlnum.includes(cleanQAlnum)) return true;
+      if (cGstAlnum.includes(cleanQAlnum)) return true;
+      if (cTanAlnum.includes(cleanQAlnum)) return true;
+      if (cVatAlnum.includes(cleanQAlnum)) return true;
     }
-    return true;
+
+    // 3. Normalized combined text for comprehensive search
+    const cleanEncoding = (s?: string) => (s || '')
+      .replace(/\xc3[\u2030\x89]|CAFÃ‰|cafÃ©|café/gi, 'cafe')
+      .replace(/[\u0080-\uFFFF]/g, ' ')
+      .replace(/[^a-zA-Z0-9\s]/g, ' ');
+
+    const unified = [
+      c.tradeName,
+      cleanEncoding(c.tradeName),
+      c.legalName,
+      cleanEncoding(c.legalName),
+      c.pan,
+      c.gstin,
+      c.tan,
+      c.vatNumber,
+      c.contactPerson,
+      c.employeeName,
+      c.phone,
+      c.employeePhone,
+      c.email,
+      c.aadharNumber,
+      c.assignedTeamName
+    ].filter(Boolean).join(' ').toLowerCase();
+
+    // 4. Substring match
+    if (unified.includes(qTrim) || unified.includes(cleanQ)) return true;
+
+    // 5. Multi-token match (all typed words must match somewhere in profile)
+    const tokens = cleanQ.split(/\s+/).filter(t => t.length > 0);
+    if (tokens.length > 1) {
+      return tokens.every(tok => unified.includes(tok));
+    }
+
+    return false;
   });
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

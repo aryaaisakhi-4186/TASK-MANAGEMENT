@@ -694,8 +694,8 @@
     },
     {
       "id": "cli-1792925712018-677",
-      "tradeName": "SEY CYBER CAFÃ & MOBILE SHOP",
-      "legalName": "SEY CYBER CAFÃ & MOBILE SHOP",
+      "tradeName": "SEY CYBER CAFE & MOBILE SHOP",
+      "legalName": "SEY CYBER CAFE & MOBILE SHOP",
       "pan": "ANXPM3059K",
       "category": "PROPRIETOR",
       "status": "ACTIVE",
@@ -4584,7 +4584,7 @@
     {
       "id": "tsk-142-cli-1792925711996-632-TDS",
       "clientId": "cli-1792925711996-632",
-      "clientName": "SEY CYBER CAFÉ & MOBILE SHOP",
+      "clientName": "SEY CYBER CAFE & MOBILE SHOP",
       "title": "Monthly TDS Payment (Challan 281)",
       "category": "TDS",
       "frequency": "MONTHLY",
@@ -4599,7 +4599,7 @@
     {
       "id": "tsk-143-cli-1792925711996-632-GST",
       "clientId": "cli-1792925711996-632",
-      "clientName": "SEY CYBER CAFÉ & MOBILE SHOP",
+      "clientName": "SEY CYBER CAFE & MOBILE SHOP",
       "title": "GSTR-1 Monthly Outward Return",
       "category": "GST",
       "frequency": "MONTHLY",
@@ -4614,7 +4614,7 @@
     {
       "id": "tsk-144-cli-1792925711996-632-GST",
       "clientId": "cli-1792925711996-632",
-      "clientName": "SEY CYBER CAFÉ & MOBILE SHOP",
+      "clientName": "SEY CYBER CAFE & MOBILE SHOP",
       "title": "GSTR-3B Monthly Return & Tax Settlement",
       "category": "GST",
       "frequency": "MONTHLY",
