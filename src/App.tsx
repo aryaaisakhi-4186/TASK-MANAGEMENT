@@ -53,6 +53,7 @@ const MainPortal: React.FC = () => {
     return currentRole === 'GUEST' && !currentUser?.trialInfo?.isDemoSetup;
   });
   const [selectedTask, setSelectedTask] = useState<TaskItem | null | 'NEW'>(null);
+  const [createTaskClientId, setCreateTaskClientId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (currentRole === 'CLIENT') {
@@ -113,7 +114,10 @@ const MainPortal: React.FC = () => {
 
           {activeTab === 'tasks' && (
             <TaskMatrixGrid
-              onOpenCreateTask={() => setSelectedTask('NEW')}
+              onOpenCreateTask={(clientId) => {
+                setCreateTaskClientId(clientId);
+                setSelectedTask('NEW');
+              }}
               onOpenEditTask={(task) => setSelectedTask(task)}
             />
           )}
@@ -179,7 +183,11 @@ const MainPortal: React.FC = () => {
         <TaskModal
           isOpen={true}
           task={selectedTask === 'NEW' ? null : selectedTask}
-          onClose={() => setSelectedTask(null)}
+          initialClientId={selectedTask === 'NEW' ? createTaskClientId : undefined}
+          onClose={() => {
+            setSelectedTask(null);
+            setCreateTaskClientId(undefined);
+          }}
         />
       )}
 

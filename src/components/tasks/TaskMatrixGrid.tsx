@@ -41,7 +41,7 @@ import { FileSpreadsheet } from 'lucide-react';
 import { VoiceSearchBar } from '../common/VoiceSearchBar';
 
 export const TaskMatrixGrid: React.FC<{
-  onOpenCreateTask: () => void;
+  onOpenCreateTask: (clientId?: string) => void;
   onOpenEditTask: (task: TaskItem) => void;
 }> = ({ onOpenCreateTask, onOpenEditTask }) => {
   const { 
@@ -540,7 +540,7 @@ export const TaskMatrixGrid: React.FC<{
 
           {(currentRole !== 'GUEST' || !currentUser?.trialInfo?.isExpired) && (
             <button
-              onClick={onOpenCreateTask}
+              onClick={() => onOpenCreateTask()}
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 transition-all"
             >
               <Plus size={16} /> New Task
@@ -758,44 +758,57 @@ export const TaskMatrixGrid: React.FC<{
                             </span>
                           )}
 
-                          {/* Quick Camera & Timer controls for this Client */}
-                          {group.tasks.length > 0 && (
-                            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-xs ml-1" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                type="button"
-                                onClick={() => setTaskForCamera(group.tasks[0])}
-                                title="Client Camera / Selfie / Document Photo"
-                                className="p-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-emerald-500 hover:text-white text-emerald-600 dark:text-emerald-400 transition-all active:scale-95 shadow-xs"
-                              >
-                                <Camera size={13} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const runningTask = group.tasks.find(t => t.id === activeTimedTask?.id) || group.tasks[0];
-                                  handleToggleTaskTimer(runningTask);
-                                }}
-                                title={group.tasks.some(t => t.id === activeTimedTask?.id) ? 'End Work Session & Enter Remarks' : 'Start Live Timer for this Client'}
-                                className={'px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all active:scale-95 shadow-xs ' + (
-                                  group.tasks.some(t => t.id === activeTimedTask?.id)
-                                    ? 'bg-red-600 text-white animate-pulse'
-                                    : 'bg-white dark:bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-700 dark:text-slate-300'
-                                )}
-                              >
-                                {group.tasks.some(t => t.id === activeTimedTask?.id) ? (
-                                  <>
-                                    <Square size={12} />
-                                    <span className="text-[10px] font-mono">{formatTimer(timerSeconds)}</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Play size={12} className="text-amber-500 fill-amber-500" />
-                                    <span className="text-[10px]">Start</span>
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          )}
+                          {/* Quick Controls: Camera, Timer & + New Task for this Client */}
+                          <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-xs ml-1" onClick={(e) => e.stopPropagation()}>
+                            {group.tasks.length > 0 && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => setTaskForCamera(group.tasks[0])}
+                                  title="Client Camera / Selfie / Document Photo"
+                                  className="p-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-emerald-500 hover:text-white text-emerald-600 dark:text-emerald-400 transition-all active:scale-95 shadow-xs"
+                                >
+                                  <Camera size={13} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const runningTask = group.tasks.find(t => t.id === activeTimedTask?.id) || group.tasks[0];
+                                    handleToggleTaskTimer(runningTask);
+                                  }}
+                                  title={group.tasks.some(t => t.id === activeTimedTask?.id) ? 'End Work Session & Enter Remarks' : 'Start Live Timer for this Client'}
+                                  className={'px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all active:scale-95 shadow-xs ' + (
+                                    group.tasks.some(t => t.id === activeTimedTask?.id)
+                                      ? 'bg-red-600 text-white animate-pulse'
+                                      : 'bg-white dark:bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-700 dark:text-slate-300'
+                                  )}
+                                >
+                                  {group.tasks.some(t => t.id === activeTimedTask?.id) ? (
+                                    <>
+                                      <Square size={12} />
+                                      <span className="text-[10px] font-mono">{formatTimer(timerSeconds)}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Play size={12} className="text-amber-500 fill-amber-500" />
+                                      <span className="text-[10px]">Start</span>
+                                    </>
+                                  )}
+                                </button>
+                              </>
+                            )}
+
+                            {/* + New Task Button for this specific Client */}
+                            <button
+                              type="button"
+                              onClick={() => onOpenCreateTask(client.id)}
+                              title={`Add new task for ${client.tradeName}`}
+                              className="px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-slate-950 transition-all active:scale-95 shadow-xs cursor-pointer"
+                            >
+                              <Plus size={13} className="stroke-[2.5]" />
+                              <span>+ New Task</span>
+                            </button>
+                          </div>
                         </div>
                         <p className="text-[11px] text-slate-500 font-medium">
                           {client.legalName} • <span className="font-semibold text-slate-700 dark:text-slate-300">{client.category}</span> • Assigned: <span className="text-amber-700 dark:text-amber-400 font-bold">{client.assignedTeamName || 'General Staff'}</span>
@@ -1039,8 +1052,38 @@ export const TaskMatrixGrid: React.FC<{
                               </tr>
                             );
                           })}
+                          {group.tasks.length === 0 && (
+                            <tr>
+                              <td colSpan={8} className="p-6 text-center text-slate-400">
+                                <p className="text-xs font-medium mb-2">No compliance tasks added for {client.tradeName} yet.</p>
+                                <button
+                                  type="button"
+                                  onClick={() => onOpenCreateTask(client.id)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+                                >
+                                  <Plus size={14} className="stroke-[2.5]" />
+                                  <span>+ Add First Task</span>
+                                </button>
+                              </td>
+                            </tr>
+                          )}
                         </tbody>
                       </table>
+
+                      {/* Footer bar with quick "+ Add Task" for this client */}
+                      <div className="p-2.5 px-4 bg-slate-50/70 dark:bg-slate-900/50 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between">
+                        <span className="text-[11px] text-slate-500 font-medium">
+                          {group.tasks.length} {group.tasks.length === 1 ? 'task' : 'tasks'} registered for {client.tradeName}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => onOpenCreateTask(client.id)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+                        >
+                          <Plus size={13} className="stroke-[2.5]" />
+                          <span>+ Add Task</span>
+                        </button>
+                      </div>
                     </div>
                   )}
 

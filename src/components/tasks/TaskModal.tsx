@@ -9,10 +9,11 @@ import { useEscapeKey } from '../../hooks/useEscapeKey';
 interface TaskModalProps {
   isOpen: boolean;
   task?: TaskItem | null;
+  initialClientId?: string;
   onClose: () => void;
 }
 
-export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) => {
+export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, initialClientId, onClose }) => {
   const { clients, team, addTask, updateTask, deleteTask } = useTasks();
   const { currentUser } = useAuth();
 
@@ -21,7 +22,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
 
   const isEditing = !!task;
 
-  const [clientId, setClientId] = useState(task?.clientId || clients[0]?.id || '');
+  const [clientId, setClientId] = useState(task?.clientId || initialClientId || clients[0]?.id || '');
   const [title, setTitle] = useState(task?.title || '');
   const [description, setDescription] = useState(task?.description || '');
   const [category, setCategory] = useState<ComplianceCategory>(task?.category || 'GST');
@@ -47,7 +48,9 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
       setPriority(task.priority);
       setFinancialYear(task.financialYear);
     } else {
-      setClientId(clients[0]?.id || '');
+      const defaultClientId = initialClientId || clients[0]?.id || '';
+      const selectedClient = clients.find(c => c.id === defaultClientId);
+      setClientId(defaultClientId);
       setTitle('');
       setDescription('');
       setCategory('GST');
@@ -56,12 +59,12 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
       setDueDate(today);
       const dayNum = parseInt(today.split('-')[2] || '20', 10);
       setDueDayOrDate(Math.max(1, dayNum - 5).toString());
-      setAssignedTeamId(team[0]?.id || '');
+      setAssignedTeamId(selectedClient?.assignedTeamId || team[0]?.id || '');
       setStatus('PENDING');
       setPriority('HIGH');
       setFinancialYear('2026-2027');
     }
-  }, [task, clients, team]);
+  }, [task, initialClientId, clients, team]);
 
   if (!isOpen) return null;
 
