@@ -16,12 +16,39 @@ import {
   Trash2, 
   FileText,
   FileSpreadsheet,
-  FolderKanban
+  FolderKanban,
+  X,
+  RotateCcw,
+  Filter
 } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { ClientFormModal } from './ClientFormModal';
 import { ClientImportModal } from './ClientImportModal';
 import { VoiceSearchBar } from '../common/VoiceSearchBar';
+
+interface ColumnFilters {
+  sNo: string;
+  name: string;
+  statutory: string;
+  compliance: string;
+  statusCategory: string;
+  contact: string;
+  employee: string;
+  aadharDob: string;
+  assignedStaff: string;
+}
+
+const INITIAL_COLUMN_FILTERS: ColumnFilters = {
+  sNo: '',
+  name: '',
+  statutory: '',
+  compliance: '',
+  statusCategory: '',
+  contact: '',
+  employee: '',
+  aadharDob: '',
+  assignedStaff: '',
+};
 
 export const ClientMasterTable: React.FC = () => {
   const { clients, tasks, addClient, updateClient, deleteClient, settings } = useTasks();
@@ -42,6 +69,19 @@ export const ClientMasterTable: React.FC = () => {
   const [selectedClientForEdit, setSelectedClientForEdit] = useState<Client | null | 'NEW'>(null);
   const [modalInitialTab, setModalInitialTab] = useState<'DETAILS' | 'REPOSITORY'>('DETAILS');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [colFilters, setColFilters] = useState<ColumnFilters>(INITIAL_COLUMN_FILTERS);
+
+  const handleColFilterChange = (key: keyof ColumnFilters, value: string) => {
+    setColFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const hasActiveColFilters = useMemo(() => {
+    return Object.values(colFilters).some(v => v.trim() !== '');
+  }, [colFilters]);
+
+  const clearAllColFilters = () => {
+    setColFilters(INITIAL_COLUMN_FILTERS);
+  };
 
   const clientWithStableSNo = useMemo(() => {
     return clients.map((c, masterIdx) => ({
@@ -52,66 +92,139 @@ export const ClientMasterTable: React.FC = () => {
 
   const filteredClients = useMemo(() => {
     return clientWithStableSNo.filter((c) => {
+      // 1. Category Filter
       if (selectedCategory !== 'ALL' && c.category !== selectedCategory) return false;
-      if (!searchTerm || !searchTerm.trim()) return true;
 
-      const qTrim = searchTerm.trim().toLowerCase();
+      // 2. Global Search Term (Voice / Text)
+      if (searchTerm && searchTerm.trim()) {
+        const qTrim = searchTerm.trim().toLowerCase();
+        const cleanQ = qTrim.replace(/^(pan|gst|gstin|tan|vat|sno)[:\s#]*/i, '').trim();
+        const cleanQAlnum = cleanQ.replace(/[^a-z0-9]/gi, '');
+        const sNoStr = String(c.displaySNo);
+        let globalMatched = false;
 
-      // 1. Check Serial Number (#21, 21, sno 21)
-      const cleanQ = qTrim.replace(/^(pan|gst|gstin|tan|vat|sno)[:\s#]*/i, '').trim();
-      const cleanQAlnum = cleanQ.replace(/[^a-z0-9]/gi, '');
-      const sNoStr = String(c.displaySNo);
-      if (qTrim === sNoStr || qTrim === '#' + sNoStr || cleanQ === sNoStr) return true;
+        if (qTrim === sNoStr || qTrim === '#' + sNoStr || cleanQ === sNoStr) {
+          globalMatched = true;
+        }
 
-      // 2. Direct PAN / GSTIN / TAN / VAT alphanumeric match (handles spaces, hyphens, prefixes)
-      const cPanAlnum = (c.pan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
-      const cGstAlnum = (c.gstin || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
-      const cTanAlnum = (c.tan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
-      const cVatAlnum = (c.vatNumber || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+        if (!globalMatched && cleanQAlnum.length >= 3) {
+          const cPanAlnum = (c.pan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+          const cGstAlnum = (c.gstin || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+          const cTanAlnum = (c.tan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+          const cVatAlnum = (c.vatNumber || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+          if (cPanAlnum.includes(cleanQAlnum) || cGstAlnum.includes(cleanQAlnum) || cTanAlnum.includes(cleanQAlnum) || cVatAlnum.includes(cleanQAlnum)) {
+            globalMatched = true;
+          }
+        }
 
-      if (cleanQAlnum.length >= 3) {
-        if (cPanAlnum.includes(cleanQAlnum)) return true;
-        if (cGstAlnum.includes(cleanQAlnum)) return true;
-        if (cTanAlnum.includes(cleanQAlnum)) return true;
-        if (cVatAlnum.includes(cleanQAlnum)) return true;
+        if (!globalMatched) {
+          const cleanEncoding = (s?: string) => (s || '')
+            .replace(/\xc3[\u2030\x89]|CAFÃ‰|cafÃ©|café/gi, 'cafe')
+            .replace(/[\u0080-\uFFFF]/g, ' ')
+            .replace(/[^a-zA-Z0-9\s]/g, ' ');
+
+          const unified = [
+            c.tradeName,
+            cleanEncoding(c.tradeName),
+            c.legalName,
+            cleanEncoding(c.legalName),
+            c.pan,
+            c.gstin,
+            c.tan,
+            c.vatNumber,
+            c.contactPerson,
+            c.employeeName,
+            c.phone,
+            c.employeePhone,
+            c.email,
+            c.aadharNumber,
+            c.assignedTeamName
+          ].filter(Boolean).join(' ').toLowerCase();
+
+          if (unified.includes(qTrim) || unified.includes(cleanQ)) {
+            globalMatched = true;
+          } else {
+            const tokens = cleanQ.split(/\s+/).filter(t => t.length > 0);
+            if (tokens.length > 1 && tokens.every(tok => unified.includes(tok))) {
+              globalMatched = true;
+            }
+          }
+        }
+
+        if (!globalMatched) return false;
       }
 
-      // 3. Normalized combined text for comprehensive search
-      const cleanEncoding = (s?: string) => (s || '')
-        .replace(/\xc3[\u2030\x89]|CAFÃ‰|cafÃ©|café/gi, 'cafe')
-        .replace(/[\u0080-\uFFFF]/g, ' ')
-        .replace(/[^a-zA-Z0-9\s]/g, ' ');
-
-      const unified = [
-        c.tradeName,
-        cleanEncoding(c.tradeName),
-        c.legalName,
-        cleanEncoding(c.legalName),
-        c.pan,
-        c.gstin,
-        c.tan,
-        c.vatNumber,
-        c.contactPerson,
-        c.employeeName,
-        c.phone,
-        c.employeePhone,
-        c.email,
-        c.aadharNumber,
-        c.assignedTeamName
-      ].filter(Boolean).join(' ').toLowerCase();
-
-      // 4. Substring match
-      if (unified.includes(qTrim) || unified.includes(cleanQ)) return true;
-
-      // 5. Multi-token match (all typed words must match somewhere in profile)
-      const tokens = cleanQ.split(/\s+/).filter(t => t.length > 0);
-      if (tokens.length > 1) {
-        return tokens.every(tok => unified.includes(tok));
+      // 3. Per-Column Filter Checks
+      if (colFilters.sNo.trim()) {
+        const qSno = colFilters.sNo.trim().replace(/^#/i, '').toLowerCase();
+        const curSno = String(c.displaySNo).toLowerCase();
+        if (!curSno.includes(qSno) && curSno !== qSno) return false;
       }
 
-      return false;
+      if (colFilters.name.trim()) {
+        const q = colFilters.name.trim().toLowerCase();
+        const trade = (c.tradeName || '').toLowerCase();
+        const legal = (c.legalName || '').toLowerCase();
+        if (!trade.includes(q) && !legal.includes(q)) return false;
+      }
+
+      if (colFilters.statutory.trim()) {
+        const q = colFilters.statutory.trim().toLowerCase().replace(/[^a-z0-9]/gi, '');
+        const pan = (c.pan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+        const gst = (c.gstin || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+        const tan = (c.tan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+        const vat = (c.vatNumber || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+        if (!pan.includes(q) && !gst.includes(q) && !tan.includes(q) && !vat.includes(q)) return false;
+      }
+
+      if (colFilters.compliance.trim()) {
+        const q = colFilters.compliance.trim().toUpperCase();
+        const app = resolveClientApplicability(c);
+        const matchesApp = Object.entries(app).some(([k, isApplicable]) => {
+          return isApplicable && k.toUpperCase().includes(q);
+        });
+        if (!matchesApp) return false;
+      }
+
+      if (colFilters.statusCategory.trim()) {
+        const q = colFilters.statusCategory.trim().toLowerCase();
+        const cat = (c.category || '').toLowerCase();
+        const stat = (c.status || '').toLowerCase();
+        if (!cat.includes(q) && !stat.includes(q)) return false;
+      }
+
+      if (colFilters.contact.trim()) {
+        const q = colFilters.contact.trim().toLowerCase();
+        const cp = (c.contactPerson || '').toLowerCase();
+        const ph = (c.phone || '').toLowerCase();
+        const em = (c.email || '').toLowerCase();
+        if (!cp.includes(q) && !ph.includes(q) && !em.includes(q)) return false;
+      }
+
+      if (colFilters.employee.trim()) {
+        const q = colFilters.employee.trim().toLowerCase();
+        const en = (c.employeeName || '').toLowerCase();
+        const ep = (c.employeePhone || '').toLowerCase();
+        if (!en.includes(q) && !ep.includes(q)) return false;
+      }
+
+      if (colFilters.aadharDob.trim()) {
+        const q = colFilters.aadharDob.trim().toLowerCase();
+        const ad = (c.aadharNumber || '').toLowerCase();
+        const dob = (c.dob || '').toLowerCase();
+        const fd = (c.formationDate || '').toLowerCase();
+        if (!ad.includes(q) && !dob.includes(q) && !fd.includes(q)) return false;
+      }
+
+      if (colFilters.assignedStaff.trim()) {
+        const q = colFilters.assignedStaff.trim().toLowerCase();
+        const staff = (c.assignedTeamName || '').toLowerCase();
+        if (!staff.includes(q)) return false;
+      }
+
+      return true;
     });
-  }, [clientWithStableSNo, selectedCategory, searchTerm]);
+  }, [clientWithStableSNo, selectedCategory, searchTerm, colFilters]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -212,7 +325,21 @@ export const ClientMasterTable: React.FC = () => {
             className="w-full md:w-96"
           />
 
-          <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+              Showing: <span className="text-amber-600 dark:text-amber-400 font-mono">{filteredClients.length}</span> / {clients.length}
+            </span>
+
+            {hasActiveColFilters && (
+              <button
+                onClick={clearAllColFilters}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500 text-red-700 dark:text-red-300 hover:text-white border border-red-500/30 font-bold text-xs shadow-xs transition-all"
+                title="Reset all column search filters"
+              >
+                <RotateCcw size={12} /> Clear Filters
+              </button>
+            )}
+
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -230,41 +357,252 @@ export const ClientMasterTable: React.FC = () => {
         </div>
       </GlassCard>
 
-      {/* Master Table with Single Combined Statutory ID Column (Sticky Frozen Header) */}
+      {/* Master Table with Column-wise Search Boxes (Sticky Frozen Header) */}
       <GlassCard className="overflow-hidden" variant="elevated">
         <div className="overflow-x-auto max-h-[calc(100vh-230px)] overflow-y-auto relative scrollbar-thin">
           <table className="w-full text-left text-xs border-collapse">
             <thead className="sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800">
+              {/* Row 1: Column Headings */}
               <tr className="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider text-[10px] leading-tight">
-                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm text-center w-12 min-w-[48px]">
+                <th className="px-2.5 py-2 text-center w-14 min-w-[56px]">
                   #<br /><span className="text-[9px] text-slate-500 font-normal">S.No.</span>
                 </th>
-                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[130px]">
+                <th className="px-2.5 py-2 min-w-[140px]">
                   Client &<br /><span className="text-[9px] text-slate-500 font-normal">Legal Name</span>
                 </th>
-                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[140px]">
+                <th className="px-2.5 py-2 min-w-[145px]">
                   Statutory IDs<br /><span className="text-[9px] text-slate-500 font-normal">(PAN / GST / TAN / VAT)</span>
                 </th>
-                <th className="px-2 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm text-center min-w-[110px]">
+                <th className="px-2 py-2 text-center min-w-[115px]">
                   Compliances<br /><span className="text-[9px] text-slate-500 font-normal">Applicability</span>
                 </th>
-                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[105px]">
+                <th className="px-2.5 py-2 min-w-[115px]">
                   Entity Status<br /><span className="text-[9px] text-slate-500 font-normal">& Constitution</span>
                 </th>
-                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[115px]">
+                <th className="px-2.5 py-2 min-w-[125px]">
                   Contact Person<br /><span className="text-[9px] text-slate-500 font-normal">& Phone / Email</span>
                 </th>
-                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[115px]">
+                <th className="px-2.5 py-2 min-w-[120px]">
                   Client Employee<br /><span className="text-[9px] text-slate-500 font-normal">(Sub-Login)</span>
                 </th>
-                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[125px]">
+                <th className="px-2.5 py-2 min-w-[125px]">
                   Aadhar, DOB &<br /><span className="text-[9px] text-slate-500 font-normal">Formation Date</span>
                 </th>
-                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm min-w-[100px]">
+                <th className="px-2.5 py-2 min-w-[110px]">
                   Assigned Staff<br /><span className="text-[9px] text-slate-500 font-normal">CA Office Team</span>
                 </th>
-                <th className="px-2.5 py-2 sticky top-0 z-20 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm text-right min-w-[100px]">
+                <th className="px-2.5 py-2 text-right min-w-[105px]">
                   Actions<br /><span className="text-[9px] text-slate-500 font-normal">(Repo / Edit)</span>
+                </th>
+              </tr>
+
+              {/* Row 2: Per-Column Search Input Boxes */}
+              <tr className="bg-slate-50/95 dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800">
+                {/* 1. S.No. Search */}
+                <th className="p-1 text-center">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={colFilters.sNo}
+                      onChange={(e) => handleColFilterChange('sNo', e.target.value)}
+                      placeholder="# S.No"
+                      className="w-full text-center px-1 py-1 text-[11px] font-mono bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
+                    />
+                    {colFilters.sNo && (
+                      <button
+                        onClick={() => handleColFilterChange('sNo', '')}
+                        className="absolute right-1 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X size={10} />
+                      </button>
+                    )}
+                  </div>
+                </th>
+
+                {/* 2. Client & Legal Name Search */}
+                <th className="p-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={colFilters.name}
+                      onChange={(e) => handleColFilterChange('name', e.target.value)}
+                      placeholder="🔍 Name..."
+                      className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
+                    />
+                    {colFilters.name && (
+                      <button
+                        onClick={() => handleColFilterChange('name', '')}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X size={10} />
+                      </button>
+                    )}
+                  </div>
+                </th>
+
+                {/* 3. Statutory IDs Search */}
+                <th className="p-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={colFilters.statutory}
+                      onChange={(e) => handleColFilterChange('statutory', e.target.value)}
+                      placeholder="🔍 PAN / GST..."
+                      className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
+                    />
+                    {colFilters.statutory && (
+                      <button
+                        onClick={() => handleColFilterChange('statutory', '')}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X size={10} />
+                      </button>
+                    )}
+                  </div>
+                </th>
+
+                {/* 4. Compliances Applicability Search */}
+                <th className="p-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={colFilters.compliance}
+                      onChange={(e) => handleColFilterChange('compliance', e.target.value)}
+                      placeholder="🔍 GST/TDS/VAT"
+                      className="w-full px-1.5 py-1 text-[11px] font-normal text-center bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
+                    />
+                    {colFilters.compliance && (
+                      <button
+                        onClick={() => handleColFilterChange('compliance', '')}
+                        className="absolute right-1 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X size={10} />
+                      </button>
+                    )}
+                  </div>
+                </th>
+
+                {/* 5. Entity Status & Constitution Search */}
+                <th className="p-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={colFilters.statusCategory}
+                      onChange={(e) => handleColFilterChange('statusCategory', e.target.value)}
+                      placeholder="🔍 Status/Type..."
+                      className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
+                    />
+                    {colFilters.statusCategory && (
+                      <button
+                        onClick={() => handleColFilterChange('statusCategory', '')}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X size={10} />
+                      </button>
+                    )}
+                  </div>
+                </th>
+
+                {/* 6. Contact Person & Phone / Email Search */}
+                <th className="p-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={colFilters.contact}
+                      onChange={(e) => handleColFilterChange('contact', e.target.value)}
+                      placeholder="🔍 Person/Phone..."
+                      className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
+                    />
+                    {colFilters.contact && (
+                      <button
+                        onClick={() => handleColFilterChange('contact', '')}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X size={10} />
+                      </button>
+                    )}
+                  </div>
+                </th>
+
+                {/* 7. Client Employee Search */}
+                <th className="p-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={colFilters.employee}
+                      onChange={(e) => handleColFilterChange('employee', e.target.value)}
+                      placeholder="🔍 Employee..."
+                      className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
+                    />
+                    {colFilters.employee && (
+                      <button
+                        onClick={() => handleColFilterChange('employee', '')}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X size={10} />
+                      </button>
+                    )}
+                  </div>
+                </th>
+
+                {/* 8. Aadhar, DOB & Formation Date Search */}
+                <th className="p-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={colFilters.aadharDob}
+                      onChange={(e) => handleColFilterChange('aadharDob', e.target.value)}
+                      placeholder="🔍 Aadhar/DOB..."
+                      className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
+                    />
+                    {colFilters.aadharDob && (
+                      <button
+                        onClick={() => handleColFilterChange('aadharDob', '')}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X size={10} />
+                      </button>
+                    )}
+                  </div>
+                </th>
+
+                {/* 9. Assigned Staff Search */}
+                <th className="p-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={colFilters.assignedStaff}
+                      onChange={(e) => handleColFilterChange('assignedStaff', e.target.value)}
+                      placeholder="🔍 Staff..."
+                      className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
+                    />
+                    {colFilters.assignedStaff && (
+                      <button
+                        onClick={() => handleColFilterChange('assignedStaff', '')}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X size={10} />
+                      </button>
+                    )}
+                  </div>
+                </th>
+
+                {/* 10. Actions / Reset All Column Filters */}
+                <th className="p-1 text-right">
+                  {hasActiveColFilters ? (
+                    <button
+                      onClick={clearAllColFilters}
+                      title="Clear all column searches"
+                      className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 rounded border border-red-200 dark:border-red-800/80 transition-all shadow-xs"
+                    >
+                      <RotateCcw size={10} />
+                      <span>Reset</span>
+                    </button>
+                  ) : (
+                    <div className="text-[9px] text-slate-400 text-center font-normal italic">
+                      Filters
+                    </div>
+                  )}
                 </th>
               </tr>
             </thead>
