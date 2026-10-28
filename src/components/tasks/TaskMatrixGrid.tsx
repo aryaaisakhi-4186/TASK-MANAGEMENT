@@ -757,6 +757,45 @@ export const TaskMatrixGrid: React.FC<{
                               GST: {client.gstin}
                             </span>
                           )}
+
+                          {/* Quick Camera & Timer controls for this Client */}
+                          {group.tasks.length > 0 && (
+                            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-xs ml-1" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                type="button"
+                                onClick={() => setTaskForCamera(group.tasks[0])}
+                                title="Client Camera / Selfie / Document Photo"
+                                className="p-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-emerald-500 hover:text-white text-emerald-600 dark:text-emerald-400 transition-all active:scale-95 shadow-xs"
+                              >
+                                <Camera size={13} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const runningTask = group.tasks.find(t => t.id === activeTimedTask?.id) || group.tasks[0];
+                                  handleToggleTaskTimer(runningTask);
+                                }}
+                                title={group.tasks.some(t => t.id === activeTimedTask?.id) ? 'End Work Session & Enter Remarks' : 'Start Live Timer for this Client'}
+                                className={'px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all active:scale-95 shadow-xs ' + (
+                                  group.tasks.some(t => t.id === activeTimedTask?.id)
+                                    ? 'bg-red-600 text-white animate-pulse'
+                                    : 'bg-white dark:bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-700 dark:text-slate-300'
+                                )}
+                              >
+                                {group.tasks.some(t => t.id === activeTimedTask?.id) ? (
+                                  <>
+                                    <Square size={12} />
+                                    <span className="text-[10px] font-mono">{formatTimer(timerSeconds)}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Play size={12} className="text-amber-500 fill-amber-500" />
+                                    <span className="text-[10px]">Start</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          )}
                         </div>
                         <p className="text-[11px] text-slate-500 font-medium">
                           {client.legalName} • <span className="font-semibold text-slate-700 dark:text-slate-300">{client.category}</span> • Assigned: <span className="text-amber-700 dark:text-amber-400 font-bold">{client.assignedTeamName || 'General Staff'}</span>
@@ -838,7 +877,6 @@ export const TaskMatrixGrid: React.FC<{
                             <th className="p-3">Category</th>
                             <th className="p-3">Frequency & Due Date</th>
                             <th className="p-3">Assigned Staff</th>
-                            <th className="p-3 text-center">Quick Camera & Timer</th>
                             <th className="p-3 text-center">Status</th>
                             <th className="p-3 text-right">Actions</th>
                           </tr>
@@ -956,43 +994,6 @@ export const TaskMatrixGrid: React.FC<{
                                   {task.assignedTeamName}
                                 </td>
 
-                                {/* Quick Camera & Live Timer Controls */}
-                                <td className="p-3 text-center">
-                                  <div className="inline-flex items-center gap-1.5 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm">
-                                    <button
-                                      type="button"
-                                      onClick={() => setTaskForCamera(task)}
-                                      title="Open Camera / Mobile Selfie for this Client Task"
-                                      className="p-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-emerald-500 hover:text-white text-emerald-600 dark:text-emerald-400 transition-all active:scale-95 shadow-sm"
-                                    >
-                                      <Camera size={13} />
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={() => handleToggleTaskTimer(task)}
-                                      title={isThisTaskTimed ? 'End Work Session & Enter Remarks' : 'Start Live Timer for this Task'}
-                                      className={'px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all active:scale-95 shadow-sm ' + (
-                                        isThisTaskTimed
-                                          ? 'bg-red-600 text-white animate-pulse'
-                                          : 'bg-white dark:bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-700 dark:text-slate-300'
-                                      )}
-                                    >
-                                      {isThisTaskTimed ? (
-                                        <>
-                                          <Square size={12} />
-                                          <span className="text-[10px] font-mono">{formatTimer(timerSeconds)}</span>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Play size={12} className="text-amber-500 fill-amber-500" />
-                                          <span className="text-[10px]">Start</span>
-                                        </>
-                                      )}
-                                    </button>
-                                  </div>
-                                </td>
-
                                 {/* Status Cycle Button */}
                                 <td className="p-3 text-center">
                                   <button
@@ -1028,9 +1029,9 @@ export const TaskMatrixGrid: React.FC<{
                                         setDeleteError('');
                                       }}
                                       title="Task delete karein (Remark anivarya hai)"
-                                      className="p-1.5 px-2 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-600 dark:text-red-400 hover:text-white font-bold text-[11px] border border-red-500/30 shadow-xs inline-flex items-center gap-1 transition-all active:scale-95"
+                                      className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-600 dark:text-red-400 hover:text-white border border-red-500/30 shadow-xs inline-flex items-center justify-center transition-all active:scale-95"
                                     >
-                                      <Trash2 size={12} /> Delete
+                                      <Trash2 size={13} />
                                     </button>
                                   </div>
                                 </td>
@@ -1277,9 +1278,9 @@ export const TaskMatrixGrid: React.FC<{
                               setDeleteError('');
                             }}
                             title="Task delete karein (Remark anivarya hai)"
-                            className="p-1.5 px-2 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-600 dark:text-red-400 hover:text-white font-bold text-[11px] border border-red-500/30 shadow-xs inline-flex items-center gap-1 transition-all active:scale-95"
+                            className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-600 dark:text-red-400 hover:text-white border border-red-500/30 shadow-xs inline-flex items-center justify-center transition-all active:scale-95"
                           >
-                            <Trash2 size={12} /> Delete
+                            <Trash2 size={13} />
                           </button>
                         </div>
                       </td>
