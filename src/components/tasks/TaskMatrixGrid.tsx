@@ -25,7 +25,9 @@ import {
   ChevronUp,
   LayoutGrid,
   ListFilter,
-  CheckCheck
+  CheckCheck,
+  Trash2,
+  X
 } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { RecurringCompliance, TaskTabType } from './RecurringCompliance';
@@ -48,6 +50,7 @@ export const TaskMatrixGrid: React.FC<{
     updateClient,
     addTask, 
     updateTaskStatus, 
+    deleteTask,
     bulkUpdateTasks, 
     cleanDuplicateTasks,
     settings, 
@@ -110,6 +113,9 @@ export const TaskMatrixGrid: React.FC<{
   const [taskForRemarks, setTaskForRemarks] = useState<{ task: TaskItem; seconds: number; sessionId?: string } | null>(null);
   const [clientForReminder, setClientForReminder] = useState<Client | null>(null);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<TaskItem | null>(null);
+  const [deleteRemark, setDeleteRemark] = useState('');
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     let interval: any = null;
@@ -998,22 +1004,33 @@ export const TaskMatrixGrid: React.FC<{
                                   </button>
                                 </td>
 
-                                {/* Edit Button */}
+                                {/* Actions: Copy, Edit, Delete */}
                                 <td className="p-3 text-right">
                                   <div className="flex items-center justify-end gap-1.5">
                                     <button
                                       onClick={() => handleDuplicateTask(task)}
                                       title="Copy / Duplicate this task"
-                                      className="p-1.5 px-2.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-700 dark:text-blue-300 hover:text-white font-bold text-[11px] border border-blue-500/30 shadow-sm inline-flex items-center gap-1 transition-all active:scale-95"
+                                      className="p-1.5 px-2 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-700 dark:text-blue-300 hover:text-white font-bold text-[11px] border border-blue-500/30 shadow-xs inline-flex items-center gap-1 transition-all active:scale-95"
                                     >
                                       <Copy size={12} /> Copy
                                     </button>
                                     <button
                                       onClick={() => onOpenEditTask(task)}
                                       title="Edit task title, due date & assigned staff"
-                                      className="p-1.5 px-2.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-900 dark:text-amber-300 hover:text-slate-950 font-bold text-[11px] border border-amber-500/30 shadow-sm inline-flex items-center gap-1 transition-all active:scale-95"
+                                      className="p-1.5 px-2 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-900 dark:text-amber-300 hover:text-slate-950 font-bold text-[11px] border border-amber-500/30 shadow-xs inline-flex items-center gap-1 transition-all active:scale-95"
                                     >
                                       <Edit3 size={12} /> Edit
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setTaskToDelete(task);
+                                        setDeleteRemark('');
+                                        setDeleteError('');
+                                      }}
+                                      title="Task delete karein (Remark anivarya hai)"
+                                      className="p-1.5 px-2 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-600 dark:text-red-400 hover:text-white font-bold text-[11px] border border-red-500/30 shadow-xs inline-flex items-center gap-1 transition-all active:scale-95"
+                                    >
+                                      <Trash2 size={12} /> Delete
                                     </button>
                                   </div>
                                 </td>
@@ -1236,22 +1253,33 @@ export const TaskMatrixGrid: React.FC<{
                         </button>
                       </td>
 
-                      {/* Edit Action */}
+                      {/* Actions: Copy, Edit, Delete */}
                       <td className="p-3.5 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => handleDuplicateTask(task)}
                             title="Copy / Duplicate this task"
-                            className="p-1.5 px-2.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-700 dark:text-blue-300 hover:text-white font-bold text-[11px] border border-blue-500/30 shadow-sm inline-flex items-center gap-1 transition-all active:scale-95"
+                            className="p-1.5 px-2 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-700 dark:text-blue-300 hover:text-white font-bold text-[11px] border border-blue-500/30 shadow-xs inline-flex items-center gap-1 transition-all active:scale-95"
                           >
                             <Copy size={12} /> Copy
                           </button>
                           <button
                             onClick={() => onOpenEditTask(task)}
                             title="Edit task title, due date & assigned staff"
-                            className="p-1.5 px-2.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-900 dark:text-amber-300 hover:text-slate-950 font-bold text-[11px] border border-amber-500/30 shadow-sm inline-flex items-center gap-1 transition-all active:scale-95"
+                            className="p-1.5 px-2 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-900 dark:text-amber-300 hover:text-slate-950 font-bold text-[11px] border border-amber-500/30 shadow-xs inline-flex items-center gap-1 transition-all active:scale-95"
                           >
                             <Edit3 size={12} /> Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              setTaskToDelete(task);
+                              setDeleteRemark('');
+                              setDeleteError('');
+                            }}
+                            title="Task delete karein (Remark anivarya hai)"
+                            className="p-1.5 px-2 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-600 dark:text-red-400 hover:text-white font-bold text-[11px] border border-red-500/30 shadow-xs inline-flex items-center gap-1 transition-all active:scale-95"
+                          >
+                            <Trash2 size={12} /> Delete
                           </button>
                         </div>
                       </td>
@@ -1294,6 +1322,102 @@ export const TaskMatrixGrid: React.FC<{
           onClose={() => setTaskForCamera(null)}
           onCapture={handleTaskSelfieCaptured}
         />
+      )}
+
+      {/* Delete Task with Mandatory Remark Modal */}
+      {taskToDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150"
+          onClick={() => setTaskToDelete(null)}
+        >
+          <div
+            className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-red-500/40 rounded-2xl p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/30">
+                  <Trash2 size={18} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">
+                    Delete Compliance Task
+                  </h3>
+                  <p className="text-[10px] text-slate-500">
+                    Remark likhna anivarya hai (History Log me save hoga)
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setTaskToDelete(null)}
+                className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-1">
+              <div className="font-bold text-slate-900 dark:text-white text-xs">
+                {taskToDelete.title}
+              </div>
+              <div className="text-[11px] text-slate-500">
+                Client: <span className="font-semibold text-slate-700 dark:text-slate-300">{taskToDelete.clientName}</span> • Due: <span className="font-mono text-amber-600 dark:text-amber-400 font-bold">{taskToDelete.dueDate}</span>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Deletion Remark / Reason <span className="text-red-500 font-bold">* (Compulsory)</span>
+              </label>
+              <textarea
+                rows={3}
+                value={deleteRemark}
+                onChange={(e) => {
+                  setDeleteRemark(e.target.value);
+                  if (e.target.value.trim()) setDeleteError('');
+                }}
+                placeholder="Kripya task delete karne ka karan / remark likhein (e.g. Work no longer applicable, Client opted out, Duplicate entry)..."
+                className="w-full p-2.5 text-xs bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl focus:border-red-500 focus:ring-1 focus:ring-red-500/30 focus:outline-none text-slate-800 dark:text-slate-200 shadow-inner resize-none"
+                autoFocus
+              />
+              {deleteError && (
+                <p className="text-[11px] font-semibold text-red-600 dark:text-red-400 flex items-center gap-1">
+                  <AlertCircle size={12} /> {deleteError}
+                </p>
+              )}
+              <p className="text-[10px] text-slate-400 italic">
+                ℹ️ Ye remark audit trail / history log me permanently store hoga. Bina remark likhe task delete nahi hoga.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setTaskToDelete(null)}
+                className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!deleteRemark.trim()) {
+                    setDeleteError('Kripya task delete karne ka remark / karan likhein. Bina remark likhe task delete nahi ho sakta.');
+                    return;
+                  }
+                  deleteTask(taskToDelete.id, deleteRemark.trim());
+                  setTaskToDelete(null);
+                  setDeleteRemark('');
+                  setActionNotice(`🗑️ Task "${taskToDelete.title}" delete kar diya gaya aur remark history log me save ho gaya.`);
+                  setTimeout(() => setActionNotice(null), 4000);
+                }}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-600/20 transition-all inline-flex items-center gap-1.5"
+              >
+                <Trash2 size={13} /> Confirm Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>

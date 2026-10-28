@@ -98,10 +98,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({ isOpen, task, onClose }) =
   };
 
   const handleDelete = () => {
-    if (task && window.confirm('Are you sure you want to delete this compliance task?')) {
-      deleteTask(task.id);
-      onClose();
+    if (!task) return;
+    const remark = window.prompt(`Task "${task.title}" delete karne ke liye Remark likhna anivarya hai.\n\nKripya deletion remark / karan likhein:`);
+    if (!remark || !remark.trim()) {
+      alert('Task delete nahi kiya gaya. Bina remark likhe task delete nahi ho sakta.');
+      return;
     }
+    deleteTask(task.id, remark.trim());
+    onClose();
   };
 
   return (

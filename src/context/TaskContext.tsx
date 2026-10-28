@@ -31,7 +31,7 @@ interface TaskContextType {
   addTask: (task: Omit<TaskItem, 'id'>) => TaskItem;
   updateTaskStatus: (taskId: string, status: TaskStatus, completedBy?: string) => void;
   updateTask: (id: string, updates: Partial<TaskItem>) => void;
-  deleteTask: (id: string) => void;
+  deleteTask: (id: string, reason?: string) => void;
   bulkUpdateTasks: (taskIds: string[], status: TaskStatus) => void;
   cleanDuplicateTasks: () => number;
 
@@ -1276,12 +1276,38 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   };
 
-  const deleteTask = (id: string) => {
+  const deleteTask = (id: string, reason?: string) => {
     if (!checkGuestWriteAllowed()) return;
-    setTasks(prev => prev.filter(t => t.id !== id));
+    const taskToDelete = tasks.find(t => t.id === id);
+    const updatedTasks = tasks.filter(t => t.id !== id);
+    setTasks(updatedTasks);
+    StorageService.saveTasks(updatedTasks);
+
     if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
       FirebaseService.deleteDoc('tasks', id);
     }
+
+    OnlineDataService.scheduleAutoOnlineSync({
+      clients: StorageService.getClients(),
+      tasks: updatedTasks,
+      team: StorageService.getTeam(),
+      extraWork: StorageService.getExtraWork(),
+      documents: StorageService.getDocuments(),
+      attendanceRecords: StorageService.getAttendance(),
+      settings: StorageService.getSettings(),
+      guestLeads: StorageService.getGuestLeads()
+    });
+
+    const remarkText = reason?.trim() || 'No remark provided';
+    StorageService.addAuditLog({
+      actorId: currentUser?.id || 'admin',
+      actorName: currentUser?.name || 'Admin',
+      role: (currentUser?.role as any) || 'ADMIN',
+      action: 'DELETE_TASK',
+      category: 'TASK',
+      details: `Deleted task "${taskToDelete?.title || id}" for client "${taskToDelete?.clientName || 'N/A'}" (Due: ${taskToDelete?.dueDate || 'N/A'}). Remark: ${remarkText}`
+    });
+    setAuditLogs(StorageService.getAuditLogs());
   };
 
   const bulkUpdateTasks = (taskIds: string[], status: TaskStatus) => {
