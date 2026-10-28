@@ -551,15 +551,19 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return merged;
     }
 
+    const currentClients = StorageService.getClients();
+    const maxExistingSNo = currentClients.reduce((max, c) => Math.max(max, c.serialNumber || 0), currentClients.length);
+
     const newClient: Client = {
       ...clientData,
       id: 'cli-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      serialNumber: maxExistingSNo + 1,
       createdAt: new Date().toISOString().split('T')[0],
       status: clientData.status || 'ACTIVE',
       category: resolvedCategory,
       portalPassword: clientData.portalPassword || 'client123'
     };
-    const updated = [newClient, ...clients];
+    const updated = [...clients, newClient];
     setClients(updated);
     
     // Auto generate standard recurring tasks for new client ONLY if not already existing
@@ -822,8 +826,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           : (normGst && normGst.length === 15 ? normGst.substring(2, 12) : 'PAN-PENDING');
         const resolvedVat = (row.vatNumber && row.vatNumber.trim().length >= 4) ? row.vatNumber.trim() : undefined;
 
+        const nextSNo = updatedClientList.reduce((max, c) => Math.max(max, c.serialNumber || 0), updatedClientList.length) + 1;
         const newClient: Client = {
           id: clientId,
+          serialNumber: nextSNo,
           createdAt: nowIso,
           tradeName: row.tradeName,
           legalName: row.legalName || row.tradeName,

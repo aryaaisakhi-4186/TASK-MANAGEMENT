@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTasks } from '../../context/TaskContext';
 import { useAuth } from '../../context/AuthContext';
 import { Client, ComplianceApplicabilityKey } from '../../types';
@@ -43,66 +43,75 @@ export const ClientMasterTable: React.FC = () => {
   const [modalInitialTab, setModalInitialTab] = useState<'DETAILS' | 'REPOSITORY'>('DETAILS');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  const filteredClients = clients.filter((c, idx) => {
-    if (selectedCategory !== 'ALL' && c.category !== selectedCategory) return false;
-    if (!searchTerm || !searchTerm.trim()) return true;
+  const clientWithStableSNo = useMemo(() => {
+    return clients.map((c, masterIdx) => ({
+      ...c,
+      displaySNo: c.serialNumber || (masterIdx + 1)
+    }));
+  }, [clients]);
 
-    const qTrim = searchTerm.trim().toLowerCase();
+  const filteredClients = useMemo(() => {
+    return clientWithStableSNo.filter((c) => {
+      if (selectedCategory !== 'ALL' && c.category !== selectedCategory) return false;
+      if (!searchTerm || !searchTerm.trim()) return true;
 
-    // 1. Check Serial Number (#21, 21, sno 21)
-    const cleanQ = qTrim.replace(/^(pan|gst|gstin|tan|vat|sno)[:\s#]*/i, '').trim();
-    const cleanQAlnum = cleanQ.replace(/[^a-z0-9]/gi, '');
-    const sNoStr = String(idx + 1);
-    if (qTrim === sNoStr || qTrim === '#' + sNoStr || cleanQ === sNoStr) return true;
+      const qTrim = searchTerm.trim().toLowerCase();
 
-    // 2. Direct PAN / GSTIN / TAN / VAT alphanumeric match (handles spaces, hyphens, prefixes)
-    const cPanAlnum = (c.pan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
-    const cGstAlnum = (c.gstin || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
-    const cTanAlnum = (c.tan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
-    const cVatAlnum = (c.vatNumber || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+      // 1. Check Serial Number (#21, 21, sno 21)
+      const cleanQ = qTrim.replace(/^(pan|gst|gstin|tan|vat|sno)[:\s#]*/i, '').trim();
+      const cleanQAlnum = cleanQ.replace(/[^a-z0-9]/gi, '');
+      const sNoStr = String(c.displaySNo);
+      if (qTrim === sNoStr || qTrim === '#' + sNoStr || cleanQ === sNoStr) return true;
 
-    if (cleanQAlnum.length >= 3) {
-      if (cPanAlnum.includes(cleanQAlnum)) return true;
-      if (cGstAlnum.includes(cleanQAlnum)) return true;
-      if (cTanAlnum.includes(cleanQAlnum)) return true;
-      if (cVatAlnum.includes(cleanQAlnum)) return true;
-    }
+      // 2. Direct PAN / GSTIN / TAN / VAT alphanumeric match (handles spaces, hyphens, prefixes)
+      const cPanAlnum = (c.pan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+      const cGstAlnum = (c.gstin || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+      const cTanAlnum = (c.tan || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
+      const cVatAlnum = (c.vatNumber || '').toLowerCase().replace(/[^a-z0-9]/gi, '');
 
-    // 3. Normalized combined text for comprehensive search
-    const cleanEncoding = (s?: string) => (s || '')
-      .replace(/\xc3[\u2030\x89]|CAFÃ‰|cafÃ©|café/gi, 'cafe')
-      .replace(/[\u0080-\uFFFF]/g, ' ')
-      .replace(/[^a-zA-Z0-9\s]/g, ' ');
+      if (cleanQAlnum.length >= 3) {
+        if (cPanAlnum.includes(cleanQAlnum)) return true;
+        if (cGstAlnum.includes(cleanQAlnum)) return true;
+        if (cTanAlnum.includes(cleanQAlnum)) return true;
+        if (cVatAlnum.includes(cleanQAlnum)) return true;
+      }
 
-    const unified = [
-      c.tradeName,
-      cleanEncoding(c.tradeName),
-      c.legalName,
-      cleanEncoding(c.legalName),
-      c.pan,
-      c.gstin,
-      c.tan,
-      c.vatNumber,
-      c.contactPerson,
-      c.employeeName,
-      c.phone,
-      c.employeePhone,
-      c.email,
-      c.aadharNumber,
-      c.assignedTeamName
-    ].filter(Boolean).join(' ').toLowerCase();
+      // 3. Normalized combined text for comprehensive search
+      const cleanEncoding = (s?: string) => (s || '')
+        .replace(/\xc3[\u2030\x89]|CAFÃ‰|cafÃ©|café/gi, 'cafe')
+        .replace(/[\u0080-\uFFFF]/g, ' ')
+        .replace(/[^a-zA-Z0-9\s]/g, ' ');
 
-    // 4. Substring match
-    if (unified.includes(qTrim) || unified.includes(cleanQ)) return true;
+      const unified = [
+        c.tradeName,
+        cleanEncoding(c.tradeName),
+        c.legalName,
+        cleanEncoding(c.legalName),
+        c.pan,
+        c.gstin,
+        c.tan,
+        c.vatNumber,
+        c.contactPerson,
+        c.employeeName,
+        c.phone,
+        c.employeePhone,
+        c.email,
+        c.aadharNumber,
+        c.assignedTeamName
+      ].filter(Boolean).join(' ').toLowerCase();
 
-    // 5. Multi-token match (all typed words must match somewhere in profile)
-    const tokens = cleanQ.split(/\s+/).filter(t => t.length > 0);
-    if (tokens.length > 1) {
-      return tokens.every(tok => unified.includes(tok));
-    }
+      // 4. Substring match
+      if (unified.includes(qTrim) || unified.includes(cleanQ)) return true;
 
-    return false;
-  });
+      // 5. Multi-token match (all typed words must match somewhere in profile)
+      const tokens = cleanQ.split(/\s+/).filter(t => t.length > 0);
+      if (tokens.length > 1) {
+        return tokens.every(tok => unified.includes(tok));
+      }
+
+      return false;
+    });
+  }, [clientWithStableSNo, selectedCategory, searchTerm]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -267,14 +276,14 @@ export const ClientMasterTable: React.FC = () => {
                   </td>
                 </tr>
               )}
-              {filteredClients.map((client, idx) => {
+              {filteredClients.map((client) => {
                 const appMap = resolveClientApplicability(client);
                 return (
                 <tr key={client.id} className="hover:bg-amber-50/40 dark:hover:bg-slate-800/30 transition-colors group">
                   
                   {/* S.No. Serial Number */}
                   <td className="px-2.5 py-2 text-center text-slate-500 dark:text-slate-400 font-mono text-xs font-bold bg-slate-50/50 dark:bg-slate-900/40 border-r border-slate-100 dark:border-slate-800/60">
-                    {idx + 1}
+                    {client.displaySNo}
                   </td>
 
                   {/* Client & Legal Name */}

@@ -6,7 +6,8 @@ export const ExcelService = {
     const wb = XLSX.utils.book_new();
 
     // 1. Clients Sheet
-    const clientsData = clients.map(c => ({
+    const clientsData = clients.map((c, idx) => ({
+      'S.No.': c.serialNumber || (idx + 1),
       'Client ID': c.id,
       'Trade / Brand Name': c.tradeName,
       'Legal Entity Name': c.legalName,

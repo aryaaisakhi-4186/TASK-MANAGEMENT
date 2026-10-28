@@ -469,6 +469,7 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
       customFields: validCustomFields,
       repositoryDocs,
       complianceApplicability,
+      serialNumber: client?.serialNumber,
     };
 
     const normPan = pan.trim().toUpperCase();

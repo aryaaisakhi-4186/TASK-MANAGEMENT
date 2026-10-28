@@ -81,6 +81,7 @@ export interface ClientComplianceApplicability {
 
 export interface Client {
   id: string;
+  serialNumber?: number;    // Master Sequential Serial Number (S.No.)
   tradeName: string;
   legalName: string;
   pan: string;

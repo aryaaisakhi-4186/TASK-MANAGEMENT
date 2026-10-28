@@ -174,6 +174,7 @@ export const deduplicateClients = (clients: Client[]): Client[] => {
         ...u,
         ...c,
         id: u.id || c.id,
+        serialNumber: u.serialNumber || c.serialNumber,
         createdAt: u.createdAt || c.createdAt,
         tradeName: c.tradeName || u.tradeName,
         legalName: c.legalName || u.legalName || c.tradeName || u.tradeName,
@@ -264,6 +265,7 @@ export const mergeClients = (localClients: Client[], incomingClients: Client[]):
       mergedList[existingIdx] = {
         ...inc,
         ...existing,
+        serialNumber: existing.serialNumber || inc.serialNumber,
         tradeName: existing.tradeName || inc.tradeName,
         legalName: existing.legalName || existing.tradeName || inc.legalName || inc.tradeName,
         pan: resolvedPan,
@@ -297,16 +299,45 @@ export const mergeClients = (localClients: Client[], incomingClients: Client[]):
   return deduplicateClients(mergedList);
 };
 
+/**
+ * Ensures clients have consistent sequential S.No. (1, 2, 3...)
+ * Preserves already assigned serial numbers and gives next sequential numbers to any new ones without disturbing previous ones.
+ */
+export const normalizeClientSerialNumbers = (clients: Client[]): Client[] => {
+  if (!Array.isArray(clients) || clients.length === 0) return [];
+
+  // Track max assigned serial number
+  let maxSNo = 0;
+  clients.forEach(c => {
+    if (typeof c.serialNumber === 'number' && c.serialNumber > maxSNo) {
+      maxSNo = c.serialNumber;
+    }
+  });
+
+  let counter = maxSNo;
+  return clients.map((c, idx) => {
+    if (typeof c.serialNumber === 'number' && c.serialNumber > 0) {
+      return c;
+    }
+    const assigned = idx + 1;
+    if (assigned > counter) counter = assigned;
+    return {
+      ...c,
+      serialNumber: assigned
+    };
+  });
+};
+
 export const StorageService = {
-  // Clients (Defaults to 0 for Clean Production Practice Start, Always Deduplicated)
+  // Clients (Defaults to 0 for Clean Production Practice Start, Always Deduplicated & Normalized S.No.)
   getClients: (): Client[] => {
     const { key } = getScopedKey(KEYS.CLIENTS);
     const raw = safeGet<Client[]>(key, []);
-    return deduplicateClients(raw);
+    return normalizeClientSerialNumbers(deduplicateClients(raw));
   },
   saveClients: (clients: Client[]) => {
     const { key } = getScopedKey(KEYS.CLIENTS);
-    safeSet(key, deduplicateClients(clients));
+    safeSet(key, normalizeClientSerialNumbers(deduplicateClients(clients)));
   },
 
   // Tasks (Defaults to 0 for Clean Production Practice Start, Always Deduplicated)
