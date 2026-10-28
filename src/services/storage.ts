@@ -121,65 +121,172 @@ export const deduplicateTasks = (taskList: TaskItem[], currentClients?: Client[]
 };
 
 /**
+ * Deduplicate clients list strictly by ID, PAN, GSTIN, and Trade/Legal Name.
+ * If duplicates exist, merges them together and ensures zero duplicate entries.
+ */
+export const deduplicateClients = (clients: Client[]): Client[] => {
+  if (!Array.isArray(clients) || clients.length <= 1) return clients || [];
+
+  const uniqueClients: Client[] = [];
+
+  for (const c of clients) {
+    if (!c) continue;
+    const normId = (c.id || '').trim();
+    const normPan = (c.pan || '').trim().toUpperCase();
+    const normGst = (c.gstin || '').trim().toUpperCase();
+    const normName = (c.tradeName || '').trim().toLowerCase();
+    const normLegalName = (c.legalName || '').trim().toLowerCase();
+
+    // Check if client already exists in uniqueClients
+    const existingIdx = uniqueClients.findIndex(u => {
+      // 1. Exact ID match
+      if (normId && u.id && u.id === normId) return true;
+      // 2. Real PAN match (ignore PAN-PENDING)
+      if (normPan && normPan !== 'PAN-PENDING' && (u.pan || '').trim().toUpperCase() === normPan) return true;
+      // 3. GSTIN match
+      if (normGst && (u.gstin || '').trim().toUpperCase() === normGst) return true;
+      // 4. Trade Name match
+      if (normName && (u.tradeName || '').trim().toLowerCase() === normName) return true;
+      // 5. Cross trade/legal name match
+      if (normLegalName && (u.legalName || '').trim().toLowerCase() === normLegalName) return true;
+      if (normName && (u.legalName || '').trim().toLowerCase() === normName) return true;
+      if (normLegalName && (u.tradeName || '').trim().toLowerCase() === normLegalName) return true;
+      return false;
+    });
+
+    if (existingIdx === -1) {
+      uniqueClients.push(c);
+    } else {
+      const u = uniqueClients[existingIdx];
+      const resolvedPan = (c.pan && c.pan !== 'PAN-PENDING')
+        ? c.pan
+        : (u.pan && u.pan !== 'PAN-PENDING' ? u.pan : (c.pan || u.pan || 'PAN-PENDING'));
+      const resolvedGst = c.gstin || u.gstin || undefined;
+      const resolvedTan = c.tan || u.tan || undefined;
+      const resolvedVat = (c.vatNumber && c.vatNumber.trim().length >= 4)
+        ? c.vatNumber.trim()
+        : (u.vatNumber && u.vatNumber.trim().length >= 4 ? u.vatNumber.trim() : undefined);
+
+      const baseApp = resolveClientApplicability(u);
+      const newApp = c.complianceApplicability ? resolveClientApplicability(c) : baseApp;
+
+      uniqueClients[existingIdx] = {
+        ...u,
+        ...c,
+        id: u.id || c.id,
+        createdAt: u.createdAt || c.createdAt,
+        tradeName: c.tradeName || u.tradeName,
+        legalName: c.legalName || u.legalName || c.tradeName || u.tradeName,
+        pan: resolvedPan,
+        gstin: resolvedGst,
+        tan: resolvedTan,
+        vatNumber: resolvedVat,
+        category: (c.category && c.category !== 'PVT_LTD') ? c.category : (u.category || c.category),
+        phone: c.phone || u.phone,
+        email: c.email || u.email,
+        contactPerson: c.contactPerson || u.contactPerson,
+        employeeName: c.employeeName || u.employeeName,
+        employeePhone: c.employeePhone || u.employeePhone,
+        dob: c.dob || u.dob,
+        formationDate: c.formationDate || u.formationDate,
+        aadharNumber: c.aadharNumber || u.aadharNumber,
+        assignedTeamId: c.assignedTeamId || u.assignedTeamId,
+        assignedTeamName: c.assignedTeamName || u.assignedTeamName,
+        googleDriveFolderId: c.googleDriveFolderId || u.googleDriveFolderId,
+        googleDriveFolderUrl: c.googleDriveFolderUrl || u.googleDriveFolderUrl,
+        repositoryDocs: (c.repositoryDocs && c.repositoryDocs.length > 0) ? c.repositoryDocs : u.repositoryDocs,
+        customFields: (c.customFields && c.customFields.length > 0) ? c.customFields : u.customFields,
+        complianceApplicability: {
+          ...baseApp,
+          ...newApp,
+          GST: !!(resolvedGst && resolvedGst.length === 15),
+          VAT: !!(resolvedVat && resolvedVat.length >= 4),
+          TDS: !!(resolvedTan && resolvedTan.length === 10) || baseApp.TDS || newApp.TDS
+        }
+      };
+    }
+  }
+
+  return uniqueClients;
+};
+
+/**
  * Merge two client lists safely without dropping any clients.
- * Updates matching clients (by PAN, GSTIN, or Trade Name) and appends non-existing ones.
+ * Updates matching clients (by ID, PAN, GSTIN, or Trade/Legal Name) and appends non-existing ones.
  */
 export const mergeClients = (localClients: Client[], incomingClients: Client[]): Client[] => {
-  if (!Array.isArray(incomingClients) || incomingClients.length === 0) return localClients || [];
-  if (!Array.isArray(localClients) || localClients.length === 0) return incomingClients || [];
+  if (!Array.isArray(incomingClients) || incomingClients.length === 0) return deduplicateClients(localClients || []);
+  if (!Array.isArray(localClients) || localClients.length === 0) return deduplicateClients(incomingClients || []);
 
-  const mergedList: Client[] = [...localClients];
+  const cleanLocal = deduplicateClients(localClients);
+  const cleanIncoming = deduplicateClients(incomingClients);
+  const mergedList: Client[] = [...cleanLocal];
 
-  for (const inc of incomingClients) {
+  for (const inc of cleanIncoming) {
     if (!inc || !inc.tradeName) continue;
+    const normId = (inc.id || '').trim();
     const normPan = (inc.pan || '').trim().toUpperCase();
     const normGst = (inc.gstin || '').trim().toUpperCase();
     const normName = (inc.tradeName || '').trim().toLowerCase();
+    const normLegalName = (inc.legalName || '').trim().toLowerCase();
 
     const existingIdx = mergedList.findIndex(c => {
+      // 1. Match by ID first
+      if (normId && c.id && c.id === normId) return true;
+      // 2. Match by valid PAN
       if (normPan && normPan !== 'PAN-PENDING' && (c.pan || '').trim().toUpperCase() === normPan) return true;
+      // 3. Match by GSTIN
       if (normGst && (c.gstin || '').trim().toUpperCase() === normGst) return true;
+      // 4. Match by Trade Name
       if (normName && (c.tradeName || '').trim().toLowerCase() === normName) return true;
+      // 5. Match by Legal Name or Cross Match
+      if (normLegalName && (c.legalName || '').trim().toLowerCase() === normLegalName) return true;
+      if (normName && (c.legalName || '').trim().toLowerCase() === normName) return true;
+      if (normLegalName && (c.tradeName || '').trim().toLowerCase() === normLegalName) return true;
       return false;
     });
 
     if (existingIdx !== -1) {
       const existing = mergedList[existingIdx];
-      const resolvedPan = (inc.pan && inc.pan !== 'PAN-PENDING') 
-        ? inc.pan 
-        : (existing.pan && existing.pan !== 'PAN-PENDING' ? existing.pan : inc.pan);
-      const resolvedGst = inc.gstin || existing.gstin || undefined;
-      const resolvedTan = inc.tan || existing.tan || undefined;
-      const resolvedVat = (inc.vatNumber && inc.vatNumber.trim().length >= 4) ? inc.vatNumber.trim() : undefined;
+      // Keep local changes as primary, enrich with any missing fields from incoming
+      const resolvedPan = (existing.pan && existing.pan !== 'PAN-PENDING') 
+        ? existing.pan 
+        : (inc.pan && inc.pan !== 'PAN-PENDING' ? inc.pan : (existing.pan || inc.pan || 'PAN-PENDING'));
+      const resolvedGst = existing.gstin || inc.gstin || undefined;
+      const resolvedTan = existing.tan || inc.tan || undefined;
+      const resolvedVat = (existing.vatNumber && existing.vatNumber.trim().length >= 4)
+        ? existing.vatNumber.trim()
+        : ((inc.vatNumber && inc.vatNumber.trim().length >= 4) ? inc.vatNumber.trim() : undefined);
 
       const baseApp = resolveClientApplicability(existing);
       const incApp = inc.complianceApplicability ? resolveClientApplicability(inc) : baseApp;
 
       mergedList[existingIdx] = {
-        ...existing,
         ...inc,
-        tradeName: inc.tradeName || existing.tradeName,
-        legalName: inc.legalName || existing.legalName || inc.tradeName || existing.tradeName,
-        pan: resolvedPan || (resolvedGst && resolvedGst.length === 15 ? resolvedGst.substring(2, 12) : 'PAN-PENDING'),
+        ...existing,
+        tradeName: existing.tradeName || inc.tradeName,
+        legalName: existing.legalName || existing.tradeName || inc.legalName || inc.tradeName,
+        pan: resolvedPan,
         gstin: resolvedGst,
         tan: resolvedTan,
-        vatNumber: resolvedVat, // Never retain fake VAT numbers
-        phone: inc.phone || existing.phone,
-        email: inc.email || existing.email,
-        contactPerson: inc.contactPerson || existing.contactPerson,
-        employeeName: inc.employeeName || existing.employeeName,
-        employeePhone: inc.employeePhone || existing.employeePhone,
-        dob: inc.dob || existing.dob,
-        formationDate: inc.formationDate || existing.formationDate,
-        aadharNumber: inc.aadharNumber || existing.aadharNumber,
-        assignedTeamName: inc.assignedTeamName || existing.assignedTeamName,
-        googleDriveFolderId: inc.googleDriveFolderId || existing.googleDriveFolderId,
-        googleDriveFolderUrl: inc.googleDriveFolderUrl || existing.googleDriveFolderUrl,
+        vatNumber: resolvedVat,
+        phone: existing.phone || inc.phone,
+        email: existing.email || inc.email,
+        contactPerson: existing.contactPerson || inc.contactPerson,
+        employeeName: existing.employeeName || inc.employeeName,
+        employeePhone: existing.employeePhone || inc.employeePhone,
+        dob: existing.dob || inc.dob,
+        formationDate: existing.formationDate || inc.formationDate,
+        aadharNumber: existing.aadharNumber || inc.aadharNumber,
+        assignedTeamName: existing.assignedTeamName || inc.assignedTeamName,
+        googleDriveFolderId: existing.googleDriveFolderId || inc.googleDriveFolderId,
+        googleDriveFolderUrl: existing.googleDriveFolderUrl || inc.googleDriveFolderUrl,
         complianceApplicability: {
-          ...baseApp,
           ...incApp,
+          ...baseApp,
           VAT: !!(resolvedVat && resolvedVat.length >= 4),
-          GST: !!(resolvedGst && resolvedGst.length === 15)
+          GST: !!(resolvedGst && resolvedGst.length === 15),
+          TDS: !!(resolvedTan && resolvedTan.length === 10) || baseApp.TDS || incApp.TDS
         }
       };
     } else {
@@ -187,18 +294,19 @@ export const mergeClients = (localClients: Client[], incomingClients: Client[]):
     }
   }
 
-  return mergedList;
+  return deduplicateClients(mergedList);
 };
 
 export const StorageService = {
-  // Clients (Defaults to 0 for Clean Production Practice Start)
+  // Clients (Defaults to 0 for Clean Production Practice Start, Always Deduplicated)
   getClients: (): Client[] => {
     const { key } = getScopedKey(KEYS.CLIENTS);
-    return safeGet<Client[]>(key, []);
+    const raw = safeGet<Client[]>(key, []);
+    return deduplicateClients(raw);
   },
   saveClients: (clients: Client[]) => {
     const { key } = getScopedKey(KEYS.CLIENTS);
-    safeSet(key, clients);
+    safeSet(key, deduplicateClients(clients));
   },
 
   // Tasks (Defaults to 0 for Clean Production Practice Start, Always Deduplicated)

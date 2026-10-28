@@ -95,7 +95,7 @@ async function compressImageToUltraLight(file: File): Promise<{ dataUrl: string;
 }
 
 export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, initialTab = 'DETAILS' }) => {
-  const { team, addClient, updateClient, addDocument } = useTasks();
+  const { clients, team, addClient, updateClient, deleteClient, addDocument } = useTasks();
   const isEditing = !!client;
 
   useEscapeKey(onClose, isOpen);
@@ -470,6 +470,35 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
       repositoryDocs,
       complianceApplicability,
     };
+
+    const normPan = pan.trim().toUpperCase();
+    const normGst = gstin.trim().toUpperCase();
+    const normTradeName = tradeName.trim().toLowerCase();
+    const normLegalName = legalName.trim().toLowerCase();
+
+    // Check if another client in directory already has matching PAN, GSTIN, Trade Name, or Legal Name
+    const duplicateExisting = clients.find(c => {
+      if (client && c.id === client.id) return false;
+      if (normPan && normPan !== 'PAN-PENDING' && (c.pan || '').trim().toUpperCase() === normPan) return true;
+      if (normGst && (c.gstin || '').trim().toUpperCase() === normGst) return true;
+      if (normTradeName && (c.tradeName || '').trim().toLowerCase() === normTradeName) return true;
+      if (normLegalName && (c.legalName || '').trim().toLowerCase() === normLegalName) return true;
+      return false;
+    });
+
+    if (duplicateExisting) {
+      // Update existing client record directly so zero duplicates are created!
+      updateClient(duplicateExisting.id, payload);
+
+      // If we were editing a different client profile and renamed it to match an existing client, remove the redundant record
+      if (isEditing && client && client.id !== duplicateExisting.id) {
+        deleteClient(client.id);
+      }
+
+      alert(`✅ Client "${payload.tradeName}" (PAN: ${payload.pan}) already registered tha.\nExisting client profile aur tasks successfully UPDATE kar diye gaye hain (Zero Duplication)!`);
+      onClose();
+      return;
+    }
 
     if (isEditing && client) {
       updateClient(client.id, payload);

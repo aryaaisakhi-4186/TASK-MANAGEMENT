@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord, TaskStatus, ClientReminder } from '../types';
-import { StorageService, deduplicateTasks, mergeClients } from '../services/storage';
+import { StorageService, deduplicateTasks, mergeClients, deduplicateClients } from '../services/storage';
 import { FirebaseService } from '../services/firebaseService';
 import { OnlineDataService } from '../services/onlineDataService';
 import { AudioService } from '../services/audioService';
@@ -78,18 +78,48 @@ interface TaskContextType {
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
-// Helper to ensure every client referenced in tasks exists in the master client directory
+// Helper to ensure every client referenced in tasks exists in the master client directory without creating duplicates
 export const syncMissingClientsFromTasks = (currentClients: Client[], currentTasks: TaskItem[]): Client[] => {
-  const existingMap = new Map<string, Client>();
-  currentClients.forEach(c => {
-    if (c.tradeName) existingMap.set(c.tradeName.trim().toLowerCase(), c);
+  const cleanClients = deduplicateClients(currentClients || []);
+  const idMap = new Map<string, Client>();
+  const nameMap = new Map<string, Client>();
+
+  cleanClients.forEach(c => {
+    if (c.id) idMap.set(c.id, c);
+    if (c.tradeName) nameMap.set(c.tradeName.trim().toLowerCase(), c);
+    if (c.legalName) nameMap.set(c.legalName.trim().toLowerCase(), c);
   });
 
   const added: Client[] = [];
+  let tasksUpdated = false;
+
   currentTasks.forEach(t => {
-    if (!t.clientName) return;
-    const norm = t.clientName.trim().toLowerCase();
-    if (!existingMap.has(norm)) {
+    if (!t.clientName && !t.clientId) return;
+
+    // 1. If task already matches an existing client by clientId:
+    if (t.clientId && idMap.has(t.clientId)) {
+      const matchedClient = idMap.get(t.clientId)!;
+      // Sync the task's clientName to match the current client's tradeName if they drifted
+      if (t.clientName !== matchedClient.tradeName) {
+        t.clientName = matchedClient.tradeName;
+        tasksUpdated = true;
+      }
+      return; // DO NOT CREATE A SYNTHETIC CLIENT
+    }
+
+    // 2. If task matches an existing client by clientName:
+    const norm = (t.clientName || '').trim().toLowerCase();
+    if (norm && nameMap.has(norm)) {
+      const matchedClient = nameMap.get(norm)!;
+      if (t.clientId !== matchedClient.id) {
+        t.clientId = matchedClient.id;
+        tasksUpdated = true;
+      }
+      return; // DO NOT CREATE A SYNTHETIC CLIENT
+    }
+
+    // 3. Only if NEITHER clientId nor clientName matches ANY client in master directory:
+    if (norm) {
       const cat = detectEntityCategoryFromPANAndGSTIN('', '', t.clientName, t.clientName);
       const synthClient: Client = {
         id: t.clientId || ('cli-' + Date.now() + '-' + Math.floor(Math.random() * 10000)),
@@ -104,7 +134,7 @@ export const syncMissingClientsFromTasks = (currentClients: Client[], currentTas
         assignedTeamId: t.assignedTeamId || '',
         assignedTeamName: t.assignedTeamName || 'Assigned Staff',
         portalPassword: 'client123',
-        createdAt: '2026-10-25',
+        createdAt: new Date().toISOString().split('T')[0],
         complianceApplicability: {
           GST: true,
           TDS: true,
@@ -116,17 +146,22 @@ export const syncMissingClientsFromTasks = (currentClients: Client[], currentTas
           RULE_86B: false
         }
       };
-      existingMap.set(norm, synthClient);
+      nameMap.set(norm, synthClient);
+      if (synthClient.id) idMap.set(synthClient.id, synthClient);
       added.push(synthClient);
     }
   });
 
+  if (tasksUpdated) {
+    StorageService.saveTasks(currentTasks);
+  }
+
   if (added.length > 0) {
-    const all = [...currentClients, ...added];
+    const all = deduplicateClients([...cleanClients, ...added]);
     StorageService.saveClients(all);
     return all;
   }
-  return currentClients;
+  return cleanClients;
 };
 
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -406,10 +441,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!checkGuestWriteAllowed()) {
       return clients[0] || ({ ...clientData, id: 'blocked', createdAt: '' } as Client);
     }
-    // 1. Check if client already exists by PAN, GSTIN, or Trade Name (NO DUPLICATES)
+    // 1. Check if client already exists by PAN, GSTIN, Trade Name, or Legal Name (NO DUPLICATES)
     const normPan = clientData.pan?.trim().toUpperCase();
     const normGst = clientData.gstin?.trim().toUpperCase();
     const normName = clientData.tradeName?.trim().toLowerCase();
+    const normLegalName = clientData.legalName?.trim().toLowerCase();
 
     // 2. Accurately resolve statutory entity constitution / category
     const resolvedCategory = clientData.category && clientData.category !== 'PVT_LTD'
@@ -420,6 +456,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (normPan && normPan !== 'PAN-PENDING' && c.pan?.trim().toUpperCase() === normPan) return true;
       if (normGst && c.gstin?.trim().toUpperCase() === normGst) return true;
       if (normName && c.tradeName?.trim().toLowerCase() === normName) return true;
+      if (normLegalName && c.legalName?.trim().toLowerCase() === normLegalName) return true;
+      if (normName && c.legalName?.trim().toLowerCase() === normName) return true;
+      if (normLegalName && c.tradeName?.trim().toLowerCase() === normLegalName) return true;
       return false;
     });
 
@@ -455,7 +494,50 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const updated = [...clients];
       updated[existingIndex] = merged;
-      setClients(updated);
+      const cleanClients = deduplicateClients(updated);
+      setClients(cleanClients);
+      StorageService.saveClients(cleanClients);
+
+      // Synchronize existing tasks if client's name changed
+      const oldTradeName = existing.tradeName?.trim().toLowerCase();
+      const oldLegalName = existing.legalName?.trim().toLowerCase();
+      let tasksChanged = false;
+      const updatedTasks = tasks.map(t => {
+        if ((t.clientId && t.clientId === existing.id) ||
+            (oldTradeName && (t.clientName || '').trim().toLowerCase() === oldTradeName) ||
+            (oldLegalName && (t.clientName || '').trim().toLowerCase() === oldLegalName)) {
+          tasksChanged = true;
+          return {
+            ...t,
+            clientId: existing.id,
+            clientName: merged.tradeName,
+            assignedTeamId: merged.assignedTeamId || t.assignedTeamId,
+            assignedTeamName: merged.assignedTeamName || t.assignedTeamName
+          };
+        }
+        return t;
+      });
+
+      if (tasksChanged) {
+        const cleanTasks = deduplicateTasks(updatedTasks, cleanClients);
+        setTasks(cleanTasks);
+        StorageService.saveTasks(cleanTasks);
+      }
+
+      OnlineDataService.scheduleAutoOnlineSync({
+        clients: cleanClients,
+        tasks: tasksChanged ? updatedTasks : tasks,
+        team: StorageService.getTeam(),
+        extraWork: StorageService.getExtraWork(),
+        documents: StorageService.getDocuments(),
+        attendanceRecords: StorageService.getAttendance(),
+        settings: StorageService.getSettings(),
+        guestLeads: StorageService.getGuestLeads()
+      });
+
+      if (FirebaseService.isConfigured()) {
+        FirebaseService.upsertDoc('clients', existing.id, merged);
+      }
 
       StorageService.addAuditLog({
         actorId: 'admin',
@@ -636,7 +718,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       details: `Created new client: ${newClient.tradeName} (PAN: ${newClient.pan})`
     });
     setAuditLogs(StorageService.getAuditLogs());
-    StorageService.saveClients(updated);
+    const cleanClients = deduplicateClients(updated);
+    setClients(cleanClients);
+    StorageService.saveClients(cleanClients);
     return newClient;
   };
 
@@ -659,12 +743,21 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const normPan = row.pan?.trim().toUpperCase();
       const normGst = row.gstin?.trim().toUpperCase();
       const normName = row.tradeName?.trim().toLowerCase();
+      const normLegalName = row.legalName?.trim().toLowerCase();
+      const normTan = row.tan?.trim().toUpperCase();
+      const normVat = row.vatNumber?.trim();
 
-      // Check if client already exists (by PAN, GSTIN, or exact Trade Name)
+      // Check if client already exists (by ID, PAN, GSTIN, Trade Name, Legal Name, TAN, or VAT)
       const existingIndex = updatedClientList.findIndex(c => {
-        if (normPan && normPan !== 'PAN-PENDING' && c.pan?.trim().toUpperCase() === normPan) return true;
-        if (normGst && c.gstin?.trim().toUpperCase() === normGst) return true;
-        if (normName && c.tradeName?.trim().toLowerCase() === normName) return true;
+        if (row.id && c.id && c.id === row.id) return true;
+        if (normPan && normPan !== 'PAN-PENDING' && (c.pan || '').trim().toUpperCase() === normPan) return true;
+        if (normGst && (c.gstin || '').trim().toUpperCase() === normGst) return true;
+        if (normName && (c.tradeName || '').trim().toLowerCase() === normName) return true;
+        if (normLegalName && (c.legalName || '').trim().toLowerCase() === normLegalName) return true;
+        if (normName && (c.legalName || '').trim().toLowerCase() === normName) return true;
+        if (normLegalName && (c.tradeName || '').trim().toLowerCase() === normLegalName) return true;
+        if (normTan && (c.tan || '').trim().toUpperCase() === normTan) return true;
+        if (normVat && normVat.length >= 4 && (c.vatNumber || '').trim() === normVat) return true;
         return false;
       });
 
@@ -707,6 +800,20 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
         updatedClientList[existingIndex] = merged;
         updatedCount++;
+
+        // Synchronize tasks if client's name changed
+        const oldTradeName = existing.tradeName?.trim().toLowerCase();
+        const oldLegalName = existing.legalName?.trim().toLowerCase();
+        if (merged.tradeName && oldTradeName && merged.tradeName.trim().toLowerCase() !== oldTradeName) {
+          existingTasks.forEach(t => {
+            if ((t.clientId && t.clientId === existing.id) ||
+                (oldTradeName && (t.clientName || '').trim().toLowerCase() === oldTradeName) ||
+                (oldLegalName && (t.clientName || '').trim().toLowerCase() === oldLegalName)) {
+              t.clientId = existing.id;
+              t.clientName = merged.tradeName;
+            }
+          });
+        }
       } else {
         // CREATE NEW CLIENT RECORD
         const clientId = 'cli-' + Date.now() + '-' + idx + '-' + Math.floor(Math.random() * 1000);
@@ -872,18 +979,19 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
-    // 1. Immediately write updated clients to state and LocalStorage
-    setClients(updatedClientList);
-    StorageService.saveClients(updatedClientList);
+    // 1. Immediately deduplicate & write updated clients to state and LocalStorage
+    const cleanClients = deduplicateClients(updatedClientList);
+    setClients(cleanClients);
+    StorageService.saveClients(cleanClients);
 
     // 2. Save tasks (Strictly Deduplicated)
-    const combinedTasks = deduplicateTasks([...newTasksToCreate, ...existingTasks], updatedClientList);
+    const combinedTasks = deduplicateTasks([...newTasksToCreate, ...existingTasks], cleanClients);
     setTasks(combinedTasks);
     StorageService.saveTasks(combinedTasks);
 
     // 3. Immediately trigger background auto-sync to online server & Firebase
     OnlineDataService.scheduleAutoOnlineSync({
-      clients: updatedClientList,
+      clients: cleanClients,
       tasks: combinedTasks,
       team: StorageService.getTeam(),
       extraWork: StorageService.getExtraWork(),
@@ -894,7 +1002,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (FirebaseService.isConfigured()) {
-      updatedClientList.forEach(c => FirebaseService.upsertDoc('clients', c.id, c));
+      cleanClients.forEach(c => FirebaseService.upsertDoc('clients', c.id, c));
       newTasksToCreate.forEach(t => FirebaseService.upsertDoc('tasks', t.id, t));
     }
 
@@ -904,32 +1012,99 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       role: 'ADMIN',
       action: 'BULK_IMPORT_CLIENTS',
       category: 'CLIENT',
-      details: `Bulk imported clients: ${createdCount} new created, ${updatedCount} existing updated (Zero Duplicates). Total in directory: ${updatedClientList.length}`
+      details: `Bulk imported clients: ${createdCount} new created, ${updatedCount} existing updated (Zero Duplicates). Total in directory: ${cleanClients.length}`
     });
     setAuditLogs(StorageService.getAuditLogs());
 
-    return { createdCount, updatedCount, totalCount: updatedClientList.length };
+    return { createdCount, updatedCount, totalCount: cleanClients.length };
   };
 
   const updateClient = (id: string, updates: Partial<Client>) => {
     if (!checkGuestWriteAllowed()) return;
-    setClients(prev => prev.map(c => {
+
+    // 1. Fetch previous client state before update
+    const currentClients = StorageService.getClients();
+    const oldClient = currentClients.find(c => c.id === id) || clients.find(c => c.id === id);
+    const oldTradeName = oldClient?.tradeName?.trim().toLowerCase();
+    const oldLegalName = oldClient?.legalName?.trim().toLowerCase();
+
+    // 2. Compute updated clients list
+    let targetUpdatedClient: Client | null = null;
+    const updatedClientList = clients.map(c => {
       if (c.id === id) {
-        const updated = { ...c, ...updates };
+        const updated: Client = {
+          ...c,
+          ...updates,
+          tradeName: updates.tradeName !== undefined ? updates.tradeName.trim() : c.tradeName,
+          legalName: updates.legalName !== undefined ? updates.legalName.trim() : (updates.tradeName !== undefined ? updates.tradeName.trim() : c.legalName),
+          pan: updates.pan !== undefined ? updates.pan.trim().toUpperCase() : c.pan,
+          gstin: updates.gstin !== undefined ? updates.gstin.trim().toUpperCase() : c.gstin,
+          tan: updates.tan !== undefined ? updates.tan.trim().toUpperCase() : c.tan,
+        };
+        targetUpdatedClient = updated;
         if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
           FirebaseService.upsertDoc('clients', id, updated);
         }
         return updated;
       }
       return c;
-    }));
+    });
+
+    // 3. Immediately deduplicate and persist clients list
+    const cleanClients = deduplicateClients(updatedClientList);
+    setClients(cleanClients);
+    StorageService.saveClients(cleanClients);
+
+    // 4. Synchronize all tasks referencing this client (by ID or old names)
+    const newTradeName = updates.tradeName !== undefined ? updates.tradeName.trim() : oldClient?.tradeName;
+    let tasksChanged = false;
+    const updatedTasks = tasks.map(t => {
+      const matchById = t.clientId && t.clientId === id;
+      const matchByName = (oldTradeName && (t.clientName || '').trim().toLowerCase() === oldTradeName) ||
+                          (oldLegalName && (t.clientName || '').trim().toLowerCase() === oldLegalName);
+
+      if (matchById || matchByName) {
+        tasksChanged = true;
+        const taskUpdate: TaskItem = {
+          ...t,
+          clientId: id,
+          clientName: newTradeName || t.clientName,
+          assignedTeamId: updates.assignedTeamId !== undefined ? (updates.assignedTeamId || '') : t.assignedTeamId,
+          assignedTeamName: updates.assignedTeamName !== undefined ? (updates.assignedTeamName || '') : t.assignedTeamName,
+        };
+        if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
+          FirebaseService.upsertDoc('tasks', t.id, taskUpdate);
+        }
+        return taskUpdate;
+      }
+      return t;
+    });
+
+    if (tasksChanged) {
+      const cleanTasks = deduplicateTasks(updatedTasks, cleanClients);
+      setTasks(cleanTasks);
+      StorageService.saveTasks(cleanTasks);
+    }
+
+    // 5. Trigger Online Sync with updated data
+    OnlineDataService.scheduleAutoOnlineSync({
+      clients: cleanClients,
+      tasks: tasksChanged ? updatedTasks : tasks,
+      team: StorageService.getTeam(),
+      extraWork: StorageService.getExtraWork(),
+      documents: StorageService.getDocuments(),
+      attendanceRecords: StorageService.getAttendance(),
+      settings: StorageService.getSettings(),
+      guestLeads: StorageService.getGuestLeads()
+    });
+
     StorageService.addAuditLog({
       actorId: 'admin',
       actorName: 'Admin',
       role: 'ADMIN',
       action: 'UPDATE_CLIENT',
       category: 'CLIENT',
-      details: `Updated details for client ID ${id}`
+      details: `Updated details for client: ${newTradeName || id} (ID: ${id})`
     });
     setAuditLogs(StorageService.getAuditLogs());
   };

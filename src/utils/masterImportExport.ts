@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 import { Client, ClientCategory, UserProfile } from '../types';
 
 export interface ParsedClientRow {
+  id?: string;
   tradeName: string;
   legalName?: string;
   pan: string;
