@@ -265,7 +265,7 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
             </h3>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
-            Prioritized Urgency: <strong className="text-red-600 dark:text-red-400">High to Low</strong> • <strong className="text-amber-600 dark:text-amber-400">Earliest Deadlines First</strong> • <span className="font-semibold text-emerald-600 dark:text-emerald-400">↕️ Up-to-Down Scrollable</span> ({filteredTasks.length} of {roleFiltered.length} items)
+            Prioritized Urgency: <strong className="text-red-600 dark:text-red-400">High to Low</strong> • <strong className="text-amber-600 dark:text-amber-400">Earliest Deadlines First</strong>
           </p>
         </div>
 
