@@ -17,6 +17,10 @@ const KEYS = {
   AI_LEARNED_MEMORY: 'taskvaani_ai_learned_memory_v1',
   GUEST_LEADS: 'taskvaani_guest_leads_v1',
   ADMIN_PASSWORD: 'taskvaani_admin_master_password_v1',
+  DELETED_TEAM_IDS: 'taskvaani_deleted_team_ids_v1',
+  DELETED_CLIENT_IDS: 'taskvaani_deleted_client_ids_v1',
+  DELETED_TASK_IDS: 'taskvaani_deleted_task_ids_v1',
+  LAST_LOCAL_MODIFIED: 'taskvaani_last_local_modified_v1',
 };
 
 // Safe JSON parser
@@ -329,42 +333,116 @@ export const normalizeClientSerialNumbers = (clients: Client[]): Client[] => {
 };
 
 export const StorageService = {
+  // Local Modification & Tombstone tracking
+  markLocalChange: () => {
+    try {
+      localStorage.setItem(KEYS.LAST_LOCAL_MODIFIED, new Date().toISOString());
+    } catch {}
+  },
+  getLastLocalModified: (): string => {
+    return safeGet<string>(KEYS.LAST_LOCAL_MODIFIED, '');
+  },
+
+  getDeletedTeamIds: (): string[] => safeGet<string[]>(KEYS.DELETED_TEAM_IDS, []),
+  recordDeletedTeamId: (id: string) => {
+    const list = safeGet<string[]>(KEYS.DELETED_TEAM_IDS, []);
+    if (!list.includes(id)) {
+      list.push(id);
+      safeSet(KEYS.DELETED_TEAM_IDS, list);
+    }
+    StorageService.markLocalChange();
+  },
+  unmarkDeletedTeamId: (id: string) => {
+    const list = safeGet<string[]>(KEYS.DELETED_TEAM_IDS, []);
+    safeSet(KEYS.DELETED_TEAM_IDS, list.filter(i => i !== id));
+    StorageService.markLocalChange();
+  },
+
+  getDeletedClientIds: (): string[] => safeGet<string[]>(KEYS.DELETED_CLIENT_IDS, []),
+  recordDeletedClientId: (id: string) => {
+    const list = safeGet<string[]>(KEYS.DELETED_CLIENT_IDS, []);
+    if (!list.includes(id)) {
+      list.push(id);
+      safeSet(KEYS.DELETED_CLIENT_IDS, list);
+    }
+    StorageService.markLocalChange();
+  },
+  unmarkDeletedClientId: (id: string) => {
+    const list = safeGet<string[]>(KEYS.DELETED_CLIENT_IDS, []);
+    safeSet(KEYS.DELETED_CLIENT_IDS, list.filter(i => i !== id));
+    StorageService.markLocalChange();
+  },
+
+  getDeletedTaskIds: (): string[] => safeGet<string[]>(KEYS.DELETED_TASK_IDS, []),
+  recordDeletedTaskId: (id: string) => {
+    const list = safeGet<string[]>(KEYS.DELETED_TASK_IDS, []);
+    if (!list.includes(id)) {
+      list.push(id);
+      safeSet(KEYS.DELETED_TASK_IDS, list);
+    }
+    StorageService.markLocalChange();
+  },
+  unmarkDeletedTaskId: (id: string) => {
+    const list = safeGet<string[]>(KEYS.DELETED_TASK_IDS, []);
+    safeSet(KEYS.DELETED_TASK_IDS, list.filter(i => i !== id));
+    StorageService.markLocalChange();
+  },
+
   // Clients (Defaults to 0 for Clean Production Practice Start, Always Deduplicated & Normalized S.No.)
   getClients: (): Client[] => {
     const { key } = getScopedKey(KEYS.CLIENTS);
+    const deleted = new Set(StorageService.getDeletedClientIds());
     const raw = safeGet<Client[]>(key, []);
-    return normalizeClientSerialNumbers(deduplicateClients(raw));
+    const filtered = raw.filter(c => !deleted.has(c.id));
+    return normalizeClientSerialNumbers(deduplicateClients(filtered));
   },
   saveClients: (clients: Client[]) => {
     const { key } = getScopedKey(KEYS.CLIENTS);
-    safeSet(key, normalizeClientSerialNumbers(deduplicateClients(clients)));
+    const deleted = new Set(StorageService.getDeletedClientIds());
+    const filtered = clients.filter(c => !deleted.has(c.id));
+    safeSet(key, normalizeClientSerialNumbers(deduplicateClients(filtered)));
+    StorageService.markLocalChange();
   },
 
   // Tasks (Defaults to 0 for Clean Production Practice Start, Always Deduplicated)
   getTasks: (): TaskItem[] => {
     const { key } = getScopedKey(KEYS.TASKS);
+    const deleted = new Set(StorageService.getDeletedTaskIds());
     const raw = safeGet<TaskItem[]>(key, []);
-    return deduplicateTasks(raw);
+    const filtered = raw.filter(t => !deleted.has(t.id));
+    return deduplicateTasks(filtered);
   },
   saveTasks: (tasks: TaskItem[]) => {
     const { key } = getScopedKey(KEYS.TASKS);
-    safeSet(key, deduplicateTasks(tasks));
+    const deleted = new Set(StorageService.getDeletedTaskIds());
+    const filtered = tasks.filter(t => !deleted.has(t.id));
+    safeSet(key, deduplicateTasks(filtered));
+    StorageService.markLocalChange();
   },
 
   // Team (Defaults to Partner Ravi Katara)
-  getTeam: (): UserProfile[] => safeGet<UserProfile[]>(KEYS.TEAM, [
-    {
-      id: 'team-1',
-      name: 'RAVI KATARA',
-      role: 'TEAM',
-      email: 'arya4186@gmail.com',
-      phone: '+91-8815052555',
-      pin: '1517',
-      designation: 'Senior Partner (Tax & Audit)',
-      assignedClientIds: []
-    }
-  ]),
-  saveTeam: (team: UserProfile[]) => safeSet(KEYS.TEAM, team),
+  getTeam: (): UserProfile[] => {
+    const deleted = new Set(StorageService.getDeletedTeamIds());
+    const raw = safeGet<UserProfile[]>(KEYS.TEAM, [
+      {
+        id: 'team-1',
+        name: 'RAVI KATARA',
+        role: 'ADMIN',
+        email: 'arya4186@gmail.com',
+        phone: '+91 8982147763',
+        pin: '1517',
+        designation: 'Head of Department / Senior Partner',
+        assignedClientIds: []
+      }
+    ]);
+    return raw.filter(m => !deleted.has(m.id));
+  },
+  saveTeam: (team: UserProfile[]) => {
+    const deleted = new Set(StorageService.getDeletedTeamIds());
+    const filtered = team.filter(m => !deleted.has(m.id));
+    safeSet(KEYS.TEAM, filtered);
+    StorageService.markLocalChange();
+  },
 
   // Extra Work (Defaults to 0)
   getExtraWork: (): ExtraWorkItem[] => {

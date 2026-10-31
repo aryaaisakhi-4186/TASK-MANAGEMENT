@@ -208,21 +208,53 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     OnlineDataService.pullLiveOnlineData().then(onlineData => {
       if (onlineData) {
+        const deletedTeam = new Set(StorageService.getDeletedTeamIds());
+        const deletedClients = new Set(StorageService.getDeletedClientIds());
+        const deletedTasks = new Set(StorageService.getDeletedTaskIds());
+        const localLastModified = StorageService.getLastLocalModified();
+        const onlineUpdatedAt = onlineData.updatedAt || '';
+
+        // Only overwrite local state from online static snapshot if local storage has never been modified,
+        // or if online snapshot is strictly newer than the user's latest local edit.
+        const isOnlineNewer = !localLastModified || (onlineUpdatedAt && new Date(onlineUpdatedAt).getTime() > new Date(localLastModified).getTime());
+
         if (Array.isArray(onlineData.clients) && onlineData.clients.length > 0) {
           const currentLocal = StorageService.getClients();
-          const merged = mergeClients(currentLocal, onlineData.clients);
-          const complete = syncMissingClientsFromTasks(merged, onlineData.tasks || StorageService.getTasks());
-          setClients(complete);
-          StorageService.saveClients(complete);
+          const cleanOnlineClients = onlineData.clients.filter(c => !deletedClients.has(c.id));
+          if (currentLocal.length === 0 || isOnlineNewer) {
+            const merged = mergeClients(currentLocal, cleanOnlineClients);
+            const complete = syncMissingClientsFromTasks(merged, onlineData.tasks || StorageService.getTasks()).filter(c => !deletedClients.has(c.id));
+            setClients(complete);
+            StorageService.saveClients(complete);
+          }
         }
         if (Array.isArray(onlineData.tasks)) {
-          const cleanTasks = deduplicateTasks(onlineData.tasks, onlineData.clients || StorageService.getClients());
-          setTasks(cleanTasks);
-          StorageService.saveTasks(cleanTasks);
+          const currentLocalTasks = StorageService.getTasks();
+          if (currentLocalTasks.length === 0 || isOnlineNewer) {
+            const cleanTasks = deduplicateTasks(
+              onlineData.tasks.filter(t => !deletedTasks.has(t.id)),
+              onlineData.clients || StorageService.getClients()
+            );
+            setTasks(cleanTasks);
+            StorageService.saveTasks(cleanTasks);
+          }
         }
         if (Array.isArray(onlineData.team) && onlineData.team.length > 0) {
-          setTeam(onlineData.team);
-          StorageService.saveTeam(onlineData.team);
+          const currentLocalTeam = StorageService.getTeam();
+          const cleanOnlineTeam = onlineData.team.filter(m => !deletedTeam.has(m.id));
+          if (currentLocalTeam.length === 0 || isOnlineNewer) {
+            setTeam(cleanOnlineTeam);
+            StorageService.saveTeam(cleanOnlineTeam);
+          } else {
+            // Merge any genuinely new team member that isn't deleted
+            const localIds = new Set(currentLocalTeam.map(m => m.id));
+            const newMembers = cleanOnlineTeam.filter(m => !localIds.has(m.id));
+            if (newMembers.length > 0) {
+              const mergedTeam = [...currentLocalTeam, ...newMembers];
+              setTeam(mergedTeam);
+              StorageService.saveTeam(mergedTeam);
+            }
+          }
         }
         if (Array.isArray(onlineData.extraWork)) {
           setExtraWork(onlineData.extraWork);
@@ -271,20 +303,32 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Attach Real-Time Live Server Listener (/api/online-db across tabs & office devices)
       unsubscribers.push(
         OnlineDataService.subscribeToLiveServerUpdates((liveSnap) => {
+          const deletedClients = new Set(StorageService.getDeletedClientIds());
+          const deletedTasks = new Set(StorageService.getDeletedTaskIds());
+          const deletedTeam = new Set(StorageService.getDeletedTeamIds());
+
           if (Array.isArray(liveSnap.clients) && liveSnap.clients.length > 0) {
             setClients(prev => {
               const currentLocal = StorageService.getClients();
-              const merged = mergeClients(currentLocal, liveSnap.clients || []);
+              const clean = (liveSnap.clients || []).filter(c => !deletedClients.has(c.id));
+              const merged = mergeClients(currentLocal, clean);
               StorageService.saveClients(merged);
               return merged;
             });
           }
           if (Array.isArray(liveSnap.tasks)) {
-            const clean = deduplicateTasks(liveSnap.tasks, liveSnap.clients || StorageService.getClients());
+            const clean = deduplicateTasks(
+              (liveSnap.tasks || []).filter(t => !deletedTasks.has(t.id)),
+              liveSnap.clients || StorageService.getClients()
+            );
             setTasks(clean);
             StorageService.saveTasks(clean);
           }
-          if (Array.isArray(liveSnap.team)) setTeam(liveSnap.team);
+          if (Array.isArray(liveSnap.team)) {
+            const cleanTeam = (liveSnap.team || []).filter(m => !deletedTeam.has(m.id));
+            setTeam(cleanTeam);
+            StorageService.saveTeam(cleanTeam);
+          }
           if (Array.isArray(liveSnap.extraWork)) setExtraWork(liveSnap.extraWork);
           if (Array.isArray(liveSnap.documents)) setDocuments(liveSnap.documents);
           if (Array.isArray(liveSnap.attendanceRecords)) setAttendanceRecords(liveSnap.attendanceRecords);
@@ -320,24 +364,31 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (FirebaseService.isConfigured()) {
         unsubscribers.push(
           FirebaseService.subscribeToCollection<Client>('clients', (items) => {
-            if (items.length > 0) {
+            const deletedClients = new Set(StorageService.getDeletedClientIds());
+            const clean = items.filter(c => !deletedClients.has(c.id));
+            if (clean.length > 0) {
               setClients(prev => {
                 const currentLocal = StorageService.getClients();
-                const merged = mergeClients(currentLocal, items);
+                const merged = mergeClients(currentLocal, clean);
                 StorageService.saveClients(merged);
                 return merged;
               });
             }
           }),
           FirebaseService.subscribeToCollection<TaskItem>('tasks', (items) => {
-            if (items.length > 0) {
-              const clean = deduplicateTasks(items, StorageService.getClients());
-              setTasks(clean);
-              StorageService.saveTasks(clean);
+            const deletedTasks = new Set(StorageService.getDeletedTaskIds());
+            const clean = items.filter(t => !deletedTasks.has(t.id));
+            if (clean.length > 0) {
+              const deduped = deduplicateTasks(clean, StorageService.getClients());
+              setTasks(deduped);
+              StorageService.saveTasks(deduped);
             }
           }),
           FirebaseService.subscribeToCollection<UserProfile>('team', (items) => {
-            if (items.length > 0) setTeam(items);
+            const deletedTeam = new Set(StorageService.getDeletedTeamIds());
+            const clean = items.filter(m => !deletedTeam.has(m.id));
+            setTeam(clean);
+            StorageService.saveTeam(clean);
           }),
           FirebaseService.subscribeToCollection<ExtraWorkItem>('extraWork', (items) => {
             if (items.length > 0) setExtraWork(items);
@@ -1117,8 +1168,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const deleteClient = (id: string) => {
     if (!checkGuestWriteAllowed()) return;
+    StorageService.recordDeletedClientId(id);
     const target = clients.find(c => c.id === id);
     const clientTaskIds = tasks.filter(t => t.clientId === id).map(t => t.id);
+    clientTaskIds.forEach(tid => StorageService.recordDeletedTaskId(tid));
     setClients(prev => prev.filter(c => c.id !== id));
     setTasks(prev => prev.filter(t => t.clientId !== id));
     if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
@@ -1278,6 +1331,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const deleteTask = (id: string, reason?: string) => {
     if (!checkGuestWriteAllowed()) return;
+    StorageService.recordDeletedTaskId(id);
     const taskToDelete = tasks.find(t => t.id === id);
     const updatedTasks = tasks.filter(t => t.id !== id);
     setTasks(updatedTasks);
@@ -1371,7 +1425,21 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const deleteTeamMember = (id: string) => {
+    StorageService.recordDeletedTeamId(id);
+    const target = team.find(m => m.id === id);
     setTeam(prev => prev.filter(m => m.id !== id));
+    if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
+      FirebaseService.deleteDoc('team', id);
+    }
+    StorageService.addAuditLog({
+      actorId: currentUser?.id || 'admin',
+      actorName: currentUser?.name || 'Admin',
+      role: (currentUser?.role as any) || 'ADMIN',
+      action: 'DELETE_TEAM_MEMBER',
+      category: 'SYSTEM',
+      details: `Removed team member "${target?.name || id}" (ID: ${id}) from directory`
+    });
+    setAuditLogs(StorageService.getAuditLogs());
   };
 
   // Extra Work

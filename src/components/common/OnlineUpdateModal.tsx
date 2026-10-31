@@ -153,11 +153,11 @@ export const OnlineUpdateModal: React.FC<OnlineUpdateModalProps> = ({ isOpen, on
 
       if (deployedViaServer) {
         setStatusDetails(
-          '✅ App code aur data dono सफलतापूर्वक (Successfully) GitHub Pages par Live Update ho gaye hain! Ab aapko terminal me npm run deploy chalane ki jarurat nahi hai.'
+          '✅ App code aur database dono सफलतापूर्वक (Successfully) GitHub Pages par Live Publish ho gaye hain! Team aur clients ke sabhi changes online lock ho gaye hain.'
         );
       } else {
         setStatusDetails(
-          '✅ App ke sabhi changes Cloud aur Online Version ke sath sync & update ho gaye hain! Niche button se latest live version reload kar sakte hain.'
+          '✅ Team Members, Clients aur Tasks ke sabhi corrections Realtime Storage me successfully lock aur save ho gaye hain! Koi bhi deleted member ab reload karne par vapis nahi aayega.'
         );
       }
 
@@ -175,6 +175,27 @@ export const OnlineUpdateModal: React.FC<OnlineUpdateModalProps> = ({ isOpen, on
     } finally {
       setIsUpdating(false);
     }
+  };
+
+  const handleDownloadBackup = () => {
+    const backupData = {
+      clients: StorageService.getClients(),
+      tasks: StorageService.getTasks(),
+      team: StorageService.getTeam(),
+      extraWork: StorageService.getExtraWork(),
+      documents: StorageService.getDocuments(),
+      attendanceRecords: StorageService.getAttendance(),
+      settings: StorageService.getSettings(),
+      updatedAt: new Date().toISOString(),
+      updatedAtIST: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+    };
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `TASK_VAANI_ONLINE_DB_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleReloadLatestVersion = () => {
@@ -332,7 +353,7 @@ export const OnlineUpdateModal: React.FC<OnlineUpdateModalProps> = ({ isOpen, on
             ) : (
               <>
                 <Rocket size={16} />
-                <span>🚀 Update & Publish Online Now</span>
+                <span>🚀 Update & Lock Changes</span>
               </>
             )}
           </button>
@@ -347,6 +368,17 @@ export const OnlineUpdateModal: React.FC<OnlineUpdateModalProps> = ({ isOpen, on
               <span>Reload App</span>
             </button>
           )}
+        </div>
+
+        {/* Download Backup Database JSON Button */}
+        <div className="mt-3 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={handleDownloadBackup}
+            className="text-xs text-slate-400 hover:text-emerald-400 font-semibold underline flex items-center gap-1 transition-colors"
+          >
+            <span>📥 Download Backup Database File (.json)</span>
+          </button>
         </div>
 
         <p className="text-[10px] text-center text-slate-500 mt-3">

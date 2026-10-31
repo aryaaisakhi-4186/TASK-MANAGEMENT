@@ -92,6 +92,11 @@ function onlineDataAndDeployPlugin(): Plugin {
             };
             fs.mkdirSync(path.dirname(onlineDbPath), { recursive: true });
             fs.writeFileSync(onlineDbPath, JSON.stringify(snapshot, null, 2), 'utf-8');
+
+            const distDbPath = path.resolve(process.cwd(), 'dist', 'online-db.json');
+            if (fs.existsSync(path.dirname(distDbPath))) {
+              fs.writeFileSync(distDbPath, JSON.stringify(snapshot, null, 2), 'utf-8');
+            }
           }
         } catch (snapErr) {
           console.warn('Snapshot save warning before deploy:', snapErr);
@@ -99,44 +104,27 @@ function onlineDataAndDeployPlugin(): Plugin {
 
         const isWin = process.platform === 'win32';
         const buildAndDeployCmd = isWin
-          ? `.\\node_modules\\.bin\\tsc.cmd -b && .\\node_modules\\.bin\\vite.cmd build && .\\node_modules\\.bin\\gh-pages.cmd -d dist`
-          : `npx tsc -b && npx vite build && npx gh-pages -d dist`;
+          ? `npm run build && npx gh-pages -d dist`
+          : `npm run build && npx gh-pages -d dist`;
 
-        // Run git commit/push (including public/online-db.json, excluding .github) + build & deploy
-        const cmd = `git add src public index.html package.json vite.config.ts && (git diff --cached --quiet || git commit -m "One-click online app & data update from TASK-VAANI") && git push origin main && ${buildAndDeployCmd}`;
-
-        exec(cmd, { cwd: process.cwd() }, (error, stdout, stderr) => {
-          if (error) {
-            exec(buildAndDeployCmd, { cwd: process.cwd() }, (deployErr, deployOut, deployStderr) => {
-              if (deployErr) {
-                res.statusCode = 500;
-                res.end(JSON.stringify({
-                  success: false,
-                  message: deployErr.message || 'Deployment failed',
-                  details: deployStderr || stderr
-                }));
-              } else {
-                res.statusCode = 200;
-                res.end(JSON.stringify({
-                  success: true,
-                  mode: 'LIVE_GITHUB_DEPLOY',
-                  message: 'App & Online Database built and published live to GitHub Pages!',
-                  output: deployOut || stdout,
-                  timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
-                }));
-              }
-            });
-            return;
+        exec(buildAndDeployCmd, { cwd: process.cwd() }, (deployErr, deployOut, deployStderr) => {
+          if (deployErr) {
+            res.statusCode = 500;
+            res.end(JSON.stringify({
+              success: false,
+              message: deployErr.message || 'Deployment failed',
+              details: deployStderr
+            }));
+          } else {
+            res.statusCode = 200;
+            res.end(JSON.stringify({
+              success: true,
+              mode: 'LIVE_GITHUB_DEPLOY',
+              message: 'App & Online Database built and published live to GitHub Pages!',
+              output: deployOut,
+              timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+            }));
           }
-
-          res.statusCode = 200;
-          res.end(JSON.stringify({
-            success: true,
-            mode: 'LIVE_GITHUB_DEPLOY',
-            message: 'All app & database changes committed and deployed live to GitHub Pages!',
-            output: stdout,
-            timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
-          }));
         });
       });
     }
