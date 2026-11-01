@@ -511,6 +511,7 @@ export const StorageService = {
     const settings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
     settings.adminPasswordHash = clean;
     safeSet(KEYS.SETTINGS, settings);
+    StorageService.markLocalChange();
   },
   getSettings: (): SystemSettings => {
     const settings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
@@ -535,10 +536,16 @@ export const StorageService = {
     return settings;
   },
   saveSettings: (settings: SystemSettings) => {
-    if (settings.adminPasswordHash) {
-      safeSet(KEYS.ADMIN_PASSWORD, settings.adminPasswordHash);
-    }
+    // Preserve custom admin password: NEVER allow external data to revert custom password to 'admin123'
+    const customPassword = StorageService.getAdminPassword();
+    const cleanPassword = (customPassword && customPassword !== 'admin123')
+      ? customPassword
+      : (settings.adminPasswordHash || customPassword || 'admin123');
+
+    settings.adminPasswordHash = cleanPassword;
+    safeSet(KEYS.ADMIN_PASSWORD, cleanPassword);
     safeSet(KEYS.SETTINGS, settings);
+    StorageService.markLocalChange();
   },
 
   // Auth Session

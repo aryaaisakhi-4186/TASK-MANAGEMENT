@@ -115,7 +115,7 @@ export const HomePageLogin: React.FC = () => {
       (adminEmail && cleanId.toLowerCase() === adminEmail);
 
     if (isMatchAdminId) {
-      if (!cleanSecret || cleanSecret === adminPass || cleanSecret === 'admin123' || adminPass === 'admin123') {
+      if (cleanSecret === adminPass || (!cleanSecret && adminPass === 'admin123')) {
         const success = loginAsAdmin(cleanSecret || adminPass);
         if (success) {
           setSuccessInfo('Logging in as Admin (Managing Partner)...');

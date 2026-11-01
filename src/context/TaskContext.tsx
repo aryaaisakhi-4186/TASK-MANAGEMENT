@@ -186,6 +186,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTasks(StorageService.getTasks());
     setExtraWork(StorageService.getExtraWork());
     setDocuments(StorageService.getDocuments());
+    setSettings(StorageService.getSettings());
   }, [currentUser?.id, currentUser?.phone, currentUser?.role]);
 
   // Guard for 15-Day Guest Trial Expiry (Read/View allowed, Write blocked after 15 days)

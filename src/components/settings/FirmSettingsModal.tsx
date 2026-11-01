@@ -28,6 +28,7 @@ export const FirmSettingsModal: React.FC = () => {
   const [cloudStorageEmail, setCloudStorageEmail] = useState(settings.cloudStorageEmail || 'arya.taskmanagement@gmail.com');
   const [googleDriveSync, setGoogleDriveSync] = useState(settings.googleDriveSyncEnabled ?? true);
   const [saved, setSaved] = useState(false);
+  const [passwordSavedNotice, setPasswordSavedNotice] = useState(false);
 
   // Sync internal form state whenever settings are updated from Cloud, but ONLY if user hasn't typed modifications
   useEffect(() => {
@@ -40,11 +41,49 @@ export const FirmSettingsModal: React.FC = () => {
       if (settings.morningAlarmTime) setAlarmTime(settings.morningAlarmTime);
       if (typeof settings.enableSoundChime === 'boolean') setEnableSound(settings.enableSoundChime);
       const savedPass = StorageService.getAdminPassword();
-      setAdminPassword(savedPass || settings.adminPasswordHash || 'admin123');
+      const effectivePass = (savedPass && savedPass !== 'admin123') ? savedPass : (settings.adminPasswordHash || savedPass || 'admin123');
+      setAdminPassword(effectivePass);
       if (settings.cloudStorageEmail) setCloudStorageEmail(settings.cloudStorageEmail);
       if (typeof settings.googleDriveSyncEnabled === 'boolean') setGoogleDriveSync(settings.googleDriveSyncEnabled);
     }
   }, [settings, isDirty]);
+
+  const handleDirectPasswordSave = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const cleanPassword = adminPassword.trim();
+    if (!cleanPassword) {
+      alert('Password khali nahi ho sakta.');
+      return;
+    }
+
+    StorageService.saveAdminPassword(cleanPassword);
+    const updated = {
+      ...settings,
+      adminPasswordHash: cleanPassword,
+      lastCloudSyncTimestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+    };
+    updateSettings({ adminPasswordHash: cleanPassword });
+    StorageService.saveSettings(updated);
+    refreshAdminSession();
+    setIsDirty(false);
+
+    OnlineDataService.scheduleAutoOnlineSync({
+      clients,
+      tasks,
+      team,
+      extraWork,
+      documents,
+      attendanceRecords,
+      settings: updated,
+      guestLeads: StorageService.getGuestLeads()
+    });
+
+    setPasswordSavedNotice(true);
+    setTimeout(() => setPasswordSavedNotice(false), 4000);
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -271,22 +310,40 @@ export const FirmSettingsModal: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Admin Master Password</label>
-              <div className="relative">
-                <input
-                  type={showAdminPassword ? 'text' : 'password'}
-                  value={adminPassword}
-                  onChange={(e) => { setAdminPassword(e.target.value); setIsDirty(true); }}
-                  placeholder="Enter Admin Master Password"
-                  className="w-full pl-3.5 pr-10 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono"
-                />
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Admin Master Password</label>
+                {passwordSavedNotice && (
+                  <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 animate-pulse">
+                    <Check size={12} /> Password Saved & Locked!
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type={showAdminPassword ? 'text' : 'password'}
+                    value={adminPassword}
+                    onChange={(e) => { setAdminPassword(e.target.value); setIsDirty(true); }}
+                    placeholder="Enter Admin Master Password"
+                    className="w-full pl-3.5 pr-10 py-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono font-bold"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminPassword(!showAdminPassword)}
+                    title={showAdminPassword ? 'Hide Password' : 'Show Password'}
+                    className="absolute right-3 top-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                  >
+                    {showAdminPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
                 <button
                   type="button"
-                  onClick={() => setShowAdminPassword(!showAdminPassword)}
-                  title={showAdminPassword ? 'Hide Password' : 'Show Password'}
-                  className="absolute right-3 top-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                  onClick={handleDirectPasswordSave}
+                  title="Directly save & lock this Admin Password immediately"
+                  className="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-sm transition-all active:scale-95 cursor-pointer"
                 >
-                  {showAdminPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {passwordSavedNotice ? <Check size={14} className="text-slate-950" /> : <Save size={14} />}
+                  <span>{passwordSavedNotice ? 'Saved!' : 'Save Password'}</span>
                 </button>
               </div>
             </div>
