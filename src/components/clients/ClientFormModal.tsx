@@ -803,14 +803,14 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
                   </p>
                 </div>
 
-                {/* Compliances (AUDIT, GST, GSTR-9, GSTR-9C, TDS | ITR, VAT, E-INVOICE, RCM, 86B) */}
+                {/* Compliances Applicability in a Single Horizontal Line Left to Right */}
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-800/80 space-y-1.5">
                   <label className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                     <ShieldCheck size={14} className="text-emerald-500" />
                     <span>Compliances Applicability</span>
                   </label>
 
-                  <div className="grid grid-rows-5 grid-flow-col gap-1 w-fit">
+                  <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto scrollbar-none py-1 max-w-full">
                     {COMPLIANCE_APPLICABILITY_ITEMS.map(item => {
                       const isApp = complianceApplicability[item.key];
                       return (
@@ -819,17 +819,21 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
                           type="button"
                           onClick={() => handleToggleApplicability(item.key)}
                           title={item.fullTitle}
-                          className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-400 transition-all flex items-center justify-between gap-1.5 cursor-pointer whitespace-nowrap leading-none"
+                          className={`px-2 py-1 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap leading-none shrink-0 shadow-2xs ${
+                            isApp
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700/80 text-emerald-800 dark:text-emerald-300'
+                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-400'
+                          }`}
                         >
-                          <span className="font-mono font-bold text-[8.5px] leading-none uppercase text-slate-800 dark:text-slate-200 whitespace-nowrap">
+                          <span className="font-mono font-bold text-[9px] leading-none uppercase whitespace-nowrap">
                             {item.label}
                           </span>
                           <span
-                            className={`w-4 h-2.5 rounded-full p-[1px] flex items-center shrink-0 transition-colors duration-200 ${
+                            className={`w-3.5 h-2 rounded-full p-[1px] flex items-center shrink-0 transition-colors duration-200 ${
                               isApp ? 'bg-emerald-500 justify-end' : 'bg-red-500 justify-start'
                             }`}
                           >
-                            <span className="w-2 h-2 rounded-full bg-white shadow-sm block" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-white shadow-xs block" />
                           </span>
                         </button>
                       );
