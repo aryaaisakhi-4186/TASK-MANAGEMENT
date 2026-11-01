@@ -405,7 +405,7 @@ export const ClientMasterTable: React.FC = () => {
                       type="text"
                       value={colFilters.sNo}
                       onChange={(e) => handleColFilterChange('sNo', e.target.value)}
-                      placeholder="# S.No"
+                      placeholder="S.No..."
                       className="w-full text-center px-1 py-1 text-[11px] font-mono bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
                     />
                     {colFilters.sNo && (
@@ -426,7 +426,7 @@ export const ClientMasterTable: React.FC = () => {
                       type="text"
                       value={colFilters.name}
                       onChange={(e) => handleColFilterChange('name', e.target.value)}
-                      placeholder="🔍 Name..."
+                      placeholder="Name..."
                       className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
                     />
                     {colFilters.name && (
@@ -447,7 +447,7 @@ export const ClientMasterTable: React.FC = () => {
                       type="text"
                       value={colFilters.statutory}
                       onChange={(e) => handleColFilterChange('statutory', e.target.value)}
-                      placeholder="🔍 PAN / GST..."
+                      placeholder="PAN / GST..."
                       className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
                     />
                     {colFilters.statutory && (
@@ -468,7 +468,7 @@ export const ClientMasterTable: React.FC = () => {
                       type="text"
                       value={colFilters.compliance}
                       onChange={(e) => handleColFilterChange('compliance', e.target.value)}
-                      placeholder="🔍 GST/TDS/VAT"
+                      placeholder="GST/TDS/VAT..."
                       className="w-full px-1.5 py-1 text-[11px] font-normal text-center bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
                     />
                     {colFilters.compliance && (
@@ -489,7 +489,7 @@ export const ClientMasterTable: React.FC = () => {
                       type="text"
                       value={colFilters.statusCategory}
                       onChange={(e) => handleColFilterChange('statusCategory', e.target.value)}
-                      placeholder="🔍 Status/Type..."
+                      placeholder="Status/Type..."
                       className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
                     />
                     {colFilters.statusCategory && (
@@ -510,7 +510,7 @@ export const ClientMasterTable: React.FC = () => {
                       type="text"
                       value={colFilters.contact}
                       onChange={(e) => handleColFilterChange('contact', e.target.value)}
-                      placeholder="🔍 Person/Phone..."
+                      placeholder="Person/Phone..."
                       className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
                     />
                     {colFilters.contact && (
@@ -531,7 +531,7 @@ export const ClientMasterTable: React.FC = () => {
                       type="text"
                       value={colFilters.employee}
                       onChange={(e) => handleColFilterChange('employee', e.target.value)}
-                      placeholder="🔍 Employee..."
+                      placeholder="Employee..."
                       className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
                     />
                     {colFilters.employee && (
@@ -552,7 +552,7 @@ export const ClientMasterTable: React.FC = () => {
                       type="text"
                       value={colFilters.aadharDob}
                       onChange={(e) => handleColFilterChange('aadharDob', e.target.value)}
-                      placeholder="🔍 Aadhar/DOB..."
+                      placeholder="Aadhar/DOB..."
                       className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
                     />
                     {colFilters.aadharDob && (
@@ -573,7 +573,7 @@ export const ClientMasterTable: React.FC = () => {
                       type="text"
                       value={colFilters.assignedStaff}
                       onChange={(e) => handleColFilterChange('assignedStaff', e.target.value)}
-                      placeholder="🔍 Staff..."
+                      placeholder="Staff..."
                       className="w-full px-2 py-1 text-[11px] font-normal bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded focus:border-amber-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 placeholder:text-[10px]"
                     />
                     {colFilters.assignedStaff && (
