@@ -180,6 +180,8 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
   }, [initialTab, isOpen]);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     if (client) {
       setTradeName(client.tradeName || '');
       setLegalName(client.legalName || '');
@@ -231,7 +233,7 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
       setRepositoryDocs([]);
       setComplianceApplicability(resolveClientApplicability(null));
     }
-  }, [client, team, isOpen]);
+  }, [client?.id, isOpen]);
 
   const handleToggleApplicability = (key: ComplianceApplicabilityKey, forcedVal?: boolean) => {
     setComplianceApplicability(prev => ({
@@ -716,9 +718,15 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
                     <input
                       type="text"
                       value={vatNumber}
-                      onChange={(e) => setVatNumber(e.target.value)}
-                      placeholder="VAT-MH-998811"
-                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono focus:border-amber-500 focus:outline-none"
+                      onChange={(e) => {
+                        const val = e.target.value.toUpperCase();
+                        setVatNumber(val);
+                        if (val.trim().length >= 4) {
+                          handleToggleApplicability('VAT', true);
+                        }
+                      }}
+                      placeholder="e.g. 23947701879 or VAT-MH-998811"
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono uppercase focus:border-amber-500 focus:outline-none"
                     />
                   </div>
                 </div>

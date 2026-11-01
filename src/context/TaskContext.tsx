@@ -1171,6 +1171,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           pan: updates.pan !== undefined ? updates.pan.trim().toUpperCase() : c.pan,
           gstin: updates.gstin !== undefined ? updates.gstin.trim().toUpperCase() : c.gstin,
           tan: updates.tan !== undefined ? updates.tan.trim().toUpperCase() : c.tan,
+          vatNumber: updates.vatNumber !== undefined ? updates.vatNumber.trim().toUpperCase() : c.vatNumber,
         };
         targetUpdatedClient = updated;
         if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
