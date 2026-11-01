@@ -180,6 +180,44 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [clientReminders, setClientReminders] = useState<ClientReminder[]>(() => StorageService.getClientReminders());
   const [settings, setSettings] = useState<SystemSettings>(() => StorageService.getSettings());
 
+  // Listen for Real-Time synchronization across browser tabs and windows
+  useEffect(() => {
+    const handleSync = () => {
+      setClients(StorageService.getClients());
+      setTasks(StorageService.getTasks());
+      setTeam(StorageService.getTeam());
+      setExtraWork(StorageService.getExtraWork());
+      setDocuments(StorageService.getDocuments());
+      setAttendanceRecords(StorageService.getAttendance());
+      setSettings(StorageService.getSettings());
+      setClientReminders(StorageService.getClientReminders());
+    };
+
+    let bc: BroadcastChannel | null = null;
+    if (typeof window !== 'undefined' && typeof BroadcastChannel !== 'undefined') {
+      try {
+        bc = new BroadcastChannel('TASK_VAANI_REALTIME_BUS');
+        bc.onmessage = (event) => {
+          if (event.data?.type === 'REALTIME_STATE_SYNC') {
+            handleSync();
+          }
+        };
+      } catch {}
+    }
+
+    const handleStorageEvent = (e: StorageEvent) => {
+      if (!e.key || e.key.startsWith('tv_')) {
+        handleSync();
+      }
+    };
+    window.addEventListener('storage', handleStorageEvent);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageEvent);
+      if (bc) bc.close();
+    };
+  }, []);
+
   // Reload isolated workspace whenever user session changes (Admin vs Guest Mobile Demo)
   useEffect(() => {
     setClients(StorageService.getClients());
@@ -212,42 +250,72 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const deletedTeam = new Set(StorageService.getDeletedTeamIds());
         const deletedClients = new Set(StorageService.getDeletedClientIds());
         const deletedTasks = new Set(StorageService.getDeletedTaskIds());
-        const localLastModified = StorageService.getLastLocalModified();
-        const onlineUpdatedAt = onlineData.updatedAt || '';
+        const currentLocal = StorageService.getClients();
+        const currentLocalTasks = StorageService.getTasks();
+        const currentLocalTeam = StorageService.getTeam();
 
-        // Only overwrite local state from online static snapshot if local storage has never been modified,
-        // or if online snapshot is strictly newer than the user's latest local edit.
-        const isOnlineNewer = !localLastModified || (onlineUpdatedAt && new Date(onlineUpdatedAt).getTime() > new Date(localLastModified).getTime());
-
+        // 1. CLIENTS: If local storage has 0 clients (first-time launch on fresh device), initialize from onlineData.
+        // If local clients already exist, LOCAL IS MASTER. Never overwrite local client details with old snapshot!
         if (Array.isArray(onlineData.clients) && onlineData.clients.length > 0) {
-          const currentLocal = StorageService.getClients();
           const cleanOnlineClients = onlineData.clients.filter(c => !deletedClients.has(c.id));
-          if (currentLocal.length === 0 || isOnlineNewer) {
-            const merged = mergeClients(currentLocal, cleanOnlineClients);
-            const complete = syncMissingClientsFromTasks(merged, onlineData.tasks || StorageService.getTasks()).filter(c => !deletedClients.has(c.id));
+          if (currentLocal.length === 0) {
+            const complete = syncMissingClientsFromTasks(cleanOnlineClients, onlineData.tasks || []).filter(c => !deletedClients.has(c.id));
             setClients(complete);
             StorageService.saveClients(complete);
+          } else {
+            // Local data already exists. Only enrich with any genuinely missing new client not deleted
+            const localPanSet = new Set(currentLocal.map(c => (c.pan || '').trim().toUpperCase()).filter(Boolean));
+            const localIdSet = new Set(currentLocal.map(c => c.id).filter(Boolean));
+            const localNameSet = new Set(currentLocal.map(c => (c.tradeName || '').trim().toLowerCase()).filter(Boolean));
+
+            const trulyNewClients = cleanOnlineClients.filter(c => {
+              const pan = (c.pan || '').trim().toUpperCase();
+              const name = (c.tradeName || '').trim().toLowerCase();
+              if (c.id && localIdSet.has(c.id)) return false;
+              if (pan && pan !== 'PAN-PENDING' && localPanSet.has(pan)) return false;
+              if (name && localNameSet.has(name)) return false;
+              return true;
+            });
+
+            if (trulyNewClients.length > 0) {
+              const merged = [...currentLocal, ...trulyNewClients];
+              const complete = syncMissingClientsFromTasks(merged, currentLocalTasks).filter(c => !deletedClients.has(c.id));
+              setClients(complete);
+              StorageService.saveClients(complete);
+            }
           }
         }
+
+        // 2. TASKS: If local storage has 0 tasks, load from onlineData.
+        // If local tasks already exist, LOCAL IS MASTER. NEVER overwrite user tasks or reset statuses to PENDING!
         if (Array.isArray(onlineData.tasks)) {
-          const currentLocalTasks = StorageService.getTasks();
-          if (currentLocalTasks.length === 0 || isOnlineNewer) {
+          if (currentLocalTasks.length === 0) {
             const cleanTasks = deduplicateTasks(
               onlineData.tasks.filter(t => !deletedTasks.has(t.id)),
               onlineData.clients || StorageService.getClients()
             );
             setTasks(cleanTasks);
             StorageService.saveTasks(cleanTasks);
+          } else {
+            // Local tasks exist. Only add tasks for new clients if missing, never overwrite existing task status!
+            const localTaskIdSet = new Set(currentLocalTasks.map(t => t.id));
+            const newTasks = onlineData.tasks.filter(t => !deletedTasks.has(t.id) && !localTaskIdSet.has(t.id));
+            if (newTasks.length > 0) {
+              const combined = deduplicateTasks([...currentLocalTasks, ...newTasks], currentLocal);
+              setTasks(combined);
+              StorageService.saveTasks(combined);
+            }
           }
         }
+
+        // 3. TEAM: If local team has 0 members, load from online.
+        // Otherwise, keep local team and never bring back deleted members!
         if (Array.isArray(onlineData.team) && onlineData.team.length > 0) {
-          const currentLocalTeam = StorageService.getTeam();
           const cleanOnlineTeam = onlineData.team.filter(m => !deletedTeam.has(m.id));
-          if (currentLocalTeam.length === 0 || isOnlineNewer) {
+          if (currentLocalTeam.length === 0) {
             setTeam(cleanOnlineTeam);
             StorageService.saveTeam(cleanOnlineTeam);
           } else {
-            // Merge any genuinely new team member that isn't deleted
             const localIds = new Set(currentLocalTeam.map(m => m.id));
             const newMembers = cleanOnlineTeam.filter(m => !localIds.has(m.id));
             if (newMembers.length > 0) {
@@ -257,21 +325,25 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           }
         }
-        if (Array.isArray(onlineData.extraWork)) {
+
+        // 4. EXTRA WORK & DOCUMENTS & ATTENDANCE
+        if (Array.isArray(onlineData.extraWork) && StorageService.getExtraWork().length === 0) {
           setExtraWork(onlineData.extraWork);
           StorageService.saveExtraWork(onlineData.extraWork);
         }
-        if (Array.isArray(onlineData.documents)) {
+        if (Array.isArray(onlineData.documents) && StorageService.getDocuments().length === 0) {
           setDocuments(onlineData.documents);
           StorageService.saveDocuments(onlineData.documents);
         }
-        if (Array.isArray(onlineData.attendanceRecords)) {
+        if (Array.isArray(onlineData.attendanceRecords) && StorageService.getAttendance().length === 0) {
           setAttendanceRecords(onlineData.attendanceRecords);
           StorageService.saveAttendance(onlineData.attendanceRecords);
         }
         if (Array.isArray(onlineData.guestLeads)) {
           StorageService.saveGuestLeads(onlineData.guestLeads);
         }
+
+        // 5. SETTINGS: Preserve all local settings, firm name, admin designation, master password!
         if (onlineData.settings) {
           const currentSavedSettings = StorageService.getSettings();
           const savedAdminPass = StorageService.getAdminPassword();
@@ -284,8 +356,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
             cleanSettings.adminPasswordHash = currentSavedSettings.adminPasswordHash;
           }
 
-          if (!cleanSettings.firmName || cleanSettings.firmName.includes('VAANI') || cleanSettings.firmName.includes('Vaani')) {
-            cleanSettings.firmName = currentSavedSettings.firmName || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+          if (currentSavedSettings.firmName && !currentSavedSettings.firmName.includes('VAANI')) {
+            cleanSettings.firmName = currentSavedSettings.firmName;
           }
           if (currentSavedSettings.adminName) {
             cleanSettings.adminName = currentSavedSettings.adminName;
@@ -318,9 +390,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
           }
           if (Array.isArray(liveSnap.tasks)) {
+            const currentLocalTasks = StorageService.getTasks();
             const clean = deduplicateTasks(
-              (liveSnap.tasks || []).filter(t => !deletedTasks.has(t.id)),
-              liveSnap.clients || StorageService.getClients()
+              [...currentLocalTasks, ...(liveSnap.tasks || []).filter(t => !deletedTasks.has(t.id))],
+              StorageService.getClients()
             );
             setTasks(clean);
             StorageService.saveTasks(clean);
@@ -344,8 +417,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
               cleanSettings.adminPasswordHash = currentSavedSettings.adminPasswordHash;
             }
 
-            if (!cleanSettings.firmName || cleanSettings.firmName.includes('VAANI') || cleanSettings.firmName.includes('Vaani')) {
-              cleanSettings.firmName = currentSavedSettings.firmName || 'M/S. ARYA ASSOCIATES, ACCOUNTS & TAXATION';
+            if (currentSavedSettings.firmName && !currentSavedSettings.firmName.includes('VAANI')) {
+              cleanSettings.firmName = currentSavedSettings.firmName;
             }
             if (currentSavedSettings.adminName) {
               cleanSettings.adminName = currentSavedSettings.adminName;

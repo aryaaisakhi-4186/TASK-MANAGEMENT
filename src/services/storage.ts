@@ -287,13 +287,17 @@ export const mergeClients = (localClients: Client[], incomingClients: Client[]):
         assignedTeamName: existing.assignedTeamName || inc.assignedTeamName,
         googleDriveFolderId: existing.googleDriveFolderId || inc.googleDriveFolderId,
         googleDriveFolderUrl: existing.googleDriveFolderUrl || inc.googleDriveFolderUrl,
-        complianceApplicability: {
-          ...incApp,
-          ...baseApp,
-          VAT: !!(resolvedVat && resolvedVat.length >= 4),
-          GST: !!(resolvedGst && resolvedGst.length === 15),
-          TDS: !!(resolvedTan && resolvedTan.length === 10) || baseApp.TDS || incApp.TDS
-        }
+        complianceApplicability: existing.complianceApplicability
+          ? { ...baseApp, ...existing.complianceApplicability }
+          : (inc.complianceApplicability
+              ? { ...incApp, ...inc.complianceApplicability }
+              : {
+                  ...incApp,
+                  ...baseApp,
+                  VAT: !!(resolvedVat && resolvedVat.length >= 4),
+                  GST: !!(resolvedGst && resolvedGst.length === 15),
+                  TDS: !!(resolvedTan && resolvedTan.length === 10) || baseApp.TDS || incApp.TDS
+                })
       };
     } else {
       mergedList.push(inc);
@@ -337,6 +341,11 @@ export const StorageService = {
   markLocalChange: () => {
     try {
       localStorage.setItem(KEYS.LAST_LOCAL_MODIFIED, new Date().toISOString());
+      if (typeof window !== 'undefined' && typeof BroadcastChannel !== 'undefined') {
+        const bc = new BroadcastChannel('TASK_VAANI_REALTIME_BUS');
+        bc.postMessage({ type: 'REALTIME_STATE_SYNC', timestamp: Date.now() });
+        bc.close();
+      }
     } catch {}
   },
   getLastLocalModified: (): string => {
