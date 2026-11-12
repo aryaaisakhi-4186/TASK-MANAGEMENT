@@ -4845,10 +4845,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "RAKHI AGENCY",
+      "assignedTeamId": "",
+      "assignedTeamName": "PRADEEP"
     },
     {
       "id": "tsk-auto-cli-1792925711984-605-itr",
@@ -4858,10 +4860,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "AMAN KUMAR ANUJ KUMAR NAMDEO",
+      "assignedTeamId": "",
+      "assignedTeamName": "PRADEEP"
     },
     {
       "id": "tsk-auto-cli-1792925711984-853-itr",
@@ -4871,10 +4875,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "BALKRISHNA PREMNARAYAN",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925711984-420-itr",
@@ -4884,10 +4890,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "ASHOK AGENCIES",
+      "assignedTeamId": "",
+      "assignedTeamName": "PRADEEP"
     },
     {
       "id": "tsk-auto-cli-1792925711985-357-itr",
@@ -4897,10 +4905,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "CLASSIC WHEELZ",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925711985-61-itr",
@@ -4910,10 +4920,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "K. B. PULSES",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925711986-544-itr",
@@ -4923,10 +4935,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "NUTRI TRADE",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925711986-252-itr",
@@ -4936,10 +4950,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "GREEN ROOTS BIOMASS INDUSTRIES",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925711987-475-itr",
@@ -4949,10 +4965,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "RAJESH KUMAR RAKESH KUMAR RUSIA",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925711987-626-itr",
@@ -4962,10 +4980,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "PREMNARAYAN SAHU",
+      "assignedTeamId": "",
+      "assignedTeamName": "PRADEEP"
     },
     {
       "id": "tsk-auto-cli-1792925711987-943-itr",
@@ -4975,10 +4995,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "DHRUV TRADING COMPANY",
+      "assignedTeamId": "",
+      "assignedTeamName": "PRADEEP"
     },
     {
       "id": "tsk-auto-cli-1792925711988-939-itr",
@@ -4988,10 +5010,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "APSARA SAREES",
+      "assignedTeamId": "",
+      "assignedTeamName": "DIVYA"
     },
     {
       "id": "tsk-auto-cli-1792925711988-288-itr",
@@ -5001,10 +5025,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "APSARA FASHION HOUSE",
+      "assignedTeamId": "",
+      "assignedTeamName": "DIVYA"
     },
     {
       "id": "tsk-auto-cli-1792925711989-534-itr",
@@ -5014,10 +5040,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "MADHUBAN FASHION CORNER",
+      "assignedTeamId": "",
+      "assignedTeamName": "DIVYA"
     },
     {
       "id": "tsk-auto-cli-1792925711990-68-itr",
@@ -5027,10 +5055,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "ANKIT AGENCY",
+      "assignedTeamId": "",
+      "assignedTeamName": "PRADEEP"
     },
     {
       "id": "tsk-auto-cli-1792925711991-567-itr",
@@ -5040,10 +5070,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "TEEKAM GENERAL STORES",
+      "assignedTeamId": "",
+      "assignedTeamName": "PRADEEP"
     },
     {
       "id": "tsk-auto-cli-1792925711992-681-itr",
@@ -5053,10 +5085,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "SANJAY TRADERS",
+      "assignedTeamId": "",
+      "assignedTeamName": "PRADEEP"
     },
     {
       "id": "tsk-auto-cli-1792925711992-613-itr",
@@ -5066,10 +5100,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "BABULAL GYAN CHAND JAIN",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925711993-579-itr",
@@ -5079,10 +5115,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "ALOK PUSTAK SADAN",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925711994-990-itr",
@@ -5092,10 +5130,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "SHIKSHA SAHITYA SADAN",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925712018-677-itr",
@@ -5105,10 +5145,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "RAWAT INFOCOM SERVICES",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925711997-851-itr",
@@ -5118,10 +5160,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "RAJESH KUMAR RAHUL KUMAR JAIN - RANI JAIN",
+      "assignedTeamId": "",
+      "assignedTeamName": "PRADEEP"
     },
     {
       "id": "tsk-auto-cli-1792925711998-931-itr",
@@ -5131,10 +5175,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "SARITA STEELS",
+      "assignedTeamId": "",
+      "assignedTeamName": "VIJAY"
     },
     {
       "id": "tsk-auto-cli-1792925711998-378-itr",
@@ -5144,10 +5190,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "ANMOL CEMENT AGENCY",
+      "assignedTeamId": "",
+      "assignedTeamName": "VIJAY"
     },
     {
       "id": "tsk-auto-cli-1792925711998-640-itr",
@@ -5157,10 +5205,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "ARYAN STEELS",
+      "assignedTeamId": "",
+      "assignedTeamName": "VIJAY"
     },
     {
       "id": "tsk-auto-cli-1792925711999-178-itr",
@@ -5170,10 +5220,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "AGRAWALS STEELS",
+      "assignedTeamId": "",
+      "assignedTeamName": "VIJAY"
     },
     {
       "id": "tsk-auto-cli-1792925711999-625-itr",
@@ -5183,10 +5235,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "VEERA STEEL CORPORATION",
+      "assignedTeamId": "",
+      "assignedTeamName": "VIJAY"
     },
     {
       "id": "tsk-auto-cli-1792925711999-323-itr",
@@ -5196,10 +5250,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "NAMDEO WAREHOUSEING",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925712000-543-itr",
@@ -5209,10 +5265,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "NAMDEO TRADERS",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925712001-665-itr",
@@ -5222,10 +5280,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "KAMAKHYA FASHION HUB",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925712001-399-itr",
@@ -5235,10 +5295,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "HOTEL KAMAKHYA INN",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925712002-528-itr",
@@ -5248,10 +5310,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "KAMAKHYA FILLING STATION",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925712002-241-itr",
@@ -5261,10 +5325,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "MANJULA MAHILA MANDAL",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925712003-675-itr",
@@ -5274,10 +5340,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "RUCHI MAHILA MANDAL",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925712003-181-itr",
@@ -5287,10 +5355,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "MAA SHARDA TRADERS",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925712003-159-itr",
@@ -5300,10 +5370,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "NEW BAHU BETI COLLECTION",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925712004-598-itr",
@@ -5313,10 +5385,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "BAHU BETI EMPORIUM",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925712005-815-itr",
@@ -5326,10 +5400,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "DULHAN SAREE CENTER",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925712005-702-itr",
@@ -5339,10 +5415,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "NEW DULHAN SAREE CENTRE",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925712006-276-itr",
@@ -5352,10 +5430,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "NOWGONG FILLING STATION",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712006-476-itr",
@@ -5365,10 +5445,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "THE BUNDELA",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712006-106-itr",
@@ -5378,10 +5460,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "DEVENDRA AGENCIES",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712007-138-itr",
@@ -5391,10 +5475,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "PRAVENDRA AGENCIES",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712008-247-itr",
@@ -5404,10 +5490,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "AGRAWAL AGENCIES",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712009-837-itr",
@@ -5417,10 +5505,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "SANJAY DALL INDUSTRIES",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712011-889-itr",
@@ -5430,10 +5520,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "GAHOI TRADING COMPANY",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712012-696-itr",
@@ -5443,10 +5535,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "BALAJI PULSES",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712016-554-itr",
@@ -5456,10 +5550,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "HOTEL EVA GALAXY",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712019-885-itr",
@@ -5469,10 +5565,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "GEETA TELECOM",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925712019-990-itr",
@@ -5482,10 +5580,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "VARDHMAN TRADERS",
+      "assignedTeamId": "",
+      "assignedTeamName": "ISHAN"
     },
     {
       "id": "tsk-auto-cli-1792925712020-324-itr",
@@ -5495,10 +5595,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "MAHAVEER GENERAL STORE",
+      "assignedTeamId": "",
+      "assignedTeamName": "ISHAN"
     },
     {
       "id": "tsk-auto-cli-1792925712021-131-itr",
@@ -5508,10 +5610,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "VARDHMAN GENERAL STORE",
+      "assignedTeamId": "",
+      "assignedTeamName": "ISHAN"
     },
     {
       "id": "tsk-auto-cli-1792925712022-719-itr",
@@ -5521,10 +5625,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "THE WHITE STORE BY VARYA'S",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712023-382-itr",
@@ -5534,10 +5640,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "ANANT SHAKTI MOBILE GALLERY",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925712024-87-itr",
@@ -5547,10 +5655,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "SURESH SOUND",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925712025-935-itr",
@@ -5560,10 +5670,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "PAWAN HARDWARE & PLYWOOD",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925712026-329-itr",
@@ -5573,10 +5685,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "SATGURU ENTERPRISES-HARDWARE",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925712028-118-itr",
@@ -5586,10 +5700,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "ASHIRWAD PAINT SANITARY AND HARDWARE",
+      "assignedTeamId": "",
+      "assignedTeamName": "PAWAN"
     },
     {
       "id": "tsk-auto-cli-1792925712029-721-itr",
@@ -5599,10 +5715,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "ODHNI SAREES",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925712030-578-itr",
@@ -5612,10 +5730,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "KOMAL SAREES",
+      "assignedTeamId": "",
+      "assignedTeamName": "AKASH"
     },
     {
       "id": "tsk-auto-cli-1792925712030-869-itr",
@@ -5625,10 +5745,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "ASHIRWAD BAKERS",
+      "assignedTeamId": "",
+      "assignedTeamName": "KABIR"
     },
     {
       "id": "tsk-auto-cli-1792925712031-455-itr",
@@ -5638,10 +5760,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "MAA BAGRAJAN TRADING COMPANY",
+      "assignedTeamId": "",
+      "assignedTeamName": "KABIR"
     },
     {
       "id": "tsk-auto-cli-1792925712031-862-itr",
@@ -5651,10 +5775,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "RAJARAM SWAMIPRASAD TRADING COMPANY",
+      "assignedTeamId": "",
+      "assignedTeamName": "KABIR"
     },
     {
       "id": "tsk-auto-cli-1792925712032-998-itr",
@@ -5664,10 +5790,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "SHRI SATGURU HOSIERY & READYMADE",
+      "assignedTeamId": "",
+      "assignedTeamName": "PRADEEP"
     },
     {
       "id": "tsk-auto-cli-1792925576133-615-itr",
@@ -5677,10 +5805,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "S. R. TRADING COMPANY",
+      "assignedTeamId": "",
+      "assignedTeamName": "KABIR"
     },
     {
       "id": "tsk-auto-cli-1792925526886-383-itr",
@@ -5690,10 +5820,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "SYED BROTHERS, NOWGONG",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     },
     {
       "id": "tsk-auto-cli-1792925518993-415-itr",
@@ -5703,10 +5835,12 @@
       "frequency": "YEARLY",
       "dueDayOrDate": "26",
       "dueDate": "2026-07-31",
-      "assignedTo": "PRADEEP",
       "status": "PENDING",
       "priority": "HIGH",
-      "financialYear": "Tax Year 2026-27"
+      "financialYear": "Tax Year 2026-27",
+      "clientName": "SYED INFOCOM",
+      "assignedTeamId": "",
+      "assignedTeamName": "RAVI"
     }
   ],
   "team": [
@@ -5825,6 +5959,6 @@
   },
   "guestLeads": [],
   "firebaseConfig": null,
-  "updatedAt": "2026-11-12T15:33:44.322Z",
+  "updatedAt": "2026-11-12T15:44:22.145Z",
   "updatedAtIST": "1/11/2026, 9:07:16 pm"
 }
