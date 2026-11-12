@@ -5,7 +5,7 @@ import { FirebaseService } from '../services/firebaseService';
 import { OnlineDataService } from '../services/onlineDataService';
 import { AudioService } from '../services/audioService';
 import { GoogleDriveService } from '../services/googleDriveService';
-import { detectEntityCategoryFromPANAndGSTIN, ParsedClientRow } from '../utils/masterImportExport';
+import { detectEntityCategoryFromPANAndGSTIN, ParsedClientRow, findMatchingClientIndex } from '../utils/masterImportExport';
 import { resolveClientApplicability } from '../utils/complianceApplicability';
 import { useAuth } from './AuthContext';
 import { SEED_CLIENTS, SEED_TASKS, SEED_EXTRA_WORK, SEED_DOCUMENTS } from '../data/seedData';
@@ -566,7 +566,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!checkGuestWriteAllowed()) {
       return clients[0] || ({ ...clientData, id: 'blocked', createdAt: '' } as Client);
     }
-    // 1. Check if client already exists by PAN, GSTIN, Trade Name, or Legal Name (NO DUPLICATES)
+    // 1. Check if client already exists (Prioritizing GSTIN first, then PAN if no GSTIN, then Name)
     const normPan = clientData.pan?.trim().toUpperCase();
     const normGst = clientData.gstin?.trim().toUpperCase();
     const normName = clientData.tradeName?.trim().toLowerCase();
@@ -577,15 +577,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ? clientData.category
       : detectEntityCategoryFromPANAndGSTIN(normPan, normGst, clientData.tradeName, clientData.legalName);
 
-    const existingIndex = clients.findIndex(c => {
-      if (normPan && normPan !== 'PAN-PENDING' && c.pan?.trim().toUpperCase() === normPan) return true;
-      if (normGst && c.gstin?.trim().toUpperCase() === normGst) return true;
-      if (normName && c.tradeName?.trim().toLowerCase() === normName) return true;
-      if (normLegalName && c.legalName?.trim().toLowerCase() === normLegalName) return true;
-      if (normName && c.legalName?.trim().toLowerCase() === normName) return true;
-      if (normLegalName && c.tradeName?.trim().toLowerCase() === normLegalName) return true;
-      return false;
-    });
+    const existingIndex = findMatchingClientIndex(clients, clientData);
 
     if (existingIndex !== -1) {
       // Merge and update existing client record (NO DUPLICATES!)
@@ -876,19 +868,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const normTan = row.tan?.trim().toUpperCase();
       const normVat = row.vatNumber?.trim();
 
-      // Check if client already exists (by ID, PAN, GSTIN, Trade Name, Legal Name, TAN, or VAT)
-      const existingIndex = updatedClientList.findIndex(c => {
-        if (row.id && c.id && c.id === row.id) return true;
-        if (normPan && normPan !== 'PAN-PENDING' && (c.pan || '').trim().toUpperCase() === normPan) return true;
-        if (normGst && (c.gstin || '').trim().toUpperCase() === normGst) return true;
-        if (normName && (c.tradeName || '').trim().toLowerCase() === normName) return true;
-        if (normLegalName && (c.legalName || '').trim().toLowerCase() === normLegalName) return true;
-        if (normName && (c.legalName || '').trim().toLowerCase() === normName) return true;
-        if (normLegalName && (c.tradeName || '').trim().toLowerCase() === normLegalName) return true;
-        if (normTan && (c.tan || '').trim().toUpperCase() === normTan) return true;
-        if (normVat && normVat.length >= 4 && (c.vatNumber || '').trim() === normVat) return true;
-        return false;
-      });
+      // Check if client already exists (Prioritizing GSTIN first, then PAN if no GSTIN, then Name)
+      const existingIndex = findMatchingClientIndex(updatedClientList, row);
 
       const categoryToUse = row.category || detectEntityCategoryFromPANAndGSTIN(normPan, normGst, row.tradeName, row.legalName);
 

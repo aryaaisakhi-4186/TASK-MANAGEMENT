@@ -141,17 +141,24 @@ export const deduplicateClients = (clients: Client[]): Client[] => {
     const normName = (c.tradeName || '').trim().toLowerCase();
     const normLegalName = (c.legalName || '').trim().toLowerCase();
 
-    // Check if client already exists in uniqueClients
+    // Check if client already exists in uniqueClients (Prioritizing GSTIN first, then PAN if no GSTIN)
     const existingIdx = uniqueClients.findIndex(u => {
       // 1. Exact ID match
       if (normId && u.id && u.id === normId) return true;
-      // 2. Real PAN match (ignore PAN-PENDING)
-      if (normPan && normPan !== 'PAN-PENDING' && (u.pan || '').trim().toUpperCase() === normPan) return true;
-      // 3. GSTIN match
+      // 2. FIRST PREFERENCE: GSTIN match
       if (normGst && (u.gstin || '').trim().toUpperCase() === normGst) return true;
-      // 4. Trade Name match
+      // 3. SECOND PREFERENCE: PAN match (only when target has no GSTIN or existing has no GSTIN, or GSTIN matches)
+      if (normPan && normPan !== 'PAN-PENDING' && (u.pan || '').trim().toUpperCase() === normPan) {
+        const uGst = (u.gstin || '').trim().toUpperCase();
+        if (!normGst || !uGst || normGst === uGst) return true;
+      }
+      // 4. Fallback to Name match (only if GSTIN and PAN do not conflict)
+      const uGst = (u.gstin || '').trim().toUpperCase();
+      const uPan = (u.pan || '').trim().toUpperCase();
+      if (normGst && uGst && normGst !== uGst) return false;
+      if (normPan && normPan !== 'PAN-PENDING' && uPan && uPan !== 'PAN-PENDING' && normPan !== uPan) return false;
+
       if (normName && (u.tradeName || '').trim().toLowerCase() === normName) return true;
-      // 5. Cross trade/legal name match
       if (normLegalName && (u.legalName || '').trim().toLowerCase() === normLegalName) return true;
       if (normName && (u.legalName || '').trim().toLowerCase() === normName) return true;
       if (normLegalName && (u.tradeName || '').trim().toLowerCase() === normLegalName) return true;
@@ -238,13 +245,20 @@ export const mergeClients = (localClients: Client[], incomingClients: Client[]):
     const existingIdx = mergedList.findIndex(c => {
       // 1. Match by ID first
       if (normId && c.id && c.id === normId) return true;
-      // 2. Match by valid PAN
-      if (normPan && normPan !== 'PAN-PENDING' && (c.pan || '').trim().toUpperCase() === normPan) return true;
-      // 3. Match by GSTIN
+      // 2. FIRST PREFERENCE: GSTIN match
       if (normGst && (c.gstin || '').trim().toUpperCase() === normGst) return true;
-      // 4. Match by Trade Name
+      // 3. SECOND PREFERENCE: PAN match (only when incoming has no GSTIN or existing has no GSTIN, or GSTIN matches)
+      if (normPan && normPan !== 'PAN-PENDING' && (c.pan || '').trim().toUpperCase() === normPan) {
+        const cGst = (c.gstin || '').trim().toUpperCase();
+        if (!normGst || !cGst || normGst === cGst) return true;
+      }
+      // 4. Fallback to Name match (only if GSTIN and PAN do not conflict)
+      const cGst = (c.gstin || '').trim().toUpperCase();
+      const cPan = (c.pan || '').trim().toUpperCase();
+      if (normGst && cGst && normGst !== cGst) return false;
+      if (normPan && normPan !== 'PAN-PENDING' && cPan && cPan !== 'PAN-PENDING' && normPan !== cPan) return false;
+
       if (normName && (c.tradeName || '').trim().toLowerCase() === normName) return true;
-      // 5. Match by Legal Name or Cross Match
       if (normLegalName && (c.legalName || '').trim().toLowerCase() === normLegalName) return true;
       if (normName && (c.legalName || '').trim().toLowerCase() === normName) return true;
       if (normLegalName && (c.tradeName || '').trim().toLowerCase() === normLegalName) return true;

@@ -23,7 +23,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
-import { detectEntityCategoryFromPANAndGSTIN, formatExcelOrStandardDate } from '../../utils/masterImportExport';
+import { detectEntityCategoryFromPANAndGSTIN, formatExcelOrStandardDate, findMatchingClientIndex } from '../../utils/masterImportExport';
 import { COMPLIANCE_APPLICABILITY_ITEMS, resolveClientApplicability } from '../../utils/complianceApplicability';
 import { extractDocumentDataDirectly, cleanExtractedEntityName } from '../../services/documentOCRService';
 
@@ -479,15 +479,17 @@ export const ClientFormModal: React.FC<Props> = ({ isOpen, client, onClose, init
     const normTradeName = tradeName.trim().toLowerCase();
     const normLegalName = legalName.trim().toLowerCase();
 
-    // Check if another client in directory already has matching PAN, GSTIN, Trade Name, or Legal Name
-    const duplicateExisting = clients.find(c => {
-      if (client && c.id === client.id) return false;
-      if (normPan && normPan !== 'PAN-PENDING' && (c.pan || '').trim().toUpperCase() === normPan) return true;
-      if (normGst && (c.gstin || '').trim().toUpperCase() === normGst) return true;
-      if (normTradeName && (c.tradeName || '').trim().toLowerCase() === normTradeName) return true;
-      if (normLegalName && (c.legalName || '').trim().toLowerCase() === normLegalName) return true;
-      return false;
+    // Check if another client in directory already matches (prioritizing GSTIN first, then PAN if no GSTIN, etc.)
+    const otherClients = clients.filter(c => !client || c.id !== client.id);
+    const duplicateCandidateIndex = findMatchingClientIndex(otherClients, {
+      pan: normPan,
+      gstin: normGst,
+      tradeName: normTradeName,
+      legalName: normLegalName,
+      tan: tan.trim().toUpperCase(),
+      vatNumber: vatNumber.trim().toUpperCase()
     });
+    const duplicateExisting = duplicateCandidateIndex !== -1 ? otherClients[duplicateCandidateIndex] : null;
 
     if (duplicateExisting) {
       // Update existing client record directly so zero duplicates are created!

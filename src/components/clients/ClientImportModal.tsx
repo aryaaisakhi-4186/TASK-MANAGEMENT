@@ -27,7 +27,8 @@ import {
   mapRawDataToClients,
   ParsedClientRow, 
   downloadClientExcelTemplate,
-  detectEntityCategoryFromPANAndGSTIN
+  detectEntityCategoryFromPANAndGSTIN,
+  findMatchingClientIndex
 } from '../../utils/masterImportExport';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { ClientCategory, Client } from '../../types';
@@ -803,11 +804,7 @@ export const ClientImportModal: React.FC<Props> = ({ isOpen, onClose }) => {
                       </tr>
                     ) : (
                       displayRows.map(({ row, originalIndex }) => {
-                        const isExisting = clients.some(c => 
-                          (row.pan && row.pan !== 'PAN-PENDING' && c.pan?.toUpperCase() === row.pan.toUpperCase()) ||
-                          (row.gstin && c.gstin?.toUpperCase() === row.gstin.toUpperCase()) ||
-                          (row.tradeName && c.tradeName.toLowerCase() === row.tradeName.toLowerCase())
-                        );
+                        const isExisting = findMatchingClientIndex(clients, row) !== -1;
 
                         return (
                           <tr 

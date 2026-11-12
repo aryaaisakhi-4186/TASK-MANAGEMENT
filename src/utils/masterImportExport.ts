@@ -887,3 +887,118 @@ export const downloadTeamExcelTemplate = () => {
   XLSX.utils.book_append_sheet(wb, ws, 'Team_Master_Template');
   XLSX.writeFile(wb, 'TASK-VAANI_Team_Master_Template.xlsx');
 };
+
+/**
+ * Find existing client match prioritizing GSTIN first, then PAN, then Name.
+ * Per statutory rules: A business may have multiple GSTINs under the same PAN (different states or branches).
+ * 1. If incoming has a GSTIN, match by GSTIN first!
+ * 2. If no GSTIN is present (or existing has matching PAN and no conflicting GSTIN), match by PAN.
+ * 3. Fallback to Trade / Legal name if neither GSTIN nor PAN conflict.
+ */
+export const findMatchingClientIndex = (
+  existingList: Client[],
+  target: {
+    id?: string;
+    gstin?: string;
+    pan?: string;
+    tradeName?: string;
+    legalName?: string;
+    tan?: string;
+    vatNumber?: string;
+  }
+): number => {
+  if (!Array.isArray(existingList) || existingList.length === 0 || !target) return -1;
+
+  const targetId = (target.id || '').trim();
+  const targetGst = (target.gstin || '').trim().toUpperCase();
+  const targetPan = (target.pan || '').trim().toUpperCase();
+  const targetName = (target.tradeName || '').trim().toLowerCase();
+  const targetLegal = (target.legalName || '').trim().toLowerCase();
+  const targetTan = (target.tan || '').trim().toUpperCase();
+  const targetVat = (target.vatNumber || '').trim().toUpperCase();
+
+  // 1. Direct ID match (if both records have the same internal ID)
+  if (targetId) {
+    const idx = existingList.findIndex(c => c.id && c.id.trim() === targetId);
+    if (idx !== -1) return idx;
+  }
+
+  // 2. FIRST PREFERENCE: GSTIN MATCH
+  // If target has a valid GSTIN, match by GSTIN first!
+  if (targetGst && targetGst.length >= 10) {
+    const idx = existingList.findIndex(c => {
+      const cGst = (c.gstin || '').trim().toUpperCase();
+      return !!(cGst && cGst === targetGst);
+    });
+    if (idx !== -1) return idx;
+  }
+
+  // 3. SECOND PREFERENCE: PAN MATCH (Only when GSTIN is NOT present on target, or existing client has no conflicting GSTIN)
+  // "yadi gstin nhi hai, tab pan ke base par import hona chahiye"
+  if (targetPan && targetPan !== 'PAN-PENDING') {
+    const idx = existingList.findIndex(c => {
+      const cPan = (c.pan || '').trim().toUpperCase();
+      const cGst = (c.gstin || '').trim().toUpperCase();
+      if (cPan !== targetPan) return false;
+
+      // If incoming target has NO GSTIN, match by PAN directly!
+      if (!targetGst) return true;
+
+      // If incoming target has a GSTIN, but existing client has NO GSTIN registered yet,
+      // it means this is that client now getting their GSTIN registered -> match!
+      if (!cGst) return true;
+
+      // If both have GSTIN, only match if GSTIN is identical (which was already checked in step 2)
+      return cGst === targetGst;
+    });
+    if (idx !== -1) return idx;
+  }
+
+  // 4. TAN Match (if present and valid 10-char TAN)
+  if (targetTan && targetTan.length === 10) {
+    const idx = existingList.findIndex(c => {
+      const cTan = (c.tan || '').trim().toUpperCase();
+      const cGst = (c.gstin || '').trim().toUpperCase();
+      const cPan = (c.pan || '').trim().toUpperCase();
+      if (targetGst && cGst && targetGst !== cGst) return false;
+      if (targetPan && targetPan !== 'PAN-PENDING' && cPan && cPan !== 'PAN-PENDING' && targetPan !== cPan) return false;
+      return cTan === targetTan;
+    });
+    if (idx !== -1) return idx;
+  }
+
+  // 5. VAT / State ID Match
+  if (targetVat && targetVat.length >= 4) {
+    const idx = existingList.findIndex(c => {
+      const cVat = (c.vatNumber || '').trim().toUpperCase();
+      const cGst = (c.gstin || '').trim().toUpperCase();
+      const cPan = (c.pan || '').trim().toUpperCase();
+      if (targetGst && cGst && targetGst !== cGst) return false;
+      if (targetPan && targetPan !== 'PAN-PENDING' && cPan && cPan !== 'PAN-PENDING' && targetPan !== cPan) return false;
+      return cVat === targetVat;
+    });
+    if (idx !== -1) return idx;
+  }
+
+  // 6. Name match fallback (Trade Name / Legal Name) - only if GSTIN and PAN do NOT conflict
+  if (targetName || targetLegal) {
+    const idx = existingList.findIndex(c => {
+      const cName = (c.tradeName || '').trim().toLowerCase();
+      const cLegal = (c.legalName || '').trim().toLowerCase();
+      const cGst = (c.gstin || '').trim().toUpperCase();
+      const cPan = (c.pan || '').trim().toUpperCase();
+
+      if (targetGst && cGst && targetGst !== cGst) return false;
+      if (targetPan && targetPan !== 'PAN-PENDING' && cPan && cPan !== 'PAN-PENDING' && targetPan !== cPan) return false;
+
+      if (targetName && cName && targetName === cName) return true;
+      if (targetLegal && cLegal && targetLegal === cLegal) return true;
+      if (targetName && cLegal && targetName === cLegal) return true;
+      if (targetLegal && cName && targetLegal === cName) return true;
+      return false;
+    });
+    if (idx !== -1) return idx;
+  }
+
+  return -1;
+};
