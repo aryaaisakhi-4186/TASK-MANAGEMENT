@@ -124,16 +124,25 @@ export const deduplicateTasks = (taskList: TaskItem[], currentClients?: Client[]
       continue;
     }
 
-    const clientKey = normClientName || normalizeTaskKey(targetClientId);
+    const resolvedClientId = matchedClient?.id || targetClientId || t.clientId;
+    const resolvedClientName = t.clientName || matchedClient?.tradeName || matchedClient?.legalName || 'Unknown Client';
+    const resolvedTeamId = t.assignedTeamId || matchedClient?.assignedTeamId || '';
+    const resolvedTeamName = t.assignedTeamName || matchedClient?.assignedTeamName || 'Assigned Staff';
+
+    const clientKey = normalizeTaskKey(matchedClient?.tradeName || resolvedClientName) || normalizeTaskKey(resolvedClientId);
     
     // For standard recurring monthly tasks, ensure strictly one active task per client
     const isMonthly = t.frequency === 'MONTHLY' || normTitle.includes('monthly') || normTitle.includes('gstr') || normTitle.includes('challan 281');
     const dateKey = isMonthly ? '' : `::${normDate}`;
     const compositeKey = `${clientKey}::${normCategory}::${normTitle}${dateKey}`;
 
-    const taskWithHarmonizedId: TaskItem = targetClientId && targetClientId !== t.clientId
-      ? { ...t, clientId: targetClientId }
-      : t;
+    const taskWithHarmonizedId: TaskItem = {
+      ...t,
+      clientId: resolvedClientId,
+      clientName: resolvedClientName,
+      assignedTeamId: resolvedTeamId,
+      assignedTeamName: resolvedTeamName,
+    };
 
     if (!uniqueMap.has(compositeKey)) {
       uniqueMap.set(compositeKey, taskWithHarmonizedId);

@@ -228,13 +228,14 @@ export const TaskMatrixGrid: React.FC<{
         const tan = (tax.tan || '').toLowerCase();
 
         return (
-          t.title.toLowerCase().includes(q) ||
-          t.clientName.toLowerCase().includes(q) ||
-          t.assignedTeamName.toLowerCase().includes(q) ||
-          t.category.toLowerCase().includes(q) ||
+          (t.title || '').toLowerCase().includes(q) ||
+          (t.clientName || '').toLowerCase().includes(q) ||
+          (t.assignedTeamName || '').toLowerCase().includes(q) ||
+          (t.category || '').toLowerCase().includes(q) ||
           pan.includes(q) ||
           gstin.includes(q) ||
-          tan.includes(q)
+          tan.includes(q) ||
+          (tax.vatNumber || '').toLowerCase().includes(q)
         );
       }
       return true;

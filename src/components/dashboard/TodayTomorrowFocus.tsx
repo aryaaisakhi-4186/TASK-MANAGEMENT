@@ -137,7 +137,7 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
         const numB = parseInt(b.dueDayOrDate, 10);
         if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numA - numB;
 
-        return a.clientName.localeCompare(b.clientName);
+        return (a.clientName || '').localeCompare(b.clientName || '');
       });
   }, [roleFiltered, activeFilter]);
 

@@ -224,7 +224,7 @@ export const AuditLogViewer: React.FC = () => {
       }
     });
 
-    return Array.from(map.values()).sort((a, b) => b.date.localeCompare(a.date));
+    return Array.from(map.values()).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   }, [filteredAttendanceRecords]);
 
   // Aggregate Month-Wise Summary per Staff
