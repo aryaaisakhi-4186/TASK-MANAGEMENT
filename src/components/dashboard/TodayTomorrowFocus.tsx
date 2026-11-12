@@ -162,9 +162,10 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
         const matchDate = (t.dueDate || t.dueDayOrDate || '').toLowerCase().includes(q);
         const matchPan = client?.pan ? client.pan.toLowerCase().includes(q) : false;
         const matchGst = client?.gstin ? client.gstin.toLowerCase().includes(q) : false;
+        const matchTan = client?.tan ? client.tan.toLowerCase().includes(q) : false;
         const matchVat = client?.vatNumber ? client.vatNumber.toLowerCase().includes(q) : false;
 
-        if (!matchTitle && !matchClient && !matchStaff && !matchCat && !matchDate && !matchPan && !matchGst && !matchVat) {
+        if (!matchTitle && !matchClient && !matchStaff && !matchCat && !matchDate && !matchPan && !matchGst && !matchTan && !matchVat) {
           return false;
         }
       }
@@ -295,7 +296,7 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by client, PAN, GSTIN, VAT, task, staff..."
+            placeholder="Search by client, PAN, GSTIN, TAN, VAT, task, staff..."
             className="w-full pl-8 pr-8 py-1.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:border-amber-500 focus:outline-none shadow-xs"
           />
           {searchTerm && (
@@ -398,9 +399,10 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
                     client = clientMap.get(task.clientName.toLowerCase().trim());
                   }
 
+                  const pan = client?.pan && client.pan !== 'N/A' && client.pan !== 'PAN-PENDING' ? client.pan : null;
                   const gstin = client?.gstin && client.gstin !== 'N/A' ? client.gstin : null;
+                  const tan = client?.tan && client.tan !== 'N/A' ? client.tan : null;
                   const vatNumber = client?.vatNumber && client.vatNumber !== 'N/A' ? client.vatNumber : null;
-                  const pan = client?.pan && client.pan !== 'N/A' ? client.pan : null;
 
                   return (
                     <tr
@@ -422,11 +424,12 @@ export const TodayTomorrowFocus: React.FC<{ onOpenTaskModal: (task: TaskItem) =>
                         <p className="font-bold text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors">
                           {task.clientName}
                         </p>
-                        <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-mono mt-0.5">
+                        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] text-slate-500 font-mono mt-0.5">
                           <span>{task.financialYear}</span>
+                          {pan && <span className="text-emerald-700 dark:text-emerald-400 font-semibold">• PAN: {pan}</span>}
                           {gstin && <span className="text-amber-600 dark:text-amber-400 font-semibold">• GST: {gstin}</span>}
+                          {tan && <span className="text-blue-600 dark:text-blue-400 font-semibold">• TAN: {tan}</span>}
                           {vatNumber && <span className="text-cyan-600 dark:text-cyan-400 font-semibold">• VAT: {vatNumber}</span>}
-                          {!gstin && !vatNumber && pan && <span>• PAN: {pan}</span>}
                         </div>
                       </td>
 

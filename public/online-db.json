@@ -17,14 +17,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAJPN9957E1ZD",
       "tan": "BPLR04751F",
@@ -54,14 +54,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ADXPN8151F1Z7",
       "employeeName": "Rakesh Namdeo",
@@ -90,14 +90,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AADFB5406E1Z4",
       "tan": "BPLB02690C",
@@ -126,14 +126,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAIFM0486E1ZI",
       "tan": "JBPM02987F",
@@ -162,14 +162,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAMFC0655R1Z2",
       "tan": "BPLC04468C",
@@ -198,14 +198,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AFIPR5851F1ZD",
       "employeeName": "IRFAN",
@@ -231,14 +231,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AFIPR5908R1ZQ",
       "tan": "BPLN01439E",
@@ -266,14 +266,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AANHV7893K1Z6",
       "tan": "RTKV11281E",
@@ -300,14 +300,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AJUPR9282N1Z2",
       "employeeName": "IRFAN",
@@ -336,14 +336,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AYNPS9752J1ZN",
       "employeeName": "DHRUV",
@@ -371,14 +371,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AXAPS1336G1ZT",
       "employeeName": "DHRUV",
@@ -406,14 +406,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAMPN3472D1ZU",
       "employeeName": "UDAY NAMDEO",
@@ -442,14 +442,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ADKPN1801B1Z9",
       "employeeName": "UDAY NAMDEO",
@@ -478,14 +478,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ADCPA5583D1Z3",
       "employeeName": "YASHKANT",
@@ -514,14 +514,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23BGAPA3274K1ZR",
       "employeeName": "ANKIT ASATI",
@@ -549,14 +549,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ADMPS7859Q1ZD",
       "employeeName": "RAJENDRA",
@@ -585,14 +585,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ARVPS1860Q1ZU",
       "tan": "JBPR04884F",
@@ -622,14 +622,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AATPJ4305N1ZG",
       "tan": "JBPG01582A",
@@ -659,14 +659,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ALWPK7646R1Z4",
       "employeeName": "AKHILESH",
@@ -694,14 +694,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AOAPK8854J1ZR",
       "employeeName": "RAJENDRA",
@@ -729,14 +729,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "employeeName": "CHOTE MIYAN",
       "employeePhone": "8359053570",
@@ -765,14 +765,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23BVYPJ1495A1ZH",
       "employeeName": "RAHUL",
@@ -801,14 +801,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AGXPA6562G1Z9",
       "employeeName": "ARYAN",
@@ -837,14 +837,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AKQPA4123Q1Z1",
       "employeeName": "ARYAN",
@@ -873,14 +873,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ENHPA0969N1ZS",
       "employeeName": "ARYAN",
@@ -909,14 +909,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AGXPA6563H1Z6",
       "tan": "BPLS33309D",
@@ -946,14 +946,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23BEDPA4868J1ZK",
       "employeeName": "VIJAY",
@@ -982,14 +982,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ACWPN3083A1ZN",
       "tan": "JBPR03771F",
@@ -1019,14 +1019,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AHCPN2665H1ZH",
       "employeeName": "BOBBY",
@@ -1055,14 +1055,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAZFK5511B1ZH",
       "employeeName": "BOBBY",
@@ -1090,14 +1090,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ACWPN3081C1ZL",
       "employeeName": "BOBBY",
@@ -1126,14 +1126,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": true,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ABAFK0068P1Z9",
       "tan": "BPLK08775E",
@@ -1163,14 +1163,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AABTM5584C1ZR",
       "employeeName": "BOBBY",
@@ -1198,14 +1198,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAATR9820R1ZX",
       "employeeName": "BOBBY",
@@ -1233,14 +1233,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ASYPN2734N1Z1",
       "employeeName": "SUBHASH",
@@ -1267,14 +1267,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAZPG8471E1ZD",
       "employeeName": "ANSHUL",
@@ -1302,14 +1302,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AEEPG3505L1ZU",
       "employeeName": "ANSHUL",
@@ -1337,14 +1337,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAZPG8472H1Z6",
       "employeeName": "ANKIT GUPTA",
@@ -1370,14 +1370,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AIZPG5456D1Z3",
       "employeeName": "ANKIT GUPTA",
@@ -1403,14 +1403,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": true,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAFFN0267M1Z8",
       "tan": "BPLN01975B",
@@ -1440,14 +1440,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": true,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23BPQPS6396F1Z8",
       "vatNumber": "23789254299",
@@ -1477,14 +1477,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AERPA8188G1Z9",
       "employeeName": "MOHIT",
@@ -1513,14 +1513,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AGJPA8216D1ZY",
       "tan": "BPLJ05150F",
@@ -1550,14 +1550,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AZXPA4923C1ZL",
       "employeeName": "MOHIT",
@@ -1585,14 +1585,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": true,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AGNPG7827Q2ZP",
       "tan": "BPLS09945F",
@@ -1623,14 +1623,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AGNPG8318A1ZR",
       "tan": "BPLD03258D",
@@ -1660,14 +1660,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23BBAPG9474L1ZF",
       "tan": "BPLA07473E",
@@ -1697,14 +1697,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAXHS9062D1ZP",
       "employeeName": "RAVI",
@@ -1732,14 +1732,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AKGPR0686P2ZJ",
       "employeeName": "PAWAN",
@@ -1767,14 +1767,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AMQPJ4727M1ZM",
       "employeeName": "SHAILENDRA",
@@ -1803,14 +1803,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AFFPJ1863A1Z2",
       "employeeName": "SHAILENDRA",
@@ -1839,14 +1839,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AKIPJ8106C1ZM",
       "employeeName": "DEVENDRA JAIN",
@@ -1875,14 +1875,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23CMGPK9444J2ZQ",
       "tan": "BPLY00991E",
@@ -1910,14 +1910,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ARCPN5350K1ZT",
       "employeeName": "AASHIQ",
@@ -1944,14 +1944,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23EYLPK1891J1Z1",
       "employeeName": "PAWAN",
@@ -1980,14 +1980,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AJYPP2578F1ZO",
       "employeeName": "VISHNU",
@@ -2016,14 +2016,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": true,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23EEDPP1580K1ZD",
       "tan": "BPLA15322G",
@@ -2053,14 +2053,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ABLPP0414D1Z7",
       "employeeName": "ANAND",
@@ -2089,14 +2089,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AAYPJ5089L2ZV",
       "employeeName": "RAJEEV",
@@ -2125,14 +2125,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AGSPJ3050D1ZQ",
       "employeeName": "RAJEEV",
@@ -2161,14 +2161,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ACXPO6867A1Z7",
       "employeeName": "KABIR",
@@ -2197,14 +2197,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AGIPA7741A1Z1",
       "employeeName": "KABIR",
@@ -2233,14 +2233,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23AGIPA7742D1ZU",
       "employeeName": "KABIR",
@@ -2269,14 +2269,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23GZIPP9724H1ZW",
       "employeeName": "SUMIT",
@@ -2305,14 +2305,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23DYFPR4251E1ZK",
       "employeeName": "KABIR",
@@ -2341,14 +2341,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23ACFFS3939P1ZK",
       "employeeName": "CHOTE MIYAN",
@@ -2374,14 +2374,14 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": true,
-        "GSTR_9": false,
-        "GSTR_9C": false,
+        "GSTR9": false,
+        "GSTR9C": false,
         "TDS": false,
         "ITR": true,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "gstin": "23FMBPS4943E1Z2",
       "employeeName": "CHOTE MIYAN",
@@ -2408,34 +2408,19 @@
       "complianceApplicability": {
         "AUDIT": false,
         "GST": false,
-        "GSTR_9": false,
-        "GSTR_9C": false,
-        "TDS": true,
-        "ITR": true,
+        "GSTR9": false,
+        "GSTR9C": false,
+        "TDS": false,
+        "ITR": false,
         "VAT": false,
-        "E_INVOICE": false,
+        "EINVOICE": false,
         "RCM": false,
-        "RULE_86B": false
+        "RULE86B": false
       },
       "serialNumber": 68
     }
   ],
   "tasks": [
-    {
-      "id": "tsk-1-cli-1792925712032-998-TDS",
-      "clientId": "cli-1792925712032-998",
-      "clientName": "SHRI SATGURU HOSIERY & READYMADE",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
     {
       "id": "tsk-2-cli-1792925712032-998-GST",
       "clientId": "cli-1792925712032-998",
@@ -2464,21 +2449,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-4-cli-1792925712031-862-TDS",
-      "clientId": "cli-1792925712031-862",
-      "clientName": "RAJARAM SWAMIPRASAD TRADING COMPANY",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -2512,21 +2482,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-7-cli-1792925712031-455-TDS",
-      "clientId": "cli-1792925712031-455",
-      "clientName": "MAA BAGRAJAN TRADING COMPANY",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-8-cli-1792925712031-455-GST",
       "clientId": "cli-1792925712031-455",
       "clientName": "MAA BAGRAJAN TRADING COMPANY",
@@ -2554,21 +2509,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-10-cli-1792925712030-869-TDS",
-      "clientId": "cli-1792925712030-869",
-      "clientName": "ASHIRWAD BAKERS",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -2602,21 +2542,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-13-cli-1792925712030-578-TDS",
-      "clientId": "cli-1792925712030-578",
-      "clientName": "KOMAL SAREES",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-14-cli-1792925712030-578-GST",
       "clientId": "cli-1792925712030-578",
       "clientName": "KOMAL SAREES",
@@ -2647,21 +2572,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-16-cli-1792925712029-721-TDS",
-      "clientId": "cli-1792925712029-721",
-      "clientName": "ODHNI SAREES",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-17-cli-1792925712029-721-GST",
       "clientId": "cli-1792925712029-721",
       "clientName": "ODHNI SAREES",
@@ -2689,21 +2599,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-19-cli-1792925712028-118-TDS",
-      "clientId": "cli-1792925712028-118",
-      "clientName": "ASHIRWAD PAINT SANITARY AND HARDWARE",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -2782,21 +2677,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-28-cli-1792925712025-935-TDS",
-      "clientId": "cli-1792925712025-935",
-      "clientName": "PAWAN HARDWARE & PLYWOOD",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-29-cli-1792925712025-935-GST",
       "clientId": "cli-1792925712025-935",
       "clientName": "PAWAN HARDWARE & PLYWOOD",
@@ -2827,21 +2707,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-31-cli-1792925712024-87-TDS",
-      "clientId": "cli-1792925712024-87",
-      "clientName": "SURESH SOUND",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-32-cli-1792925712024-87-GST",
       "clientId": "cli-1792925712024-87",
       "clientName": "SURESH SOUND",
@@ -2869,21 +2734,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-34-cli-1792925712023-382-TDS",
-      "clientId": "cli-1792925712023-382",
-      "clientName": "ANANT SHAKTI MOBILE GALLERY",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -2962,21 +2812,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-40-cli-1792925712021-131-TDS",
-      "clientId": "cli-1792925712021-131",
-      "clientName": "VARDHMAN GENERAL STORE",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-41-cli-1792925712021-131-GST",
       "clientId": "cli-1792925712021-131",
       "clientName": "VARDHMAN GENERAL STORE",
@@ -3004,21 +2839,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-43-cli-1792925712020-324-TDS",
-      "clientId": "cli-1792925712020-324",
-      "clientName": "MAHAVEER GENERAL STORE",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -3052,21 +2872,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-46-cli-1792925712019-990-TDS",
-      "clientId": "cli-1792925712019-990",
-      "clientName": "VARDHMAN TRADERS",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-47-cli-1792925712019-990-GST",
       "clientId": "cli-1792925712019-990",
       "clientName": "VARDHMAN TRADERS",
@@ -3094,21 +2899,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-49-cli-1792925712019-885-TDS",
-      "clientId": "cli-1792925712019-885",
-      "clientName": "GEETA TELECOM",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -3142,21 +2932,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-52-cli-1792925712018-677-TDS",
-      "clientId": "cli-1792925712018-677",
-      "clientName": "RAWAT INFOCOM SERVICES",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-53-cli-1792925712018-677-GST",
       "clientId": "cli-1792925712018-677",
       "clientName": "RAWAT INFOCOM SERVICES",
@@ -3184,21 +2959,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-55-cli-1792925712016-554-TDS",
-      "clientId": "cli-1792925712016-554",
-      "clientName": "HOTEL EVA GALAXY",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -3367,21 +3127,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-70-cli-1792925712008-247-TDS",
-      "clientId": "cli-1792925712008-247",
-      "clientName": "AGRAWAL AGENCIES",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-71-cli-1792925712008-247-GST",
       "clientId": "cli-1792925712008-247",
       "clientName": "AGRAWAL AGENCIES",
@@ -3457,21 +3202,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-76-cli-1792925712006-106-TDS",
-      "clientId": "cli-1792925712006-106",
-      "clientName": "DEVENDRA AGENCIES",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-77-cli-1792925712006-106-GST",
       "clientId": "cli-1792925712006-106",
       "clientName": "DEVENDRA AGENCIES",
@@ -3499,21 +3229,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-79-cli-1792925712006-476-TDS",
-      "clientId": "cli-1792925712006-476",
-      "clientName": "THE BUNDELA",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -3592,21 +3307,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-85-cli-1792925712005-702-TDS",
-      "clientId": "cli-1792925712005-702",
-      "clientName": "NEW DULHAN SAREE CENTRE",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-86-cli-1792925712005-702-GST",
       "clientId": "cli-1792925712005-702",
       "clientName": "NEW DULHAN SAREE CENTRE",
@@ -3634,21 +3334,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-88-cli-1792925712005-815-TDS",
-      "clientId": "cli-1792925712005-815",
-      "clientName": "DULHAN SAREE CENTER",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -3682,21 +3367,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-91-cli-1792925712004-598-TDS",
-      "clientId": "cli-1792925712004-598",
-      "clientName": "BAHU BETI EMPORIUM",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-92-cli-1792925712004-598-GST",
       "clientId": "cli-1792925712004-598",
       "clientName": "BAHU BETI EMPORIUM",
@@ -3724,21 +3394,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-94-cli-1792925712003-159-TDS",
-      "clientId": "cli-1792925712003-159",
-      "clientName": "NEW BAHU BETI COLLECTION",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -3772,21 +3427,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-97-cli-1792925712003-181-TDS",
-      "clientId": "cli-1792925712003-181",
-      "clientName": "MAA SHARDA TRADERS",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-98-cli-1792925712003-181-GST",
       "clientId": "cli-1792925712003-181",
       "clientName": "MAA SHARDA TRADERS",
@@ -3817,21 +3457,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-100-cli-1792925712003-675-TDS",
-      "clientId": "cli-1792925712003-675",
-      "clientName": "RUCHI MAHILA MANDAL",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-101-cli-1792925712003-675-GST",
       "clientId": "cli-1792925712003-675",
       "clientName": "RUCHI MAHILA MANDAL",
@@ -3859,21 +3484,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-103-cli-1792925712002-241-TDS",
-      "clientId": "cli-1792925712002-241",
-      "clientName": "MANJULA MAHILA MANDAL",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -3952,21 +3562,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-109-cli-1792925712001-399-TDS",
-      "clientId": "cli-1792925712001-399",
-      "clientName": "HOTEL KAMAKHYA INN",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-110-cli-1792925712001-399-GST",
       "clientId": "cli-1792925712001-399",
       "clientName": "HOTEL KAMAKHYA INN",
@@ -3997,21 +3592,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-112-cli-1792925712001-665-TDS",
-      "clientId": "cli-1792925712001-665",
-      "clientName": "KAMAKHYA FASHION HUB",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-113-cli-1792925712001-665-GST",
       "clientId": "cli-1792925712001-665",
       "clientName": "KAMAKHYA FASHION HUB",
@@ -4039,21 +3619,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-115-cli-1792925712000-543-TDS",
-      "clientId": "cli-1792925712000-543",
-      "clientName": "NAMDEO TRADERS",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -4132,21 +3697,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-124-cli-1792925711999-625-TDS",
-      "clientId": "cli-1792925711999-625",
-      "clientName": "VEERA STEEL CORPORATION",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-125-cli-1792925711999-625-GST",
       "clientId": "cli-1792925711999-625",
       "clientName": "VEERA STEEL CORPORATION",
@@ -4222,21 +3772,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-130-cli-1792925711998-640-TDS",
-      "clientId": "cli-1792925711998-640",
-      "clientName": "ARYAN STEELS",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-131-cli-1792925711998-640-GST",
       "clientId": "cli-1792925711998-640",
       "clientName": "ARYAN STEELS",
@@ -4264,21 +3799,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-133-cli-1792925711998-378-TDS",
-      "clientId": "cli-1792925711998-378",
-      "clientName": "ANMOL CEMENT AGENCY",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -4312,21 +3832,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-136-cli-1792925711998-931-TDS",
-      "clientId": "cli-1792925711998-931",
-      "clientName": "SARITA STEELS",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-137-cli-1792925711998-931-GST",
       "clientId": "cli-1792925711998-931",
       "clientName": "SARITA STEELS",
@@ -4354,21 +3859,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-139-cli-1792925711997-851-TDS",
-      "clientId": "cli-1792925711997-851",
-      "clientName": "RAJESH KUMAR RAHUL KUMAR JAIN - RANI JAIN",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -4402,66 +3892,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-142-cli-1792925711996-632-TDS",
-      "clientId": "cli-1792925711996-632",
-      "clientName": "SEY CYBER CAFE & MOBILE SHOP",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-143-cli-1792925711996-632-GST",
-      "clientId": "cli-1792925711996-632",
-      "clientName": "SEY CYBER CAFE & MOBILE SHOP",
-      "title": "GSTR-1 Monthly Outward Return",
-      "category": "GST",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "6",
-      "dueDate": "2026-09-11",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-144-cli-1792925711996-632-GST",
-      "clientId": "cli-1792925711996-632",
-      "clientName": "SEY CYBER CAFE & MOBILE SHOP",
-      "title": "GSTR-3B Monthly Return & Tax Settlement",
-      "category": "GST",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "15",
-      "dueDate": "2026-09-20",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-145-cli-1792925711994-990-TDS",
-      "clientId": "cli-1792925711994-990",
-      "clientName": "SHIKSHA SAHITYA SADAN",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-146-cli-1792925711994-990-GST",
       "clientId": "cli-1792925711994-990",
       "clientName": "SHIKSHA SAHITYA SADAN",
@@ -4489,21 +3919,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-148-cli-1792925711993-579-TDS",
-      "clientId": "cli-1792925711993-579",
-      "clientName": "ALOK PUSTAK SADAN",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -4627,21 +4042,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-157-cli-1792925711991-567-TDS",
-      "clientId": "cli-1792925711991-567",
-      "clientName": "TEEKAM GENERAL STORES",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-158-cli-1792925711991-567-GST",
       "clientId": "cli-1792925711991-567",
       "clientName": "TEEKAM GENERAL STORES",
@@ -4669,21 +4069,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-160-cli-1792925711990-68-TDS",
-      "clientId": "cli-1792925711990-68",
-      "clientName": "ANKIT AGENCY",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -4717,21 +4102,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-163-cli-1792925711989-534-TDS",
-      "clientId": "cli-1792925711989-534",
-      "clientName": "MADHUBAN FASHION CORNER",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-164-cli-1792925711989-534-GST",
       "clientId": "cli-1792925711989-534",
       "clientName": "MADHUBAN FASHION CORNER",
@@ -4759,21 +4129,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-166-cli-1792925711988-288-TDS",
-      "clientId": "cli-1792925711988-288",
-      "clientName": "APSARA FASHION HOUSE",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -4807,21 +4162,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-169-cli-1792925711988-939-TDS",
-      "clientId": "cli-1792925711988-939",
-      "clientName": "APSARA SAREES",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-170-cli-1792925711988-939-GST",
       "clientId": "cli-1792925711988-939",
       "clientName": "APSARA SAREES",
@@ -4849,21 +4189,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-172-cli-1792925711987-943-TDS",
-      "clientId": "cli-1792925711987-943",
-      "clientName": "DHRUV TRADING COMPANY",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -4897,21 +4222,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-175-cli-1792925711987-626-TDS",
-      "clientId": "cli-1792925711987-626",
-      "clientName": "PREMNARAYAN SAHU",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-176-cli-1792925711987-626-GST",
       "clientId": "cli-1792925711987-626",
       "clientName": "PREMNARAYAN SAHU",
@@ -4939,21 +4249,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-178-cli-1792925711987-475-TDS",
-      "clientId": "cli-1792925711987-475",
-      "clientName": "RAJESH KUMAR RAKESH KUMAR RUSIA",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -5074,21 +4369,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-187-cli-1792925711985-61-TDS",
-      "clientId": "cli-1792925711985-61",
-      "clientName": "K. B. PULSES",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -5257,21 +4537,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-199-cli-1792925711984-605-TDS",
-      "clientId": "cli-1792925711984-605",
-      "clientName": "AMAN KUMAR ANUJ KUMAR NAMDEO",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-200-cli-1792925711984-605-GST",
       "clientId": "cli-1792925711984-605",
       "clientName": "AMAN KUMAR ANUJ KUMAR NAMDEO",
@@ -5347,21 +4612,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-205-cli-1792925576133-615-TDS",
-      "clientId": "cli-1792925576133-615",
-      "clientName": "S. R. TRADING COMPANY",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-206-cli-1792925576133-615-GST",
       "clientId": "cli-1792925576133-615",
       "clientName": "S. R. TRADING COMPANY",
@@ -5392,21 +4642,6 @@
       "financialYear": "2026-2027"
     },
     {
-      "id": "tsk-208-cli-1792925526886-383-TDS",
-      "clientId": "cli-1792925526886-383",
-      "clientName": "SYED BROTHERS, NOWGONG",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
-      "financialYear": "2026-2027"
-    },
-    {
       "id": "tsk-209-cli-1792925526886-383-GST",
       "clientId": "cli-1792925526886-383",
       "clientName": "SYED BROTHERS, NOWGONG",
@@ -5434,21 +4669,6 @@
       "assignedTeamId": "",
       "assignedTeamName": "Assigned Staff",
       "priority": "CRITICAL",
-      "financialYear": "2026-2027"
-    },
-    {
-      "id": "tsk-211-cli-1792925518993-415-TDS",
-      "clientId": "cli-1792925518993-415",
-      "clientName": "SYED INFOCOM",
-      "title": "Monthly TDS Payment (Challan 281)",
-      "category": "TDS",
-      "frequency": "MONTHLY",
-      "dueDayOrDate": "2",
-      "dueDate": "2026-09-07",
-      "status": "PENDING",
-      "assignedTeamId": "",
-      "assignedTeamName": "Assigned Staff",
-      "priority": "HIGH",
       "financialYear": "2026-2027"
     },
     {
@@ -5616,6 +4836,877 @@
       "priority": "CRITICAL",
       "financialYear": "2026-27",
       "period": "August 2026"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711983-546-itr",
+      "clientId": "cli-1792925711983-546",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711984-605-itr",
+      "clientId": "cli-1792925711984-605",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711984-853-itr",
+      "clientId": "cli-1792925711984-853",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711984-420-itr",
+      "clientId": "cli-1792925711984-420",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711985-357-itr",
+      "clientId": "cli-1792925711985-357",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711985-61-itr",
+      "clientId": "cli-1792925711985-61",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711986-544-itr",
+      "clientId": "cli-1792925711986-544",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711986-252-itr",
+      "clientId": "cli-1792925711986-252",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711987-475-itr",
+      "clientId": "cli-1792925711987-475",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711987-626-itr",
+      "clientId": "cli-1792925711987-626",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711987-943-itr",
+      "clientId": "cli-1792925711987-943",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711988-939-itr",
+      "clientId": "cli-1792925711988-939",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711988-288-itr",
+      "clientId": "cli-1792925711988-288",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711989-534-itr",
+      "clientId": "cli-1792925711989-534",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711990-68-itr",
+      "clientId": "cli-1792925711990-68",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711991-567-itr",
+      "clientId": "cli-1792925711991-567",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711992-681-itr",
+      "clientId": "cli-1792925711992-681",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711992-613-itr",
+      "clientId": "cli-1792925711992-613",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711993-579-itr",
+      "clientId": "cli-1792925711993-579",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711994-990-itr",
+      "clientId": "cli-1792925711994-990",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712018-677-itr",
+      "clientId": "cli-1792925712018-677",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711997-851-itr",
+      "clientId": "cli-1792925711997-851",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711998-931-itr",
+      "clientId": "cli-1792925711998-931",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711998-378-itr",
+      "clientId": "cli-1792925711998-378",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711998-640-itr",
+      "clientId": "cli-1792925711998-640",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711999-178-itr",
+      "clientId": "cli-1792925711999-178",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711999-625-itr",
+      "clientId": "cli-1792925711999-625",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925711999-323-itr",
+      "clientId": "cli-1792925711999-323",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712000-543-itr",
+      "clientId": "cli-1792925712000-543",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712001-665-itr",
+      "clientId": "cli-1792925712001-665",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712001-399-itr",
+      "clientId": "cli-1792925712001-399",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712002-528-itr",
+      "clientId": "cli-1792925712002-528",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712002-241-itr",
+      "clientId": "cli-1792925712002-241",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712003-675-itr",
+      "clientId": "cli-1792925712003-675",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712003-181-itr",
+      "clientId": "cli-1792925712003-181",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712003-159-itr",
+      "clientId": "cli-1792925712003-159",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712004-598-itr",
+      "clientId": "cli-1792925712004-598",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712005-815-itr",
+      "clientId": "cli-1792925712005-815",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712005-702-itr",
+      "clientId": "cli-1792925712005-702",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712006-276-itr",
+      "clientId": "cli-1792925712006-276",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712006-476-itr",
+      "clientId": "cli-1792925712006-476",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712006-106-itr",
+      "clientId": "cli-1792925712006-106",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712007-138-itr",
+      "clientId": "cli-1792925712007-138",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712008-247-itr",
+      "clientId": "cli-1792925712008-247",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712009-837-itr",
+      "clientId": "cli-1792925712009-837",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712011-889-itr",
+      "clientId": "cli-1792925712011-889",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712012-696-itr",
+      "clientId": "cli-1792925712012-696",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712016-554-itr",
+      "clientId": "cli-1792925712016-554",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712019-885-itr",
+      "clientId": "cli-1792925712019-885",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712019-990-itr",
+      "clientId": "cli-1792925712019-990",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712020-324-itr",
+      "clientId": "cli-1792925712020-324",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712021-131-itr",
+      "clientId": "cli-1792925712021-131",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712022-719-itr",
+      "clientId": "cli-1792925712022-719",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712023-382-itr",
+      "clientId": "cli-1792925712023-382",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712024-87-itr",
+      "clientId": "cli-1792925712024-87",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712025-935-itr",
+      "clientId": "cli-1792925712025-935",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712026-329-itr",
+      "clientId": "cli-1792925712026-329",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712028-118-itr",
+      "clientId": "cli-1792925712028-118",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712029-721-itr",
+      "clientId": "cli-1792925712029-721",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712030-578-itr",
+      "clientId": "cli-1792925712030-578",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712030-869-itr",
+      "clientId": "cli-1792925712030-869",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712031-455-itr",
+      "clientId": "cli-1792925712031-455",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712031-862-itr",
+      "clientId": "cli-1792925712031-862",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925712032-998-itr",
+      "clientId": "cli-1792925712032-998",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925576133-615-itr",
+      "clientId": "cli-1792925576133-615",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925526886-383-itr",
+      "clientId": "cli-1792925526886-383",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
+    },
+    {
+      "id": "tsk-auto-cli-1792925518993-415-itr",
+      "clientId": "cli-1792925518993-415",
+      "title": "Income Tax Return (ITR) Annual Filing",
+      "category": "INCOME_TAX",
+      "frequency": "YEARLY",
+      "dueDayOrDate": "26",
+      "dueDate": "2026-07-31",
+      "assignedTo": "PRADEEP",
+      "status": "PENDING",
+      "priority": "HIGH",
+      "financialYear": "Tax Year 2026-27"
     }
   ],
   "team": [
@@ -5734,6 +5825,6 @@
   },
   "guestLeads": [],
   "firebaseConfig": null,
-  "updatedAt": "2026-11-01T15:37:16.492Z",
+  "updatedAt": "2026-11-12T15:33:44.322Z",
   "updatedAtIST": "1/11/2026, 9:07:16 pm"
 }

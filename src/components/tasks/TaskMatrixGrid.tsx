@@ -302,7 +302,10 @@ export const TaskMatrixGrid: React.FC<{
         const q = searchTerm.toLowerCase();
         return (
           group.client.tradeName?.toLowerCase().includes(q) ||
-          group.client.pan?.toLowerCase().includes(q)
+          group.client.pan?.toLowerCase().includes(q) ||
+          group.client.gstin?.toLowerCase().includes(q) ||
+          group.client.tan?.toLowerCase().includes(q) ||
+          group.client.vatNumber?.toLowerCase().includes(q)
         );
       }
       return false;
@@ -747,14 +750,24 @@ export const TaskMatrixGrid: React.FC<{
                           <h3 className="font-bold text-slate-900 dark:text-white text-base">
                             {client.tradeName}
                           </h3>
-                          {client.pan && client.pan !== 'N/A' && (
+                          {client.pan && client.pan !== 'N/A' && client.pan !== 'PAN-PENDING' && (
                             <span className="px-2 py-0.5 rounded bg-amber-500/15 text-amber-800 dark:text-amber-300 text-[10px] font-mono font-bold border border-amber-500/30">
                               PAN: {client.pan}
                             </span>
                           )}
-                          {client.gstin && (
-                            <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-mono">
+                          {client.gstin && client.gstin !== 'N/A' && (
+                            <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-mono font-semibold border border-slate-200 dark:border-slate-700">
                               GST: {client.gstin}
+                            </span>
+                          )}
+                          {client.tan && client.tan !== 'N/A' && (
+                            <span className="px-2 py-0.5 rounded bg-blue-500/15 text-blue-800 dark:text-blue-300 text-[10px] font-mono font-bold border border-blue-500/30">
+                              TAN: {client.tan}
+                            </span>
+                          )}
+                          {client.vatNumber && client.vatNumber !== 'N/A' && (
+                            <span className="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-800 dark:text-cyan-300 text-[10px] font-mono font-bold border border-cyan-500/30">
+                              VAT: {client.vatNumber}
                             </span>
                           )}
 
@@ -932,6 +945,11 @@ export const TaskMatrixGrid: React.FC<{
                                               <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
                                             </div>
                                           )}
+                                          {tax.tan && (
+                                            <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                                              <span className="font-sans font-bold text-[9px]">TAN: </span>{tax.tan}
+                                            </div>
+                                          )}
                                         </div>
                                       );
                                     } else if (tax.isVat) {
@@ -948,6 +966,11 @@ export const TaskMatrixGrid: React.FC<{
                                           {tax.pan && (
                                             <div className="text-[10px] text-slate-500">
                                               <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                            </div>
+                                          )}
+                                          {tax.tan && (
+                                            <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                                              <span className="font-sans font-bold text-[9px]">TAN: </span>{tax.tan}
                                             </div>
                                           )}
                                         </div>
@@ -984,6 +1007,11 @@ export const TaskMatrixGrid: React.FC<{
                                           {tax.gstin && (
                                             <div className="text-[10px] text-slate-500 truncate max-w-[120px]">
                                               <span className="font-sans font-medium text-[9px]">GST: </span>{tax.gstin}
+                                            </div>
+                                          )}
+                                          {tax.tan && (
+                                            <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                                              <span className="font-sans font-bold text-[9px]">TAN: </span>{tax.tan}
                                             </div>
                                           )}
                                         </div>
@@ -1167,6 +1195,11 @@ export const TaskMatrixGrid: React.FC<{
                                     <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
                                   </div>
                                 )}
+                                {tax.tan && (
+                                  <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                                    <span className="font-sans font-bold text-[9px]">TAN: </span>{tax.tan}
+                                  </div>
+                                )}
                               </div>
                             );
                           } else if (tax.isVat) {
@@ -1183,6 +1216,11 @@ export const TaskMatrixGrid: React.FC<{
                                 {tax.pan && (
                                   <div className="text-[10px] text-slate-500">
                                     <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                  </div>
+                                )}
+                                {tax.tan && (
+                                  <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                                    <span className="font-sans font-bold text-[9px]">TAN: </span>{tax.tan}
                                   </div>
                                 )}
                               </div>
@@ -1219,6 +1257,11 @@ export const TaskMatrixGrid: React.FC<{
                                 {tax.gstin && (
                                   <div className="text-[10px] text-slate-500 truncate max-w-[120px]">
                                     <span className="font-sans font-medium text-[9px]">GST: </span>{tax.gstin}
+                                  </div>
+                                )}
+                                {tax.tan && (
+                                  <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                                    <span className="font-sans font-bold text-[9px]">TAN: </span>{tax.tan}
                                   </div>
                                 )}
                               </div>

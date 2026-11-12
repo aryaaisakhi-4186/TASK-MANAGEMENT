@@ -6,7 +6,7 @@ import { OnlineDataService } from '../services/onlineDataService';
 import { AudioService } from '../services/audioService';
 import { GoogleDriveService } from '../services/googleDriveService';
 import { detectEntityCategoryFromPANAndGSTIN, ParsedClientRow, findMatchingClientIndex } from '../utils/masterImportExport';
-import { resolveClientApplicability } from '../utils/complianceApplicability';
+import { resolveClientApplicability, generateMissingTasksForClientTaxIds } from '../utils/complianceApplicability';
 import { useAuth } from './AuthContext';
 import { SEED_CLIENTS, SEED_TASKS, SEED_EXTRA_WORK, SEED_DOCUMENTS } from '../data/seedData';
 
@@ -545,19 +545,31 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, [clients, tasks, team, extraWork, documents, attendanceRecords, settings, currentUser?.role, currentUser?.phone]);
 
-  // Auto-correct any existing clients with inaccurate category on startup using PAN/GSTIN
+  // Auto-correct any existing clients with inaccurate category or complianceApplicability on startup, and sync tasks strictly with Tax ID columns
   useEffect(() => {
     let hasChanges = false;
     const corrected = clients.map(c => {
       const accurateCategory = detectEntityCategoryFromPANAndGSTIN(c.pan, c.gstin, c.tradeName, c.legalName);
-      if (c.category === 'PVT_LTD' && accurateCategory !== 'PVT_LTD') {
+      const nextCat = (c.category === 'PVT_LTD' && accurateCategory !== 'PVT_LTD') ? accurateCategory : c.category;
+      const nextApp = resolveClientApplicability({ ...c, category: nextCat });
+      if (
+        nextCat !== c.category ||
+        JSON.stringify(nextApp) !== JSON.stringify(c.complianceApplicability)
+      ) {
         hasChanges = true;
-        return { ...c, category: accurateCategory };
+        return { ...c, category: nextCat, complianceApplicability: nextApp };
       }
       return c;
     });
     if (hasChanges) {
       setClients(corrected);
+      StorageService.saveClients(corrected);
+    }
+
+    const syncedTasks = deduplicateTasks(tasks, corrected);
+    if (syncedTasks.length !== tasks.length || JSON.stringify(syncedTasks.map(t => t.id)) !== JSON.stringify(tasks.map(t => t.id))) {
+      setTasks(syncedTasks);
+      StorageService.saveTasks(syncedTasks);
     }
   }, []);
 
@@ -635,15 +647,13 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return t;
       });
 
-      if (tasksChanged) {
-        const cleanTasks = deduplicateTasks(updatedTasks, cleanClients);
-        setTasks(cleanTasks);
-        StorageService.saveTasks(cleanTasks);
-      }
+      const cleanTasks = deduplicateTasks(updatedTasks, cleanClients);
+      setTasks(cleanTasks);
+      StorageService.saveTasks(cleanTasks);
 
       OnlineDataService.scheduleAutoOnlineSync({
         clients: cleanClients,
-        tasks: tasksChanged ? updatedTasks : tasks,
+        tasks: cleanTasks,
         team: StorageService.getTeam(),
         extraWork: StorageService.getExtraWork(),
         documents: StorageService.getDocuments(),
@@ -678,156 +688,31 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString().split('T')[0],
       status: clientData.status || 'ACTIVE',
       category: resolvedCategory,
-      portalPassword: clientData.portalPassword || 'client123'
+      portalPassword: clientData.portalPassword || 'client123',
+      complianceApplicability: resolveClientApplicability({ ...clientData, category: resolvedCategory })
     };
     const updated = [...clients, newClient];
-    setClients(updated);
-    
-    // Auto generate standard recurring tasks for new client ONLY if not already existing
-    const randSuffix = Math.random().toString(36).substring(2, 7);
-    const sampleTasks: TaskItem[] = [
-      {
-        id: 'tsk-' + Date.now() + '-' + randSuffix + '-1',
-        clientId: newClient.id,
-        clientName: newClient.tradeName,
-        title: 'Monthly TDS Payment (Challan 281)',
-        category: 'TDS',
-        frequency: 'MONTHLY',
-        dueDayOrDate: '2',
-        dueDate: '2026-09-07',
-        status: 'PENDING',
-        assignedTeamId: newClient.assignedTeamId,
-        assignedTeamName: newClient.assignedTeamName,
-        priority: 'HIGH',
-        financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
-      },
-      {
-        id: 'tsk-' + Date.now() + '-' + randSuffix + '-2',
-        clientId: newClient.id,
-        clientName: newClient.tradeName,
-        title: 'GSTR-1 Monthly Outward Return',
-        category: 'GST',
-        frequency: 'MONTHLY',
-        dueDayOrDate: '6',
-        dueDate: '2026-09-11',
-        status: 'PENDING',
-        assignedTeamId: newClient.assignedTeamId,
-        assignedTeamName: newClient.assignedTeamName,
-        priority: 'CRITICAL',
-        financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
-      },
-      {
-        id: 'tsk-' + Date.now() + '-' + randSuffix + '-3',
-        clientId: newClient.id,
-        clientName: newClient.tradeName,
-        title: 'GSTR-3B Monthly Return & Tax Settlement',
-        category: 'GST',
-        frequency: 'MONTHLY',
-        dueDayOrDate: '15',
-        dueDate: '2026-09-20',
-        status: 'PENDING',
-        assignedTeamId: newClient.assignedTeamId,
-        assignedTeamName: newClient.assignedTeamName,
-        priority: 'CRITICAL',
-        financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
-      }
-    ];
+    const cleanClients = deduplicateClients(updated);
+    setClients(cleanClients);
+    StorageService.saveClients(cleanClients);
 
-    // If client has VAT applicability or VAT registration number, seed VAT Quarterly Return & Monthly Tax tasks
-    if (newClient.complianceApplicability?.VAT || (newClient.vatNumber && newClient.vatNumber.trim().length >= 3)) {
-      sampleTasks.push(
-        {
-          id: 'tsk-' + Date.now() + '-' + randSuffix + '-vat-q',
-          clientId: newClient.id,
-          clientName: newClient.tradeName,
-          title: 'VAT Quarterly Return Filing',
-          category: 'VAT',
-          frequency: 'QUARTERLY',
-          dueDayOrDate: '25',
-          dueDate: '2026-10-30',
-          status: 'PENDING',
-          assignedTeamId: newClient.assignedTeamId,
-          assignedTeamName: newClient.assignedTeamName,
-          priority: 'HIGH',
-          financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
-        },
-        {
-          id: 'tsk-' + Date.now() + '-' + randSuffix + '-vat-m',
-          clientId: newClient.id,
-          clientName: newClient.tradeName,
-          title: 'Monthly VAT Tax Payment & Challan Deposit',
-          category: 'VAT',
-          frequency: 'MONTHLY',
-          dueDayOrDate: '5',
-          dueDate: '2026-09-10',
-          status: 'PENDING',
-          assignedTeamId: newClient.assignedTeamId,
-          assignedTeamName: newClient.assignedTeamName,
-          priority: 'HIGH',
-          financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
-        }
-      );
-    }
+    // Strictly generate compliance tasks ONLY for the Tax ID columns that have data in Client Master
+    const deletedTaskSet = new Set(StorageService.getDeletedTaskIds());
+    const sampleTasks = generateMissingTasksForClientTaxIds(
+      newClient,
+      tasks,
+      deletedTaskSet,
+      settings.selectedTaxYear || 'Tax Year 2026-27'
+    );
 
-    // If client has GSTR-9 applicability
-    if (newClient.complianceApplicability?.GSTR_9) {
-      sampleTasks.push({
-        id: 'tsk-' + Date.now() + '-' + randSuffix + '-gstr9',
-        clientId: newClient.id,
-        clientName: newClient.tradeName,
-        title: 'GSTR-9 Annual Return',
-        category: 'GST',
-        frequency: 'YEARLY',
-        dueDayOrDate: '26',
-        dueDate: '2026-12-31',
-        status: 'PENDING',
-        assignedTeamId: newClient.assignedTeamId,
-        assignedTeamName: newClient.assignedTeamName,
-        priority: 'HIGH',
-        financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
-      });
-    }
-
-    // If client has GSTR-9C applicability
-    if (newClient.complianceApplicability?.GSTR_9C) {
-      sampleTasks.push({
-        id: 'tsk-' + Date.now() + '-' + randSuffix + '-gstr9c',
-        clientId: newClient.id,
-        clientName: newClient.tradeName,
-        title: 'GSTR-9C Reconciliation Statement & Audit Certification',
-        category: 'GST',
-        frequency: 'YEARLY',
-        dueDayOrDate: '26',
-        dueDate: '2026-12-31',
-        status: 'PENDING',
-        assignedTeamId: newClient.assignedTeamId,
-        assignedTeamName: newClient.assignedTeamName,
-        priority: 'HIGH',
-        financialYear: settings.selectedTaxYear || 'Tax Year 2026-27',
-      });
-    }
-
-    const normTrade = (newClient.tradeName || '').trim().toLowerCase();
-    const nonDuplicateSampleTasks = sampleTasks.filter(st => {
-      const normTitle = (st.title || '').trim().toLowerCase();
-      const normDate = (st.dueDate || st.dueDayOrDate || '').trim().toLowerCase();
-      return !tasks.some(existing =>
-        ((existing.clientId && existing.clientId === newClient.id) || (existing.clientName || '').trim().toLowerCase() === normTrade) &&
-        (existing.title || '').trim().toLowerCase() === normTitle &&
-        (existing.dueDate || existing.dueDayOrDate || '').trim().toLowerCase() === normDate
-      );
-    });
-
-    if (nonDuplicateSampleTasks.length > 0) {
-      const cleanTasks = deduplicateTasks([...nonDuplicateSampleTasks, ...tasks], updated);
-      setTasks(cleanTasks);
-      StorageService.saveTasks(cleanTasks);
-    }
+    const cleanTasks = deduplicateTasks([...sampleTasks, ...tasks], cleanClients);
+    setTasks(cleanTasks);
+    StorageService.saveTasks(cleanTasks);
 
     const isGuestDemo = currentUser?.role === 'GUEST' && !!currentUser?.phone;
-    if (!isGuestDemo && FirebaseService.isConfigured() && nonDuplicateSampleTasks.length > 0) {
+    if (!isGuestDemo && FirebaseService.isConfigured()) {
       FirebaseService.upsertDoc('clients', newClient.id, newClient);
-      nonDuplicateSampleTasks.forEach(st => FirebaseService.upsertDoc('tasks', st.id, st));
+      sampleTasks.forEach(st => FirebaseService.upsertDoc('tasks', st.id, st));
     }
 
     StorageService.addAuditLog({
@@ -839,9 +724,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       details: `Created new client: ${newClient.tradeName} (PAN: ${newClient.pan})`
     });
     setAuditLogs(StorageService.getAuditLogs());
-    const cleanClients = deduplicateClients(updated);
-    setClients(cleanClients);
-    StorageService.saveClients(cleanClients);
     return newClient;
   };
 
@@ -901,13 +783,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           assignedTeamName: row.assignedTeamName || existing.assignedTeamName,
           googleDriveFolderId: row.googleDriveFolderId || existing.googleDriveFolderId,
           googleDriveFolderUrl: row.googleDriveFolderUrl || existing.googleDriveFolderUrl,
-          complianceApplicability: {
-            ...resolveClientApplicability(existing),
-            GST: !!(updatedGst && updatedGst.length === 15),
-            VAT: !!(updatedVat && updatedVat.length >= 4),
-            TDS: !!(updatedTan && updatedTan.length === 10) || resolveClientApplicability(existing).TDS
-          }
         };
+        merged.complianceApplicability = resolveClientApplicability(merged);
         updatedClientList[existingIndex] = merged;
         updatedCount++;
 
@@ -930,7 +807,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const resolvedPan = (normPan && normPan !== 'PAN-PENDING') 
           ? normPan 
           : (normGst && normGst.length === 15 ? normGst.substring(2, 12) : 'PAN-PENDING');
-        const resolvedVat = (row.vatNumber && row.vatNumber.trim().length >= 4) ? row.vatNumber.trim() : undefined;
+        const resolvedVat = (row.vatNumber && row.vatNumber.trim().length >= 3) ? row.vatNumber.trim() : undefined;
 
         const nextSNo = updatedClientList.reduce((max, c) => Math.max(max, c.serialNumber || 0), updatedClientList.length) + 1;
         const newClient: Client = {
@@ -958,136 +835,21 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           portalPassword: 'client' + (row.phone ? row.phone.slice(-4) : '123'),
           googleDriveFolderId: row.googleDriveFolderId || '',
           googleDriveFolderUrl: row.googleDriveFolderUrl || '',
-          complianceApplicability: {
-            GST: !!(normGst && normGst.length === 15),
-            TDS: !!(row.tan && row.tan.length === 10),
-            ITR: true,
-            AUDIT: false,
-            VAT: !!(resolvedVat && resolvedVat.length >= 4),
-            E_INVOICE: false,
-            RCM: false,
-            RULE_86B: false,
-            GSTR_9: false,
-            GSTR_9C: false
-          },
           customFields: []
         };
+        newClient.complianceApplicability = resolveClientApplicability(newClient);
         updatedClientList.push(newClient);
         createdCount++;
 
-        // Add standard statutory compliance tasks for new client ONLY if not already existing
-        const randSuffix = Math.random().toString(36).substring(2, 7);
-        const tsk1: TaskItem = {
-          id: 'tsk-' + Date.now() + '-' + idx + '-' + randSuffix + '-1',
-          clientId: newClient.id,
-          clientName: newClient.tradeName,
-          title: 'Monthly TDS Payment (Challan 281)',
-          category: 'TDS',
-          frequency: 'MONTHLY',
-          dueDayOrDate: '2',
-          dueDate: '2026-09-07',
-          status: 'PENDING',
-          assignedTeamId: newClient.assignedTeamId || '',
-          assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
-          priority: 'HIGH',
-          financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
-        };
-        const tsk2: TaskItem = {
-          id: 'tsk-' + Date.now() + '-' + idx + '-' + randSuffix + '-2',
-          clientId: newClient.id,
-          clientName: newClient.tradeName,
-          title: 'GSTR-1 Monthly Outward Return',
-          category: 'GST',
-          frequency: 'MONTHLY',
-          dueDayOrDate: '6',
-          dueDate: '2026-09-11',
-          status: 'PENDING',
-          assignedTeamId: newClient.assignedTeamId || '',
-          assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
-          priority: 'CRITICAL',
-          financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
-        };
-        const tsk3: TaskItem = {
-          id: 'tsk-' + Date.now() + '-' + idx + '-' + randSuffix + '-3',
-          clientId: newClient.id,
-          clientName: newClient.tradeName,
-          title: 'GSTR-3B Monthly Return & Tax Settlement',
-          category: 'GST',
-          frequency: 'MONTHLY',
-          dueDayOrDate: '15',
-          dueDate: '2026-09-20',
-          status: 'PENDING',
-          assignedTeamId: newClient.assignedTeamId || '',
-          assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
-          priority: 'CRITICAL',
-          financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
-        };
-
-        const taskAlreadyExists = (title: string, dueDate: string) => {
-          const normTitle = title.trim().toLowerCase();
-          const normDate = dueDate.trim().toLowerCase();
-          const normClient = (newClient.tradeName || '').trim().toLowerCase();
-          return (
-            existingTasks.some(t =>
-              ((t.clientId && t.clientId === newClient.id) || (t.clientName || '').trim().toLowerCase() === normClient) &&
-              (t.title || '').trim().toLowerCase() === normTitle &&
-              (t.dueDate || t.dueDayOrDate || '').trim().toLowerCase() === normDate
-            ) ||
-            newTasksToCreate.some(t =>
-              ((t.clientId && t.clientId === newClient.id) || (t.clientName || '').trim().toLowerCase() === normClient) &&
-              (t.title || '').trim().toLowerCase() === normTitle &&
-              (t.dueDate || t.dueDayOrDate || '').trim().toLowerCase() === normDate
-            )
-          );
-        };
-
-        if (!taskAlreadyExists('Monthly TDS Payment (Challan 281)', '2026-09-07')) {
-          newTasksToCreate.push(tsk1);
-        }
-        if (!taskAlreadyExists('GSTR-1 Monthly Outward Return', '2026-09-11')) {
-          newTasksToCreate.push(tsk2);
-        }
-        if (!taskAlreadyExists('GSTR-3B Monthly Return & Tax Settlement', '2026-09-20')) {
-          newTasksToCreate.push(tsk3);
-        }
-
-        // If client has VAT applicability or VAT registration number
-        if (newClient.complianceApplicability?.VAT || (newClient.vatNumber && newClient.vatNumber.trim().length >= 3)) {
-          if (!taskAlreadyExists('VAT Quarterly Return Filing', '2026-10-30')) {
-            newTasksToCreate.push({
-              id: 'tsk-' + Date.now() + '-' + idx + '-' + randSuffix + '-vat-q',
-              clientId: newClient.id,
-              clientName: newClient.tradeName,
-              title: 'VAT Quarterly Return Filing',
-              category: 'VAT',
-              frequency: 'QUARTERLY',
-              dueDayOrDate: '25',
-              dueDate: '2026-10-30',
-              status: 'PENDING',
-              assignedTeamId: newClient.assignedTeamId || '',
-              assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
-              priority: 'HIGH',
-              financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
-            });
-          }
-          if (!taskAlreadyExists('Monthly VAT Tax Payment & Challan Deposit', '2026-09-10')) {
-            newTasksToCreate.push({
-              id: 'tsk-' + Date.now() + '-' + idx + '-' + randSuffix + '-vat-m',
-              clientId: newClient.id,
-              clientName: newClient.tradeName,
-              title: 'Monthly VAT Tax Payment & Challan Deposit',
-              category: 'VAT',
-              frequency: 'MONTHLY',
-              dueDayOrDate: '5',
-              dueDate: '2026-09-10',
-              status: 'PENDING',
-              assignedTeamId: newClient.assignedTeamId || '',
-              assignedTeamName: newClient.assignedTeamName || 'Assigned Staff',
-              priority: 'HIGH',
-              financialYear: settings.selectedTaxYear || 'Tax Year 2026-27'
-            });
-          }
-        }
+        // Add standard statutory compliance tasks strictly for the Tax ID columns that have data in Client Master
+        const deletedTaskSet = new Set(StorageService.getDeletedTaskIds());
+        const generatedForNew = generateMissingTasksForClientTaxIds(
+          newClient,
+          existingTasks,
+          deletedTaskSet,
+          settings.selectedTaxYear || 'Tax Year 2026-27'
+        );
+        newTasksToCreate.push(...generatedForNew);
       }
     });
 
@@ -1154,6 +916,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           tan: updates.tan !== undefined ? updates.tan.trim().toUpperCase() : c.tan,
           vatNumber: updates.vatNumber !== undefined ? updates.vatNumber.trim().toUpperCase() : c.vatNumber,
         };
+        updated.complianceApplicability = resolveClientApplicability(updated);
         targetUpdatedClient = updated;
         if (!(currentUser?.role === 'GUEST' && !!currentUser?.phone) && FirebaseService.isConfigured()) {
           FirebaseService.upsertDoc('clients', id, updated);
@@ -1168,16 +931,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setClients(cleanClients);
     StorageService.saveClients(cleanClients);
 
-    // 4. Synchronize all tasks referencing this client (by ID or old names)
+    // 4. Synchronize all tasks referencing this client (by ID or old names) and enforce Tax ID task rules
     const newTradeName = updates.tradeName !== undefined ? updates.tradeName.trim() : oldClient?.tradeName;
-    let tasksChanged = false;
     const updatedTasks = tasks.map(t => {
       const matchById = t.clientId && t.clientId === id;
       const matchByName = (oldTradeName && (t.clientName || '').trim().toLowerCase() === oldTradeName) ||
                           (oldLegalName && (t.clientName || '').trim().toLowerCase() === oldLegalName);
 
       if (matchById || matchByName) {
-        tasksChanged = true;
         const taskUpdate: TaskItem = {
           ...t,
           clientId: id,
@@ -1193,16 +954,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return t;
     });
 
-    if (tasksChanged) {
-      const cleanTasks = deduplicateTasks(updatedTasks, cleanClients);
-      setTasks(cleanTasks);
-      StorageService.saveTasks(cleanTasks);
-    }
+    const cleanTasks = deduplicateTasks(updatedTasks, cleanClients);
+    setTasks(cleanTasks);
+    StorageService.saveTasks(cleanTasks);
 
     // 5. Trigger Online Sync with updated data
     OnlineDataService.scheduleAutoOnlineSync({
       clients: cleanClients,
-      tasks: tasksChanged ? updatedTasks : tasks,
+      tasks: cleanTasks,
       team: StorageService.getTeam(),
       extraWork: StorageService.getExtraWork(),
       documents: StorageService.getDocuments(),
@@ -1389,6 +1148,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!checkGuestWriteAllowed()) return;
     StorageService.recordDeletedTaskId(id);
     const taskToDelete = tasks.find(t => t.id === id);
+    if (taskToDelete && taskToDelete.clientId && taskToDelete.title) {
+      const sig = `sig:${taskToDelete.clientId}::${taskToDelete.title.trim().toLowerCase().replace(/[^a-z0-9]/g, '')}`;
+      StorageService.recordDeletedTaskId(sig);
+    }
     const updatedTasks = tasks.filter(t => t.id !== id);
     setTasks(updatedTasks);
     StorageService.saveTasks(updatedTasks);

@@ -1,6 +1,6 @@
 import { Client, TaskItem, UserProfile, ExtraWorkItem, DocumentItem, AuditLog, SystemSettings, AttendanceRecord, AIMemoryItem, GuestLead } from '../types';
 import { SEED_CLIENTS, SEED_TASKS, SEED_TEAM_MEMBERS, SEED_EXTRA_WORK, SEED_DOCUMENTS, SEED_AUDIT_LOGS, INITIAL_SYSTEM_SETTINGS } from '../data/seedData';
-import { resolveClientApplicability } from '../utils/complianceApplicability';
+import { resolveClientApplicability, isTaskAllowedForClientTaxIds, generateMissingTasksForClientTaxIds } from '../utils/complianceApplicability';
 
 const KEYS = {
   CLIENTS: 'taskvaani_clients_v1',
@@ -69,15 +69,33 @@ const normalizeTaskKey = (s?: string) => (s || '').trim().toLowerCase().replace(
  * Deduplicate compliance tasks across clients and periods.
  * Preserves completed ('DONE') or 'IN_PROGRESS' tasks over 'PENDING' duplicates.
  * Links tasks to actual client.id if matching by client name.
+ * Strictly enforces that compliance tasks only exist for the Tax ID columns populated in Client Master
+ * (PAN -> ITR, GSTIN -> GSTR-1/3B, TAN -> TDS Challan 281, VAT -> VAT Returns).
  */
 export const deduplicateTasks = (taskList: TaskItem[], currentClients?: Client[]): TaskItem[] => {
   if (!Array.isArray(taskList)) return [];
 
+  const deletedClientSet = new Set(safeGet<string[]>(KEYS.DELETED_CLIENT_IDS, []));
+  const rawClients = Array.isArray(currentClients)
+    ? currentClients
+    : safeGet<Client[]>(getScopedKey(KEYS.CLIENTS).key, []);
+  const activeClients = rawClients.filter(c => c && !deletedClientSet.has(c.id));
+
   const nameToIdMap = new Map<string, string>();
-  if (Array.isArray(currentClients)) {
-    for (const c of currentClients) {
-      if (c.tradeName) nameToIdMap.set(normalizeTaskKey(c.tradeName), c.id);
-      if (c.legalName) nameToIdMap.set(normalizeTaskKey(c.legalName), c.id);
+  const clientByIdMap = new Map<string, Client>();
+  const clientByNameMap = new Map<string, Client>();
+
+  for (const c of activeClients) {
+    if (c.id) clientByIdMap.set(c.id, c);
+    if (c.tradeName) {
+      const k = normalizeTaskKey(c.tradeName);
+      nameToIdMap.set(k, c.id);
+      clientByNameMap.set(k, c);
+    }
+    if (c.legalName) {
+      const k = normalizeTaskKey(c.legalName);
+      nameToIdMap.set(k, c.id);
+      if (!clientByNameMap.has(k)) clientByNameMap.set(k, c);
     }
   }
 
@@ -95,6 +113,15 @@ export const deduplicateTasks = (taskList: TaskItem[], currentClients?: Client[]
     let targetClientId = t.clientId;
     if (normClientName && nameToIdMap.has(normClientName)) {
       targetClientId = nameToIdMap.get(normClientName)!;
+    }
+
+    const matchedClient =
+      (targetClientId ? clientByIdMap.get(targetClientId) : undefined) ||
+      (normClientName ? clientByNameMap.get(normClientName) : undefined);
+
+    // STRICT CHECK: Only allow compliance tasks if the client has the corresponding Tax ID in Client Master
+    if (matchedClient && !isTaskAllowedForClientTaxIds(t, matchedClient)) {
+      continue;
     }
 
     const clientKey = normClientName || normalizeTaskKey(targetClientId);
@@ -117,6 +144,33 @@ export const deduplicateTasks = (taskList: TaskItem[], currentClients?: Client[]
         uniqueMap.set(compositeKey, taskWithHarmonizedId);
       } else if (taskWithHarmonizedId.status === 'IN_PROGRESS' && existing.status === 'PENDING') {
         uniqueMap.set(compositeKey, taskWithHarmonizedId);
+      }
+    }
+  }
+
+  // Ensure every active client has compliance tasks for the Tax ID columns that have data in Client Master
+  if (activeClients.length > 0 && (taskList.length > 0 || activeClients.length > 0)) {
+    const deletedTaskSet = new Set(safeGet<string[]>(KEYS.DELETED_TASK_IDS, []));
+    const savedSettings = safeGet<SystemSettings>(KEYS.SETTINGS, INITIAL_SYSTEM_SETTINGS);
+    const defaultTaxYear = savedSettings?.selectedTaxYear || 'Tax Year 2026-27';
+    const currentValidTasks = Array.from(uniqueMap.values());
+
+    for (const c of activeClients) {
+      const normTrade = normalizeTaskKey(c.tradeName);
+      const clientTasks = currentValidTasks.filter(
+        t => (t.clientId && t.clientId === c.id) || normalizeTaskKey(t.clientName) === normTrade
+      );
+      const missingTasks = generateMissingTasksForClientTaxIds(c, clientTasks, deletedTaskSet, defaultTaxYear);
+      for (const mt of missingTasks) {
+        const normTitle = normalizeTaskKey(mt.title);
+        const normCategory = normalizeTaskKey(mt.category);
+        const normDate = normalizeTaskKey(mt.dueDate || mt.dueDayOrDate || mt.financialYear);
+        const isMonthly = mt.frequency === 'MONTHLY' || normTitle.includes('monthly') || normTitle.includes('gstr') || normTitle.includes('challan 281');
+        const dateKey = isMonthly ? '' : `::${normDate}`;
+        const compositeKey = `${normTrade || normalizeTaskKey(c.id)}::${normCategory}::${normTitle}${dateKey}`;
+        if (!uniqueMap.has(compositeKey)) {
+          uniqueMap.set(compositeKey, mt);
+        }
       }
     }
   }
@@ -166,7 +220,10 @@ export const deduplicateClients = (clients: Client[]): Client[] => {
     });
 
     if (existingIdx === -1) {
-      uniqueClients.push(c);
+      uniqueClients.push({
+        ...c,
+        complianceApplicability: resolveClientApplicability(c)
+      });
     } else {
       const u = uniqueClients[existingIdx];
       const resolvedPan = (c.pan && c.pan !== 'PAN-PENDING')
@@ -174,14 +231,11 @@ export const deduplicateClients = (clients: Client[]): Client[] => {
         : (u.pan && u.pan !== 'PAN-PENDING' ? u.pan : (c.pan || u.pan || 'PAN-PENDING'));
       const resolvedGst = c.gstin || u.gstin || undefined;
       const resolvedTan = c.tan || u.tan || undefined;
-      const resolvedVat = (c.vatNumber && c.vatNumber.trim().length >= 4)
+      const resolvedVat = (c.vatNumber && c.vatNumber.trim().length >= 3)
         ? c.vatNumber.trim()
-        : (u.vatNumber && u.vatNumber.trim().length >= 4 ? u.vatNumber.trim() : undefined);
+        : (u.vatNumber && u.vatNumber.trim().length >= 3 ? u.vatNumber.trim() : undefined);
 
-      const baseApp = resolveClientApplicability(u);
-      const newApp = c.complianceApplicability ? resolveClientApplicability(c) : baseApp;
-
-      uniqueClients[existingIdx] = {
+      const mergedClient: Client = {
         ...u,
         ...c,
         id: u.id || c.id,
@@ -208,14 +262,9 @@ export const deduplicateClients = (clients: Client[]): Client[] => {
         googleDriveFolderUrl: c.googleDriveFolderUrl || u.googleDriveFolderUrl,
         repositoryDocs: (c.repositoryDocs && c.repositoryDocs.length > 0) ? c.repositoryDocs : u.repositoryDocs,
         customFields: (c.customFields && c.customFields.length > 0) ? c.customFields : u.customFields,
-        complianceApplicability: {
-          ...baseApp,
-          ...newApp,
-          GST: !!(resolvedGst && resolvedGst.length === 15),
-          VAT: !!(resolvedVat && resolvedVat.length >= 4),
-          TDS: !!(resolvedTan && resolvedTan.length === 10) || baseApp.TDS || newApp.TDS
-        }
       };
+      mergedClient.complianceApplicability = resolveClientApplicability(mergedClient);
+      uniqueClients[existingIdx] = mergedClient;
     }
   }
 
@@ -277,10 +326,7 @@ export const mergeClients = (localClients: Client[], incomingClients: Client[]):
         ? existing.vatNumber.trim()
         : ((inc.vatNumber && inc.vatNumber.trim().length >= 4) ? inc.vatNumber.trim() : undefined);
 
-      const baseApp = resolveClientApplicability(existing);
-      const incApp = inc.complianceApplicability ? resolveClientApplicability(inc) : baseApp;
-
-      mergedList[existingIdx] = {
+      const mergedRecord: Client = {
         ...inc,
         ...existing,
         serialNumber: existing.serialNumber || inc.serialNumber,
@@ -301,20 +347,14 @@ export const mergeClients = (localClients: Client[], incomingClients: Client[]):
         assignedTeamName: existing.assignedTeamName || inc.assignedTeamName,
         googleDriveFolderId: existing.googleDriveFolderId || inc.googleDriveFolderId,
         googleDriveFolderUrl: existing.googleDriveFolderUrl || inc.googleDriveFolderUrl,
-        complianceApplicability: existing.complianceApplicability
-          ? { ...baseApp, ...existing.complianceApplicability }
-          : (inc.complianceApplicability
-              ? { ...incApp, ...inc.complianceApplicability }
-              : {
-                  ...incApp,
-                  ...baseApp,
-                  VAT: !!(resolvedVat && resolvedVat.length >= 4),
-                  GST: !!(resolvedGst && resolvedGst.length === 15),
-                  TDS: !!(resolvedTan && resolvedTan.length === 10) || baseApp.TDS || incApp.TDS
-                })
       };
+      mergedRecord.complianceApplicability = resolveClientApplicability(mergedRecord);
+      mergedList[existingIdx] = mergedRecord;
     } else {
-      mergedList.push(inc);
+      mergedList.push({
+        ...inc,
+        complianceApplicability: resolveClientApplicability(inc)
+      });
     }
   }
 

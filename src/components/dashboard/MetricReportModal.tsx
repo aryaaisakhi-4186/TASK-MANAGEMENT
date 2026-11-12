@@ -597,6 +597,11 @@ export const MetricReportModal: React.FC<Props> = ({
                                     <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
                                   </div>
                                 )}
+                                {tax.tan && (
+                                  <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                                    <span className="font-sans font-bold text-[9px]">TAN: </span>{tax.tan}
+                                  </div>
+                                )}
                               </div>
                             );
                           } else if (tax.isVat) {
@@ -613,6 +618,11 @@ export const MetricReportModal: React.FC<Props> = ({
                                 {tax.pan && (
                                   <div className="text-[10px] text-slate-500">
                                     <span className="font-sans font-medium text-[9px]">PAN: </span>{tax.pan}
+                                  </div>
+                                )}
+                                {tax.tan && (
+                                  <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                                    <span className="font-sans font-bold text-[9px]">TAN: </span>{tax.tan}
                                   </div>
                                 )}
                               </div>
@@ -649,6 +659,11 @@ export const MetricReportModal: React.FC<Props> = ({
                                 {tax.gstin && (
                                   <div className="text-[10px] text-slate-500 truncate max-w-[130px]">
                                     <span className="font-sans font-medium text-[9px]">GST: </span>{tax.gstin}
+                                  </div>
+                                )}
+                                {tax.tan && (
+                                  <div className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                                    <span className="font-sans font-bold text-[9px]">TAN: </span>{tax.tan}
                                   </div>
                                 )}
                               </div>
